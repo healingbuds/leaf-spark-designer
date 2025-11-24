@@ -245,18 +245,22 @@ const Header = () => {
               Contact Us
             </Link>
             
-            {/* Mobile Buttons */}
+            {/* Mobile Buttons - Floating Style */}
             <div className="pt-4 space-y-3 border-t border-white/20 mt-4">
               <button 
                 onClick={() => {
                   setMobileMenuOpen(false);
                   setEligibilityDialogOpen(true);
                 }}
-                className="w-full font-body font-semibold text-sm text-white border-2 border-white px-5 py-2.5 rounded-full transition-all duration-200 hover:bg-white/10"
+                className="w-full font-body font-semibold text-sm text-white border-2 border-white bg-white/5 px-5 py-3 rounded-full transition-all duration-300 hover:bg-white/10 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+                style={{ boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)' }}
               >
                 Eligibility Check
               </button>
-              <button className="w-full font-body font-semibold text-sm text-white border-2 border-white px-5 py-2.5 rounded-full transition-all duration-200 hover:bg-white/10">
+              <button 
+                className="w-full font-body font-semibold text-sm text-white border-2 border-white bg-white/5 px-5 py-3 rounded-full transition-all duration-300 hover:bg-white/10 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+                style={{ boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)' }}
+              >
                 Patient Sign-In
               </button>
             </div>
@@ -265,21 +269,25 @@ const Header = () => {
       </div>
     </header>
 
-    {/* Buttons underneath navbar - desktop only */}
+    {/* Buttons underneath navbar - desktop: liquid, mobile: floating */}
     <div className="hidden md:block fixed top-24 md:top-32 left-4 z-40">
       <div className="flex gap-3">
         <button 
           onClick={() => setEligibilityDialogOpen(true)}
-          className="font-body font-semibold text-sm text-white border-2 border-white px-8 py-1.5 rounded-full transition-all duration-200 hover:bg-white/10 hover:shadow-glow backdrop-blur-md"
+          className="relative font-body font-semibold text-sm text-white border-2 border-white px-8 py-2 rounded-full overflow-hidden group backdrop-blur-md"
           style={{ backgroundColor: 'rgba(42, 61, 58, 0.7)' }}
         >
-          Eligibility Check
+          <span className="relative z-10">Eligibility Check</span>
+          <span className="absolute inset-0 bg-white/0 group-hover:bg-white/20 transition-all duration-500 ease-out transform scale-x-0 group-hover:scale-x-100 origin-left"></span>
+          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000 ease-in-out"></span>
         </button>
         <button 
-          className="font-body font-semibold text-sm text-white border-2 border-white px-8 py-1.5 rounded-full transition-all duration-200 hover:bg-white/10 hover:shadow-glow backdrop-blur-md"
+          className="relative font-body font-semibold text-sm text-white border-2 border-white px-8 py-2 rounded-full overflow-hidden group backdrop-blur-md"
           style={{ backgroundColor: 'rgba(42, 61, 58, 0.7)' }}
         >
-          Patient Sign-In
+          <span className="relative z-10">Patient Sign-In</span>
+          <span className="absolute inset-0 bg-white/0 group-hover:bg-white/20 transition-all duration-500 ease-out transform scale-x-0 group-hover:scale-x-100 origin-left"></span>
+          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000 ease-in-out"></span>
         </button>
       </div>
     </div>

@@ -158,7 +158,7 @@ const ManufactureDistribution = () => {
                   onClick={() => setActiveRegion("brazil")}
                   className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
                     activeRegion === "brazil"
-                      ? "bg-teal-primary text-white shadow-md"
+                      ? "bg-primary text-white shadow-md"
                       : "bg-muted/50 text-muted-foreground hover:bg-muted hover-border"
                   }`}
                 >
@@ -168,7 +168,7 @@ const ManufactureDistribution = () => {
                   onClick={() => setActiveRegion("canada")}
                   className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
                     activeRegion === "canada"
-                      ? "bg-teal-primary text-white shadow-md"
+                      ? "bg-primary text-white shadow-md"
                       : "bg-muted/50 text-muted-foreground hover:bg-muted hover-border"
                   }`}
                 >
@@ -178,7 +178,7 @@ const ManufactureDistribution = () => {
                   onClick={() => setActiveRegion("australasia")}
                   className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
                     activeRegion === "australasia"
-                      ? "bg-teal-primary text-white shadow-md"
+                      ? "bg-primary text-white shadow-md"
                       : "bg-muted/50 text-muted-foreground hover:bg-muted hover-border"
                   }`}
                 >

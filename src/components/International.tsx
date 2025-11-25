@@ -17,7 +17,7 @@ const International = () => {
       case 'LIVE':
         return 'bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 text-emerald-700 border-emerald-300/50 shadow-emerald-200/50';
       case 'NEXT':
-        return 'bg-gradient-to-r from-blue-500/20 to-blue-600/20 text-blue-700 border-blue-300/50 shadow-blue-200/50';
+        return 'bg-gradient-to-r from-primary/20 to-primary-dark/20 text-primary border-primary/30 shadow-primary/20';
       case 'UPCOMING':
         return 'bg-gradient-to-r from-slate-500/20 to-slate-600/20 text-slate-700 border-slate-300/50 shadow-slate-200/50';
     }

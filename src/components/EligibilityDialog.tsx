@@ -461,7 +461,7 @@ const EligibilityDialog = ({ open, onOpenChange }: EligibilityDialogProps) => {
                 )}
               </div>
 
-              <div className="bg-pharma-blue-light/10 border border-pharma-blue/20 p-4 rounded-lg">
+              <div className="bg-primary/10 border border-primary/20 p-4 rounded-lg">
                 <p className="font-body text-sm text-pharma-charcoal leading-relaxed">
                   <strong>Note:</strong> This assessment does not constitute medical advice or guarantee approval for medical cannabis treatment. A qualified healthcare professional will review your application and may contact you for additional information or consultation.
                 </p>
@@ -500,14 +500,14 @@ const EligibilityDialog = ({ open, onOpenChange }: EligibilityDialogProps) => {
                 </>
               ) : (
                 <>
-                  <AlertCircle className="w-20 h-20 text-pharma-blue" />
+                  <AlertCircle className="w-20 h-20 text-primary" />
                   <h3 className="font-pharma text-2xl font-bold text-pharma-charcoal">
                     Additional Information Required
                   </h3>
                   <p className="font-body text-pharma-grey max-w-md">
                     Thank you for your application. Based on the information provided, we need to gather some additional details to properly assess your eligibility. Our team will contact you shortly to discuss your options.
                   </p>
-                  <div className="bg-pharma-blue-light/10 border border-pharma-blue/20 p-4 rounded-lg mt-4">
+                  <div className="bg-primary/10 border border-primary/20 p-4 rounded-lg mt-4">
                     <p className="font-body text-sm text-pharma-charcoal">
                       We've sent a confirmation email to <strong>{formData.email}</strong>. A healthcare professional will reach out within 2-3 business days.
                     </p>

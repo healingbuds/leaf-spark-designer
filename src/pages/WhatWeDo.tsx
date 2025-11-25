@@ -68,7 +68,7 @@ const WhatWeDo = () => {
               {/* Cultivating & Processing */}
               <ScrollAnimation delay={0.1}>
                 <div className="card-linear p-7 hover-lift">
-                <div className="w-12 h-12 bg-teal-primary rounded-xl flex items-center justify-center mb-5">
+                <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-5">
                   <Leaf className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-3 tracking-tight">Cultivating & Processing</h3>
@@ -81,7 +81,7 @@ const WhatWeDo = () => {
               {/* Manufacture & Distribution */}
               <ScrollAnimation delay={0.2}>
                 <div className="card-linear p-7 hover-lift">
-                <div className="w-12 h-12 bg-teal-primary rounded-xl flex items-center justify-center mb-5">
+                <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-5">
                   <FlaskConical className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-3 tracking-tight">Manufacture & Distribution</h3>
@@ -94,7 +94,7 @@ const WhatWeDo = () => {
               {/* Medical Cannabis Clinics */}
               <ScrollAnimation delay={0.3}>
                 <div className="card-linear p-7 hover-lift">
-                <div className="w-12 h-12 bg-teal-primary rounded-xl flex items-center justify-center mb-5">
+                <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-5">
                   <Users className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-3 tracking-tight">Medical Cannabis Clinics</h3>
@@ -107,7 +107,7 @@ const WhatWeDo = () => {
               {/* Online Pharmacy */}
               <ScrollAnimation delay={0.4}>
                 <div className="card-linear p-7 hover-lift">
-                <div className="w-12 h-12 bg-teal-primary rounded-xl flex items-center justify-center mb-5">
+                <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-5">
                   <Users className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-3 tracking-tight">Online Medical Cannabis Pharmacy</h3>
@@ -121,7 +121,7 @@ const WhatWeDo = () => {
         </section>
 
         {/* Core Values Section - Linear style */}
-        <section className="py-20 md:py-32 bg-teal-primary">
+        <section className="py-20 md:py-32" style={{ backgroundColor: 'hsl(var(--section-color))' }}>
           <div className="container mx-auto px-3 sm:px-4 lg:px-6">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white text-center mb-16 md:mb-20 tracking-tight">
               We cultivate beyond cannabis
@@ -168,7 +168,7 @@ const WhatWeDo = () => {
               We bring together expert cultivators, world-class researchers, and a commitment to quality that sets us apart in the cannabis industry.
             </p>
             <Link to="/contact">
-              <button className="btn-linear bg-teal-primary hover:bg-teal-primary/90 text-white px-7 py-3">
+              <button className="btn-primary px-7 py-3">
                 Get in touch →
               </button>
             </Link>

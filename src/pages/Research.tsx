@@ -91,7 +91,7 @@ const Research = () => {
         </section>
 
         {/* Research Areas - Linear style */}
-        <section className="py-20 md:py-32 bg-teal-primary">
+        <section className="py-20 md:py-32" style={{ backgroundColor: 'hsl(var(--section-color))' }}>
           <div className="container mx-auto px-3 sm:px-4 lg:px-6">
             <h2 className="text-4xl md:text-5xl font-semibold text-white text-center mb-16 md:mb-20 tracking-tight">
               Our Research Focus Areas
@@ -129,7 +129,7 @@ const Research = () => {
               Learn more about our ongoing studies and how we're advancing cannabis science.
             </p>
             <Link to="/contact">
-              <button className="btn-linear bg-teal-primary hover:bg-teal-primary/90 text-white px-7 py-3">
+              <button className="btn-primary px-7 py-3">
                 Contact our research team →
               </button>
             </Link>

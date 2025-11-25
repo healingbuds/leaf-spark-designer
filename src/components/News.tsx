@@ -75,7 +75,7 @@ const News = () => {
                 >
                   {item.category}
                 </Badge>
-                <h3 className="font-geist text-xl font-semibold text-foreground mb-2 leading-tight group-hover:text-teal-primary transition-colors tracking-tight">
+                <h3 className="font-geist text-xl font-semibold text-foreground mb-2 leading-tight group-hover:text-primary transition-colors tracking-tight">
                   {item.title}
                 </h3>
                 {item.description && (

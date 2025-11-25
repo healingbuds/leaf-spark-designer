@@ -7,6 +7,12 @@ import { Users, Heart, FileText } from "lucide-react";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import medicalProducts from "@/assets/medical-products-hq.jpg";
+import clinicConsultation from "@/assets/clinic-consultation.jpg";
+import clinicSouthAfrica from "@/assets/clinic-south-africa.jpg";
+import clinicUK from "@/assets/clinic-uk.jpg";
+import clinicThailand from "@/assets/clinic-thailand.jpg";
+import clinicPortugal from "@/assets/clinic-portugal.jpg";
+import clinicDoctorPatient from "@/assets/clinic-doctor-patient.jpg";
 
 const MedicalClinics = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -49,9 +55,11 @@ const MedicalClinics = () => {
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
                 <ScrollAnimation>
-                  <div className="card-linear h-[400px] flex items-center justify-center">
-                    <p className="text-muted-foreground">Clinic Consultation</p>
-                  </div>
+                  <img 
+                    src={clinicConsultation} 
+                    alt="Medical cannabis clinic consultation"
+                    className="w-full h-[400px] object-cover rounded-2xl shadow-lg"
+                  />
                 </ScrollAnimation>
                 <ScrollAnimation delay={0.2}>
                   <h2 className="text-4xl font-semibold text-foreground leading-tight mb-6">
@@ -127,9 +135,11 @@ const MedicalClinics = () => {
                 {/* South Africa */}
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                   <ScrollAnimation>
-                    <div className="card-linear h-[400px] flex items-center justify-center">
-                      <p className="text-muted-foreground">South Africa Clinic</p>
-                    </div>
+                    <img 
+                      src={clinicSouthAfrica} 
+                      alt="Medical cannabis clinic in South Africa"
+                      className="w-full h-[400px] object-cover rounded-2xl shadow-lg"
+                    />
                   </ScrollAnimation>
                   <ScrollAnimation delay={0.2}>
                     <h2 className="text-4xl font-semibold text-foreground mb-6">In South Africa</h2>
@@ -154,18 +164,22 @@ const MedicalClinics = () => {
                     </p>
                   </ScrollAnimation>
                   <ScrollAnimation delay={0.2}>
-                    <div className="card-linear h-[400px] flex items-center justify-center">
-                      <p className="text-muted-foreground">UK Clinic Network</p>
-                    </div>
+                    <img 
+                      src={clinicUK} 
+                      alt="Medical cannabis clinic network in the United Kingdom"
+                      className="w-full h-[400px] object-cover rounded-2xl shadow-lg"
+                    />
                   </ScrollAnimation>
                 </div>
 
                 {/* Thailand */}
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                   <ScrollAnimation>
-                    <div className="card-linear h-[400px] flex items-center justify-center">
-                      <p className="text-muted-foreground">Thailand Clinics</p>
-                    </div>
+                    <img 
+                      src={clinicThailand} 
+                      alt="Medical cannabis clinics in Thailand"
+                      className="w-full h-[400px] object-cover rounded-2xl shadow-lg"
+                    />
                   </ScrollAnimation>
                   <ScrollAnimation delay={0.2}>
                     <h2 className="text-4xl font-semibold text-foreground mb-6">In Thailand</h2>
@@ -190,9 +204,11 @@ const MedicalClinics = () => {
                     </p>
                   </ScrollAnimation>
                   <ScrollAnimation delay={0.2}>
-                    <div className="card-linear h-[400px] flex items-center justify-center">
-                      <p className="text-muted-foreground">Portugal Facilities</p>
-                    </div>
+                    <img 
+                      src={clinicPortugal} 
+                      alt="Medical cannabis clinic facilities in Portugal"
+                      className="w-full h-[400px] object-cover rounded-2xl shadow-lg"
+                    />
                   </ScrollAnimation>
                 </div>
               </div>
@@ -225,9 +241,11 @@ const MedicalClinics = () => {
               <div className="max-w-4xl mx-auto">
                 <div className="grid md:grid-cols-2 gap-8 items-center">
                   <ScrollAnimation>
-                    <div className="card-linear h-[300px] flex items-center justify-center">
-                      <p className="text-muted-foreground">Clinic Consultation</p>
-                    </div>
+                    <img 
+                      src={clinicDoctorPatient} 
+                      alt="Doctor consulting with patient about medical cannabis"
+                      className="w-full h-[300px] object-cover rounded-2xl shadow-lg"
+                    />
                   </ScrollAnimation>
                   <ScrollAnimation delay={0.2}>
                     <h2 className="text-3xl font-semibold text-foreground mb-6">

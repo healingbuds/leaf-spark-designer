@@ -156,15 +156,15 @@ const International = () => {
                 </h4>
                 <div className="grid sm:grid-cols-3 gap-4">
                   <div className="group flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br from-card to-card/80 border border-border/30 shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300">
-                    <div className="w-5 h-5 rounded-full shadow-md group-hover:scale-110 transition-transform duration-300" style={{ backgroundColor: 'hsl(164, 80%, 38%)' }} />
+                    <div className="w-5 h-5 rounded-full shadow-md group-hover:scale-110 transition-transform duration-300" style={{ backgroundColor: 'hsl(82, 55%, 62%)' }} />
                     <span className="text-sm text-foreground font-geist font-semibold">Operations & Sales</span>
                   </div>
                   <div className="group flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br from-card to-card/80 border border-border/30 shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300">
-                    <div className="w-5 h-5 rounded-full shadow-md group-hover:scale-110 transition-transform duration-300" style={{ backgroundColor: 'hsl(178, 48%, 33%)' }} />
+                    <div className="w-5 h-5 rounded-full shadow-md group-hover:scale-110 transition-transform duration-300" style={{ backgroundColor: 'hsl(88, 48%, 58%)' }} />
                     <span className="text-sm text-foreground font-geist font-semibold">Export Sales Only</span>
                   </div>
                   <div className="group flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br from-card to-card/80 border border-border/30 shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300">
-                    <div className="w-5 h-5 rounded-full shadow-md group-hover:scale-110 transition-transform duration-300" style={{ backgroundColor: 'hsl(171, 12%, 66%)' }} />
+                    <div className="w-5 h-5 rounded-full shadow-md group-hover:scale-110 transition-transform duration-300" style={{ backgroundColor: 'hsl(85, 42%, 70%)' }} />
                     <span className="text-sm text-foreground font-geist font-semibold">Operations Only</span>
                   </div>
                 </div>

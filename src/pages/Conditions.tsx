@@ -118,7 +118,7 @@ const Conditions = () => {
               <ScrollAnimation>
                 <div className="max-w-5xl">
                   <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 tracking-tight leading-[1.1]">
-                    Conditions
+                    Eligible Conditions
                   </h1>
                   <p className="text-xl md:text-2xl text-muted-foreground/80 max-w-3xl font-light mb-8">
                     At Healing Buds, we see patients when prescribed cannabis is an appropriate treatment option. Medical cannabis can be prescribed for a wide range of conditions where other treatments have failed.

@@ -124,7 +124,7 @@ const Header = () => {
                   className="block px-4 py-3 text-foreground hover:bg-muted transition-colors border-b border-border"
                   onClick={() => setWhatWeDoOpen(false)}
                 >
-                  <div className="font-medium">Conditions</div>
+                  <div className="font-medium">Eligible Conditions</div>
                   <div className="text-sm text-muted-foreground">Treatable conditions with medical cannabis</div>
                 </Link>
                 <Link
@@ -241,7 +241,7 @@ const Header = () => {
                   className="block text-xs text-white/80 hover:text-white py-1 transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Conditions
+                  Eligible Conditions
                 </Link>
                 <Link 
                   to="/medical-clinics" 

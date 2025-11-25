@@ -59,7 +59,7 @@ const ComplexRegionalPainSyndrome = () => {
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                 <ChevronRight className="w-4 h-4" />
-                <Link to="/conditions" className="hover:text-primary transition-colors">Conditions</Link>
+                <Link to="/conditions" className="hover:text-primary transition-colors">Eligible Conditions</Link>
                 <ChevronRight className="w-4 h-4" />
                 <span className="text-foreground">Complex Regional Pain Syndrome</span>
               </div>
@@ -294,7 +294,7 @@ const ComplexRegionalPainSyndrome = () => {
                     </Link>
                     <Link to="/conditions">
                       <button className="btn-linear text-white border border-white/30 hover:bg-white/10 px-8 py-3 text-lg">
-                        View All Conditions
+                        View All Eligible Conditions
                       </button>
                     </Link>
                   </div>

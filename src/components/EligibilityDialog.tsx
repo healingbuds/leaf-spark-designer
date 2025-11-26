@@ -148,12 +148,12 @@ const EligibilityDialog = ({ open, onOpenChange }: EligibilityDialogProps) => {
   };
 
   const renderProgressBar = () => (
-    <div className="flex items-center justify-between mb-8">
+    <div className="flex items-center justify-between mb-6 sm:mb-8">
       {[1, 2, 3, 4].map((step) => (
         <div key={step} className="flex items-center flex-1">
           <div
             className={cn(
-              "w-8 h-8 rounded-full flex items-center justify-center text-sm font-pharma font-semibold transition-all duration-200",
+              "w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-pharma font-semibold transition-all duration-200",
               currentStep >= step
                 ? "bg-pharma-green text-white"
                 : "bg-pharma-grey-light text-pharma-grey"
@@ -164,7 +164,7 @@ const EligibilityDialog = ({ open, onOpenChange }: EligibilityDialogProps) => {
           {step < 4 && (
             <div
               className={cn(
-                "flex-1 h-1 mx-2 rounded transition-all duration-200",
+                "flex-1 h-1 mx-1 sm:mx-2 rounded transition-all duration-200",
                 currentStep > step ? "bg-pharma-green" : "bg-pharma-grey-light"
               )}
             />
@@ -176,7 +176,7 @@ const EligibilityDialog = ({ open, onOpenChange }: EligibilityDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="font-pharma text-2xl text-pharma-charcoal">
             Medical Cannabis Eligibility Assessment
@@ -194,7 +194,7 @@ const EligibilityDialog = ({ open, onOpenChange }: EligibilityDialogProps) => {
             <div className="space-y-4">
               <h3 className="font-pharma text-lg font-semibold text-pharma-charcoal">Personal Information</h3>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="firstName" className="font-body">First Name *</Label>
                   <Input
@@ -272,7 +272,9 @@ const EligibilityDialog = ({ open, onOpenChange }: EligibilityDialogProps) => {
                       onSelect={(date) => step1Form.setValue('dateOfBirth', date as Date)}
                       disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
                       initialFocus
-                      className="pointer-events-auto"
+                      captionLayout="dropdown-buttons"
+                      fromYear={1900}
+                      toYear={new Date().getFullYear()}
                     />
                   </PopoverContent>
                 </Popover>

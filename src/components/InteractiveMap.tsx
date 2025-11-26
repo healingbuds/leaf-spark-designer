@@ -12,6 +12,9 @@ interface Location {
   cultivationArea?: string;
   productionCapacity?: string;
   certifications?: string[];
+  licensedPartner?: string;
+  regulatoryBody?: string;
+  medicalLicense?: boolean;
 }
 
 type CountryStatus = 'LIVE' | 'NEXT' | 'UPCOMING';
@@ -36,7 +39,7 @@ const countries: Record<string, Country> = {
     zoom: 5,
     status: 'LIVE',
     order: 1,
-    description: 'Fully operational cultivation and distribution hub',
+    description: 'Licensed partner facility - Fully compliant medical cannabis operations',
     locations: [
       { 
         name: 'Cape Town', 
@@ -44,7 +47,10 @@ const countries: Record<string, Country> = {
         type: 'operations-sales',
         cultivationArea: '15,000 m²',
         productionCapacity: '2,500 kg/year',
-        certifications: ['GMP', 'EU-GMP', 'ISO 9001']
+        certifications: ['GMP', 'EU-GMP', 'ISO 9001'],
+        licensedPartner: 'South African Health Products Regulatory Authority',
+        regulatoryBody: 'SAHPRA',
+        medicalLicense: true
       },
       { 
         name: 'Johannesburg', 
@@ -52,7 +58,10 @@ const countries: Record<string, Country> = {
         type: 'operations-only',
         cultivationArea: '8,000 m²',
         productionCapacity: '1,200 kg/year',
-        certifications: ['GMP', 'ISO 9001']
+        certifications: ['GMP', 'ISO 9001'],
+        licensedPartner: 'South African Health Products Regulatory Authority',
+        regulatoryBody: 'SAHPRA',
+        medicalLicense: true
       },
     ],
   },
@@ -62,7 +71,7 @@ const countries: Record<string, Country> = {
     zoom: 6,
     status: 'NEXT',
     order: 2,
-    description: 'EU gateway for medical cannabis operations',
+    description: 'Licensed EU partner facility - Primary European medical cannabis hub with full regulatory compliance',
     locations: [
       { 
         name: 'Lisbon', 
@@ -70,7 +79,10 @@ const countries: Record<string, Country> = {
         type: 'operations-sales',
         cultivationArea: '12,000 m²',
         productionCapacity: '2,000 kg/year',
-        certifications: ['EU-GMP', 'ISO 22000', 'Organic Certified']
+        certifications: ['EU-GMP', 'ISO 22000', 'Organic Certified'],
+        licensedPartner: 'INFARMED - Portuguese Medicines Authority',
+        regulatoryBody: 'INFARMED',
+        medicalLicense: true
       },
       { 
         name: 'Porto', 
@@ -78,7 +90,10 @@ const countries: Record<string, Country> = {
         type: 'export-only',
         cultivationArea: 'N/A',
         productionCapacity: 'N/A',
-        certifications: ['Export License']
+        certifications: ['Export License', 'EU Distribution'],
+        licensedPartner: 'INFARMED - Portuguese Medicines Authority',
+        regulatoryBody: 'INFARMED',
+        medicalLicense: true
       },
     ],
   },
@@ -88,7 +103,7 @@ const countries: Record<string, Country> = {
     zoom: 5,
     status: 'UPCOMING',
     order: 3,
-    description: 'Strategic UK market expansion',
+    description: 'Planned licensed partner facility - Subject to MHRA regulatory approval',
     locations: [
       { 
         name: 'London', 
@@ -96,7 +111,10 @@ const countries: Record<string, Country> = {
         type: 'operations-sales',
         cultivationArea: '10,000 m²',
         productionCapacity: '1,800 kg/year',
-        certifications: ['GMP', 'MHRA Approved']
+        certifications: ['GMP', 'MHRA Approved'],
+        licensedPartner: 'UK Medicines and Healthcare products Regulatory Agency',
+        regulatoryBody: 'MHRA',
+        medicalLicense: true
       },
       { 
         name: 'Manchester', 
@@ -104,7 +122,10 @@ const countries: Record<string, Country> = {
         type: 'export-only',
         cultivationArea: 'N/A',
         productionCapacity: 'N/A',
-        certifications: ['Export License']
+        certifications: ['Export License', 'UK Distribution'],
+        licensedPartner: 'UK Medicines and Healthcare products Regulatory Agency',
+        regulatoryBody: 'MHRA',
+        medicalLicense: true
       },
     ],
   },
@@ -310,17 +331,33 @@ const InteractiveMap = ({ selectedCountry, onCountrySelect }: InteractiveMapProp
           offset: 35, 
           className: 'map-popup',
           closeButton: false,
-          maxWidth: '340px',
+          maxWidth: '380px',
           closeOnClick: false,
         })
           .setHTML(`
             <div style="padding: 20px 22px; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: hsl(0, 0%, 100%); border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.1);">
+              <!-- Licensed Partner Badge -->
+              <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 9px; color: hsl(160, 84%, 39%); background: hsl(160, 84%, 96%); padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; margin-bottom: 10px; border: 1px solid hsl(160, 84%, 88%);">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="flex-shrink: 0;">
+                  <path d="M5 0L6.12257 3.45492H9.75528L6.81636 5.59017L7.93893 9.04508L5 6.90983L2.06107 9.04508L3.18364 5.59017L0.244718 3.45492H3.87743L5 0Z" fill="hsl(160, 84%, 39%)"/>
+                </svg>
+                Licensed Partner Facility
+              </div>
+              
               <div style="font-weight: 700; font-size: 18px; margin-bottom: 6px; color: hsl(142, 76%, 36%); letter-spacing: -0.4px; line-height: 1.2;">${countryData.name}</div>
               <div style="font-size: 15px; color: hsl(215, 16%, 47%); margin-bottom: 14px; font-weight: 500;">${location.name}</div>
               <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: hsl(142, 76%, 36%); background: hsl(142, 76%, 96%); padding: 6px 12px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; margin-bottom: 14px; border: 1px solid hsl(142, 76%, 88%);">
                 <div style="width: 6px; height: 6px; border-radius: 50%; background: hsl(142, 76%, 36%);"></div>
                 ${typeLabels[location.type]}
               </div>
+              
+              ${location.licensedPartner ? `
+              <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1.5px solid hsl(215, 20%, 94%);">
+                <div style="font-size: 10px; color: hsl(215, 16%, 47%); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">Regulatory Authority</div>
+                <div style="font-size: 12px; color: hsl(222.2, 84%, 4.9%); font-weight: 600; line-height: 1.4;">${location.licensedPartner}</div>
+                ${location.regulatoryBody ? `<div style="font-size: 10px; color: hsl(160, 84%, 39%); font-weight: 700; margin-top: 2px;">${location.regulatoryBody}</div>` : ''}
+              </div>
+              ` : ''}
               
               ${location.cultivationArea ? `
               <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1.5px solid hsl(215, 20%, 94%);">
@@ -343,9 +380,20 @@ const InteractiveMap = ({ selectedCountry, onCountrySelect }: InteractiveMapProp
                 </div>
               </div>
               
+              ${location.medicalLicense ? `
+              <div style="margin-bottom: 10px; padding: 8px 12px; background: hsl(173, 58%, 96%); border-radius: 8px; border: 1px solid hsl(173, 58%, 88%);">
+                <div style="font-size: 10px; color: hsl(173, 58%, 39%); font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;">✓ Medical Cannabis License Active</div>
+              </div>
+              ` : ''}
+              
               <div style="display: flex; align-items: center; justify-content: space-between;">
                 <span style="font-size: 11px; color: hsl(215, 16%, 47%); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px;">Status</span>
                 <span style="font-size: 13px; color: hsl(142, 76%, 36%); font-weight: 700; letter-spacing: 0.2px;">${countryData.status}</span>
+              </div>
+              
+              <!-- Compliance Disclaimer -->
+              <div style="margin-top: 12px; padding-top: 12px; border-top: 1.5px solid hsl(215, 20%, 94%); font-size: 9px; color: hsl(215, 16%, 47%); line-height: 1.5; font-style: italic;">
+                All operations conducted by licensed partners. Digital Key holders do not handle or sell cannabis products directly. Blockchain-verified seed-to-sale traceability ensures regulatory compliance.
               </div>
             </div>
           `);
@@ -362,6 +410,23 @@ const InteractiveMap = ({ selectedCountry, onCountrySelect }: InteractiveMapProp
 
   return (
     <div className="relative w-full h-full">
+      {/* Compliance Disclaimer Banner */}
+      <div className="absolute top-6 right-6 z-10 bg-secondary/95 backdrop-blur-sm rounded-xl shadow-lg border border-border/60 p-4 max-w-xs">
+        <div className="flex items-start gap-3">
+          <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-primary">
+              <path d="M6 0L7.34709 4.14589H11.7063L8.17963 6.70823L9.52671 10.8541L6 8.29177L2.47329 10.8541L3.82037 6.70823L0.293661 4.14589H4.65291L6 0Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <div>
+            <div className="text-xs font-bold text-foreground mb-1">Licensed Partner Network</div>
+            <p className="text-[10px] text-muted-foreground leading-relaxed">
+              All facilities operate under licensed partners with full regulatory compliance. Digital Key holders earn blockchain-verified rewards without handling cannabis products.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Layer Toggle Controls */}
       <div className="absolute top-6 left-6 z-10 bg-background/98 backdrop-blur-sm rounded-2xl shadow-2xl border border-border/60 p-3">
         <div className="flex flex-col gap-2">

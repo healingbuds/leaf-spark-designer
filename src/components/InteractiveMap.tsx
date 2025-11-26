@@ -331,74 +331,77 @@ const InteractiveMap = ({ selectedCountry, onCountrySelect }: InteractiveMapProp
             ).join('')
           : '<span style="font-size: 12px; color: hsl(215, 16%, 47%); font-style: italic;">None specified</span>';
 
+        const isMobile = window.innerWidth < 640;
         const popup = new maplibregl.Popup({ 
-          offset: 35, 
+          offset: isMobile ? 25 : 35, 
           className: 'map-popup',
           closeButton: false,
-          maxWidth: '380px',
+          maxWidth: isMobile ? '280px' : '380px',
           closeOnClick: false,
         })
           .setHTML(`
-            <div style="padding: 20px 22px; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: hsl(0, 0%, 100%); border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.1);">
+            <div style="padding: ${isMobile ? '14px 16px' : '20px 22px'}; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: hsl(0, 0%, 100%); border-radius: ${isMobile ? '12px' : '16px'}; box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.1);">
               <!-- Licensed Partner Badge -->
-              <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 9px; color: hsl(160, 84%, 39%); background: hsl(160, 84%, 96%); padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; margin-bottom: 10px; border: 1px solid hsl(160, 84%, 88%);">
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="flex-shrink: 0;">
+              <div style="display: inline-flex; align-items: center; gap: ${isMobile ? '4px' : '6px'}; font-size: ${isMobile ? '8px' : '9px'}; color: hsl(160, 84%, 39%); background: hsl(160, 84%, 96%); padding: ${isMobile ? '3px 8px' : '4px 10px'}; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; margin-bottom: ${isMobile ? '8px' : '10px'}; border: 1px solid hsl(160, 84%, 88%);">
+                <svg width="${isMobile ? '8' : '10'}" height="${isMobile ? '8' : '10'}" viewBox="0 0 10 10" fill="none" style="flex-shrink: 0;">
                   <path d="M5 0L6.12257 3.45492H9.75528L6.81636 5.59017L7.93893 9.04508L5 6.90983L2.06107 9.04508L3.18364 5.59017L0.244718 3.45492H3.87743L5 0Z" fill="hsl(160, 84%, 39%)"/>
                 </svg>
-                Licensed Partner Facility
+                Licensed Partner
               </div>
               
-              <div style="font-weight: 700; font-size: 18px; margin-bottom: 6px; color: hsl(142, 76%, 36%); letter-spacing: -0.4px; line-height: 1.2;">${countryData.name}</div>
-              <div style="font-size: 15px; color: hsl(215, 16%, 47%); margin-bottom: 14px; font-weight: 500;">${location.name}</div>
-              <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: hsl(142, 76%, 36%); background: hsl(142, 76%, 96%); padding: 6px 12px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; margin-bottom: 14px; border: 1px solid hsl(142, 76%, 88%);">
-                <div style="width: 6px; height: 6px; border-radius: 50%; background: hsl(142, 76%, 36%);"></div>
+              <div style="font-weight: 700; font-size: ${isMobile ? '15px' : '18px'}; margin-bottom: ${isMobile ? '4px' : '6px'}; color: hsl(142, 76%, 36%); letter-spacing: -0.4px; line-height: 1.2;">${countryData.name}</div>
+              <div style="font-size: ${isMobile ? '13px' : '15px'}; color: hsl(215, 16%, 47%); margin-bottom: ${isMobile ? '10px' : '14px'}; font-weight: 500;">${location.name}</div>
+              <div style="display: inline-flex; align-items: center; gap: ${isMobile ? '4px' : '6px'}; font-size: ${isMobile ? '9px' : '11px'}; color: hsl(142, 76%, 36%); background: hsl(142, 76%, 96%); padding: ${isMobile ? '4px 10px' : '6px 12px'}; border-radius: ${isMobile ? '6px' : '8px'}; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; margin-bottom: ${isMobile ? '10px' : '14px'}; border: 1px solid hsl(142, 76%, 88%);">
+                <div style="width: ${isMobile ? '5px' : '6px'}; height: ${isMobile ? '5px' : '6px'}; border-radius: 50%; background: hsl(142, 76%, 36%);"></div>
                 ${typeLabels[location.type]}
               </div>
               
               ${location.licensedPartner ? `
-              <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1.5px solid hsl(215, 20%, 94%);">
-                <div style="font-size: 10px; color: hsl(215, 16%, 47%); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">Regulatory Authority</div>
-                <div style="font-size: 12px; color: hsl(222.2, 84%, 4.9%); font-weight: 600; line-height: 1.4;">${location.licensedPartner}</div>
-                ${location.regulatoryBody ? `<div style="font-size: 10px; color: hsl(160, 84%, 39%); font-weight: 700; margin-top: 2px;">${location.regulatoryBody}</div>` : ''}
+              <div style="margin-bottom: ${isMobile ? '8px' : '10px'}; padding-bottom: ${isMobile ? '8px' : '10px'}; border-bottom: 1.5px solid hsl(215, 20%, 94%);">
+                <div style="font-size: ${isMobile ? '9px' : '10px'}; color: hsl(215, 16%, 47%); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: ${isMobile ? '3px' : '4px'};">Regulatory Authority</div>
+                <div style="font-size: ${isMobile ? '11px' : '12px'}; color: hsl(222.2, 84%, 4.9%); font-weight: 600; line-height: 1.4;">${location.licensedPartner}</div>
+                ${location.regulatoryBody ? `<div style="font-size: ${isMobile ? '9px' : '10px'}; color: hsl(160, 84%, 39%); font-weight: 700; margin-top: 2px;">${location.regulatoryBody}</div>` : ''}
               </div>
               ` : ''}
               
               ${location.cultivationArea ? `
-              <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1.5px solid hsl(215, 20%, 94%);">
-                <div style="font-size: 10px; color: hsl(215, 16%, 47%); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">Cultivation Area</div>
-                <div style="font-size: 14px; color: hsl(222.2, 84%, 4.9%); font-weight: 700;">${location.cultivationArea}</div>
+              <div style="margin-bottom: ${isMobile ? '8px' : '10px'}; padding-bottom: ${isMobile ? '8px' : '10px'}; border-bottom: 1.5px solid hsl(215, 20%, 94%);">
+                <div style="font-size: ${isMobile ? '9px' : '10px'}; color: hsl(215, 16%, 47%); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: ${isMobile ? '3px' : '4px'};">Cultivation Area</div>
+                <div style="font-size: ${isMobile ? '13px' : '14px'}; color: hsl(222.2, 84%, 4.9%); font-weight: 700;">${location.cultivationArea}</div>
               </div>
               ` : ''}
               
               ${location.productionCapacity ? `
-              <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1.5px solid hsl(215, 20%, 94%);">
-                <div style="font-size: 10px; color: hsl(215, 16%, 47%); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">Production Capacity</div>
-                <div style="font-size: 14px; color: hsl(222.2, 84%, 4.9%); font-weight: 700;">${location.productionCapacity}</div>
+              <div style="margin-bottom: ${isMobile ? '8px' : '10px'}; padding-bottom: ${isMobile ? '8px' : '10px'}; border-bottom: 1.5px solid hsl(215, 20%, 94%);">
+                <div style="font-size: ${isMobile ? '9px' : '10px'}; color: hsl(215, 16%, 47%); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: ${isMobile ? '3px' : '4px'};">Production Capacity</div>
+                <div style="font-size: ${isMobile ? '13px' : '14px'}; color: hsl(222.2, 84%, 4.9%); font-weight: 700;">${location.productionCapacity}</div>
               </div>
               ` : ''}
               
-              <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1.5px solid hsl(215, 20%, 94%);">
-                <div style="font-size: 10px; color: hsl(215, 16%, 47%); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">Certifications</div>
-                <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+              <div style="margin-bottom: ${isMobile ? '8px' : '10px'}; padding-bottom: ${isMobile ? '8px' : '10px'}; border-bottom: 1.5px solid hsl(215, 20%, 94%);">
+                <div style="font-size: ${isMobile ? '9px' : '10px'}; color: hsl(215, 16%, 47%); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: ${isMobile ? '4px' : '6px'};">Certifications</div>
+                <div style="display: flex; flex-wrap: wrap; gap: ${isMobile ? '3px' : '4px'};">
                   ${certificationsHtml}
                 </div>
               </div>
               
               ${location.medicalLicense ? `
-              <div style="margin-bottom: 10px; padding: 8px 12px; background: hsl(173, 58%, 96%); border-radius: 8px; border: 1px solid hsl(173, 58%, 88%);">
-                <div style="font-size: 10px; color: hsl(173, 58%, 39%); font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;">✓ Medical Cannabis License Active</div>
+              <div style="margin-bottom: ${isMobile ? '8px' : '10px'}; padding: ${isMobile ? '6px 10px' : '8px 12px'}; background: hsl(173, 58%, 96%); border-radius: ${isMobile ? '6px' : '8px'}; border: 1px solid hsl(173, 58%, 88%);">
+                <div style="font-size: ${isMobile ? '9px' : '10px'}; color: hsl(173, 58%, 39%); font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;">✓ Medical License Active</div>
               </div>
               ` : ''}
               
-              <div style="display: flex; align-items: center; justify-content: space-between;">
-                <span style="font-size: 11px; color: hsl(215, 16%, 47%); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px;">Status</span>
-                <span style="font-size: 13px; color: hsl(142, 76%, 36%); font-weight: 700; letter-spacing: 0.2px;">${countryData.status}</span>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: ${isMobile ? '8px' : '0'};">
+                <span style="font-size: ${isMobile ? '10px' : '11px'}; color: hsl(215, 16%, 47%); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px;">Status</span>
+                <span style="font-size: ${isMobile ? '12px' : '13px'}; color: hsl(142, 76%, 36%); font-weight: 700; letter-spacing: 0.2px;">${countryData.status}</span>
               </div>
               
+              ${!isMobile ? `
               <!-- Compliance Disclaimer -->
               <div style="margin-top: 12px; padding-top: 12px; border-top: 1.5px solid hsl(215, 20%, 94%); font-size: 9px; color: hsl(215, 16%, 47%); line-height: 1.5; font-style: italic;">
                 All operations conducted by licensed partners. Digital Key holders do not handle or sell cannabis products directly. Blockchain-verified seed-to-sale traceability ensures regulatory compliance.
               </div>
+              ` : ''}
             </div>
           `);
 

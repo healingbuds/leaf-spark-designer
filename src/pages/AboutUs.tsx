@@ -4,6 +4,7 @@ import PageTransition from "@/components/PageTransition";
 import ScrollAnimation from "@/components/ScrollAnimation";
 import BackToTop from "@/components/BackToTop";
 import BlockchainTraceability from "@/components/BlockchainTraceability";
+import StatisticsSection from "@/components/StatisticsSection";
 import { Target, Heart, Globe, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import greenhouseImage from "@/assets/greenhouse-exterior-hq.jpg";
@@ -63,6 +64,9 @@ const AboutUs = () => {
             </ScrollAnimation>
           </div>
         </section>
+
+        {/* Statistics Section */}
+        <StatisticsSection />
 
         {/* Our Values - Linear style */}
         <section className="py-20 md:py-32 bg-muted/30">

@@ -449,7 +449,87 @@ const InteractiveMap = ({ selectedCountry, onCountrySelect }: InteractiveMapProp
           quickTooltip.remove();
         });
         
-        el.addEventListener('click', () => {
+        // Enhanced click interaction - show detailed popup
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          
+          // Create detailed popup
+          const detailedPopup = new maplibregl.Popup({ 
+            offset: 35,
+            className: 'map-popup-detailed',
+            closeButton: true,
+            maxWidth: '420px',
+            closeOnClick: true,
+          })
+            .setLngLat(location.coordinates)
+            .setHTML(`
+              <div style="padding: 24px; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: hsl(0, 0%, 100%); border-radius: 16px;">
+                <div style="display: flex; items-center: gap: 12px; margin-bottom: 16px;">
+                  <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, ${colorMap[location.type]}, ${colorMap[location.type]}dd); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 style="font-size: 20px; font-weight: 700; color: hsl(240, 10%, 3.9%); margin: 0; line-height: 1.2;">${location.name}</h3>
+                    <p style="font-size: 13px; color: hsl(240, 3.8%, 46.1%); margin: 4px 0 0 0;">${countryData.name}</p>
+                  </div>
+                </div>
+
+                <div style="background: hsl(240, 4.8%, 95.9%); padding: 12px; border-radius: 10px; margin-bottom: 16px;">
+                  <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: hsl(240, 3.8%, 46.1%); font-weight: 600; margin-bottom: 6px;">Facility Type</div>
+                  <div style="font-size: 13px; font-weight: 600; color: ${colorMap[location.type]};">${typeLabels[location.type]}</div>
+                </div>
+
+                ${location.cultivationArea || location.productionCapacity ? `
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                    ${location.cultivationArea ? `
+                      <div>
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: hsl(240, 3.8%, 46.1%); font-weight: 600; margin-bottom: 4px;">Cultivation Area</div>
+                        <div style="font-size: 16px; font-weight: 700; color: hsl(240, 10%, 3.9%);">${location.cultivationArea}</div>
+                      </div>
+                    ` : ''}
+                    ${location.productionCapacity ? `
+                      <div>
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: hsl(240, 3.8%, 46.1%); font-weight: 600; margin-bottom: 4px;">Production Capacity</div>
+                        <div style="font-size: 16px; font-weight: 700; color: hsl(240, 10%, 3.9%);">${location.productionCapacity}</div>
+                      </div>
+                    ` : ''}
+                  </div>
+                ` : ''}
+
+                ${location.certifications && location.certifications.length > 0 ? `
+                  <div style="margin-bottom: 16px;">
+                    <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: hsl(240, 3.8%, 46.1%); font-weight: 600; margin-bottom: 8px;">Certifications</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                      ${location.certifications.map(cert => 
+                        `<span style="display: inline-flex; background: linear-gradient(135deg, hsl(142, 76%, 96%), hsl(142, 76%, 92%)); color: hsl(142, 76%, 36%); padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; border: 1.5px solid hsl(142, 76%, 88%); box-shadow: 0 2px 4px rgba(0,0,0,0.05);">${cert}</span>`
+                      ).join('')}
+                    </div>
+                  </div>
+                ` : ''}
+
+                ${location.licensedPartner ? `
+                  <div style="padding-top: 16px; border-top: 1px solid hsl(240, 4.8%, 95.9%);">
+                    <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: hsl(240, 3.8%, 46.1%); font-weight: 600; margin-bottom: 4px;">Licensed Partner</div>
+                    <div style="font-size: 12px; color: hsl(240, 10%, 3.9%); font-weight: 500; line-height: 1.5;">${location.licensedPartner}</div>
+                  </div>
+                ` : ''}
+              </div>
+            `)
+            .addTo(map.current!);
+
+          // Fly to location with smooth animation
+          map.current?.flyTo({
+            center: location.coordinates,
+            zoom: 8,
+            duration: 1500,
+            curve: 1.42,
+            essential: true,
+          });
+
+          // Optional: Still trigger country selection callback
           if (onCountrySelect) {
             const countryId = Object.keys(countries).find(
               key => countries[key].name === countryData.name

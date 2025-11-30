@@ -30,6 +30,7 @@ const signupSchema = z.object({
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -38,6 +39,7 @@ const Auth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -173,6 +175,44 @@ const Auth = () => {
     setConfirmPassword("");
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors({});
+
+    const emailValidation = z.string().trim().email({ message: "Please enter a valid email address" });
+    const result = emailValidation.safeParse(email);
+    
+    if (!result.success) {
+      setErrors({ email: result.error.errors[0].message });
+      return;
+    }
+
+    setLoading(true);
+
+    const redirectUrl = `${window.location.origin}/auth`;
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: redirectUrl,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setResetEmailSent(true);
+    toast({
+      title: "Check your email",
+      description: "We've sent you a password reset link.",
+    });
+  };
+
   return (
     <PageTransition>
       <div className="min-h-screen bg-gradient-to-br from-[#1a2e2a] via-[#2a3d3a] to-[#1a2e2a]">
@@ -182,7 +222,7 @@ const Auth = () => {
           <div className="container mx-auto px-4 max-w-md">
             <div className="bg-background/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-border/50 overflow-hidden">
               {/* Header */}
-                <div className="bg-gradient-to-r from-primary/20 to-secondary/20 p-8 text-center">
+              <div className="bg-gradient-to-r from-primary/20 to-secondary/20 p-8 text-center">
                 <div className="flex justify-center mb-4">
                   <img 
                     src={hbLogoWhite} 
@@ -191,128 +231,221 @@ const Auth = () => {
                   />
                 </div>
                 <h1 className="font-display text-2xl font-bold text-foreground mb-2">
-                  {isLogin ? "Welcome Back" : "Create Account"}
+                  {isForgotPassword ? "Reset Password" : isLogin ? "Welcome Back" : "Create Account"}
                 </h1>
                 <p className="text-muted-foreground text-sm">
-                  {isLogin 
-                    ? "Sign in to access your patient portal" 
-                    : "Join Healing Buds for personalized care"}
+                  {isForgotPassword 
+                    ? "Enter your email to receive a reset link"
+                    : isLogin 
+                      ? "Sign in to access your patient portal" 
+                      : "Join Healing Buds for personalized care"}
                 </p>
               </div>
 
-              {/* Form */}
-              <form onSubmit={isLogin ? handleLogin : handleSignup} className="p-8 space-y-5">
-                {!isLogin && (
+              {/* Forgot Password Form */}
+              {isForgotPassword ? (
+                <div className="p-8 space-y-5">
+                  {resetEmailSent ? (
+                    <div className="text-center space-y-4">
+                      <div className="bg-primary/10 text-primary p-4 rounded-lg">
+                        <Mail className="w-8 h-8 mx-auto mb-2" />
+                        <p className="font-medium">Check your inbox</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          We've sent a password reset link to {email}
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => {
+                          setIsForgotPassword(false);
+                          setResetEmailSent(false);
+                          setEmail("");
+                        }}
+                      >
+                        Back to Sign In
+                      </Button>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleForgotPassword} className="space-y-5">
+                      <div className="space-y-2">
+                        <Label htmlFor="resetEmail" className="text-foreground">Email</Label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                          <Input
+                            id="resetEmail"
+                            type="email"
+                            placeholder="you@example.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="pl-10"
+                            disabled={loading}
+                          />
+                        </div>
+                        {errors.email && (
+                          <p className="text-destructive text-xs">{errors.email}</p>
+                        )}
+                      </div>
+
+                      <Button
+                        type="submit"
+                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                        disabled={loading}
+                      >
+                        {loading ? (
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : null}
+                        Send Reset Link
+                        {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
+                      </Button>
+
+                      <div className="text-center pt-4 border-t border-border">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsForgotPassword(false);
+                            setErrors({});
+                          }}
+                          className="text-primary hover:underline text-sm font-medium"
+                          disabled={loading}
+                        >
+                          Back to Sign In
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              ) : (
+                /* Login/Signup Form */
+                <form onSubmit={isLogin ? handleLogin : handleSignup} className="p-8 space-y-5">
+                  {!isLogin && (
+                    <div className="space-y-2">
+                      <Label htmlFor="fullName" className="text-foreground">Full Name</Label>
+                      <div className="relative">
+                        <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          id="fullName"
+                          type="text"
+                          placeholder="John Doe"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          className="pl-10"
+                          disabled={loading}
+                        />
+                      </div>
+                      {errors.fullName && (
+                        <p className="text-destructive text-xs">{errors.fullName}</p>
+                      )}
+                    </div>
+                  )}
+
                   <div className="space-y-2">
-                    <Label htmlFor="fullName" className="text-foreground">Full Name</Label>
+                    <Label htmlFor="email" className="text-foreground">Email</Label>
                     <div className="relative">
-                      <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
-                        id="fullName"
-                        type="text"
-                        placeholder="John Doe"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
+                        id="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="pl-10"
                         disabled={loading}
                       />
                     </div>
-                    {errors.fullName && (
-                      <p className="text-destructive text-xs">{errors.fullName}</p>
+                    {errors.email && (
+                      <p className="text-destructive text-xs">{errors.email}</p>
                     )}
                   </div>
-                )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-foreground">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
-                      disabled={loading}
-                    />
-                  </div>
-                  {errors.email && (
-                    <p className="text-destructive text-xs">{errors.email}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-foreground">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10"
-                      disabled={loading}
-                    />
-                  </div>
-                  {errors.password && (
-                    <p className="text-destructive text-xs">{errors.password}</p>
-                  )}
-                </div>
-
-                {!isLogin && (
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
+                    <div className="flex justify-between items-center">
+                      <Label htmlFor="password" className="text-foreground">Password</Label>
+                      {isLogin && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsForgotPassword(true);
+                            setErrors({});
+                            setPassword("");
+                          }}
+                          className="text-xs text-primary hover:underline"
+                        >
+                          Forgot password?
+                        </button>
+                      )}
+                    </div>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
-                        id="confirmPassword"
+                        id="password"
                         type="password"
                         placeholder="••••••••"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         className="pl-10"
                         disabled={loading}
                       />
                     </div>
-                    {errors.confirmPassword && (
-                      <p className="text-destructive text-xs">{errors.confirmPassword}</p>
+                    {errors.password && (
+                      <p className="text-destructive text-xs">{errors.password}</p>
                     )}
                   </div>
-                )}
 
-                <Button
-                  type="submit"
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  ) : null}
-                  {isLogin ? "Sign In" : "Create Account"}
-                  {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
-                </Button>
+                  {!isLogin && (
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          id="confirmPassword"
+                          type="password"
+                          placeholder="••••••••"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          className="pl-10"
+                          disabled={loading}
+                        />
+                      </div>
+                      {errors.confirmPassword && (
+                        <p className="text-destructive text-xs">{errors.confirmPassword}</p>
+                      )}
+                    </div>
+                  )}
 
-                <div className="text-center pt-4 border-t border-border">
-                  <p className="text-muted-foreground text-sm">
-                    {isLogin ? "Don't have an account?" : "Already have an account?"}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsLogin(!isLogin);
-                        setErrors({});
-                        setPassword("");
-                        setConfirmPassword("");
-                      }}
-                      className="text-primary hover:underline ml-1 font-medium"
-                      disabled={loading}
-                    >
-                      {isLogin ? "Sign up" : "Sign in"}
-                    </button>
-                  </p>
-                </div>
-              </form>
+                  <Button
+                    type="submit"
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    ) : null}
+                    {isLogin ? "Sign In" : "Create Account"}
+                    {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
+                  </Button>
+
+                  <div className="text-center pt-4 border-t border-border">
+                    <p className="text-muted-foreground text-sm">
+                      {isLogin ? "Don't have an account?" : "Already have an account?"}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsLogin(!isLogin);
+                          setErrors({});
+                          setPassword("");
+                          setConfirmPassword("");
+                        }}
+                        className="text-primary hover:underline ml-1 font-medium"
+                        disabled={loading}
+                      >
+                        {isLogin ? "Sign up" : "Sign in"}
+                      </button>
+                    </p>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         </main>

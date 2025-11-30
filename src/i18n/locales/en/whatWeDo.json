@@ -1,0 +1,49 @@
+{
+  "hero": {
+    "title": "What We Do",
+    "subtitle": "Shaping the future of cannabis through cultivation, research, and innovation"
+  },
+  "intro": {
+    "title": "Healing Buds: Leading the World in Cannabis",
+    "description": "Consistently delivering superior products and services and driving the global acceptance of cannabis. At Healing Buds, we're at the forefront of cannabis innovation, from cultivation to patient care."
+  },
+  "services": {
+    "title": "Our Services",
+    "cultivating": {
+      "title": "Cultivating & Processing",
+      "description": "At our extensive facilities in Canada and Portugal, covering over 30,000 m², we select, grow, harvest and process a broad portfolio of pharmaceutical-grade cannabis products. With careful control over every aspect of production, we test, trim, dry, cure and package high-grade medical cannabis that passes third-party testing, batch after batch."
+    },
+    "manufacture": {
+      "title": "Manufacture & Distribution",
+      "description": "With an evergreen global supply chain and deep regulatory understanding, our EU Good Manufacturing Practices (GMP) certified medical products reach patients by supplying to clinics and pharmacies worldwide. Established distribution to over 15 countries across Europe, Australia and New Zealand."
+    },
+    "clinics": {
+      "title": "Medical Cannabis Clinics",
+      "description": "We're leading in a new era of patient access, bridging the gap between healthcare professionals and those who may benefit from medical cannabis. Our clinics provide expert consultations and personalized treatment plans."
+    },
+    "pharmacy": {
+      "title": "Online Medical Cannabis Pharmacy",
+      "description": "We provide a seamless pathway from prescription to secure direct delivery of EU GMP-certified medical cannabis, through our registered pharmacy and specialist clinic network."
+    }
+  },
+  "values": {
+    "title": "We cultivate beyond cannabis",
+    "betterStandards": {
+      "title": "Better Standards",
+      "description": "From plant to patient, every step of cultivation, extraction and production receives our care and attention – no detail is too small. That's why our products are EU GMP-certified and trusted worldwide."
+    },
+    "patientAccess": {
+      "title": "Patient Access",
+      "description": "As we grow, we aspire to leave no patient behind. Thanks to a growing body of evidence, we're breaking down stigma, pushing for progress, and widening safer access to medical cannabis."
+    },
+    "essentialResearch": {
+      "title": "Essential Research",
+      "description": "We partner with leading institutions Imperial College London and University of Pennsylvania, to deepen the clinical understanding of cannabis-based medicine. Scientific research isn't just what we do – it's everything we stand for."
+    }
+  },
+  "cta": {
+    "title": "Why partner with us?",
+    "description": "We bring together expert cultivators, world-class researchers, and a commitment to quality that sets us apart in the cannabis industry.",
+    "button": "Get in touch"
+  }
+}

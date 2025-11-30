@@ -1,0 +1,56 @@
+{
+  "hero": {
+    "title": "About Healing Buds",
+    "subtitle": "Leading the way in pharmaceutical-grade cannabis production"
+  },
+  "story": {
+    "title": "Our Story",
+    "paragraph1": "Healing Buds was founded with a clear mission: to consistently deliver superior products and services while driving the global acceptance of medical cannabis. Launching from South Africa, we've expanded our cultivation and processing operations across the United Kingdom and Thailand, with exciting developments underway in Portugal. Our facilities produce EU GMP-certified medical cannabis that meets the strictest pharmaceutical-grade quality standards.",
+    "paragraph2": "From plant to patient, every step of cultivation, extraction, and production receives our meticulous care and attention – no detail is too small. This unwavering commitment to quality is why our products are trusted by healthcare professionals across multiple continents.",
+    "paragraph3": "As we grow our international footprint, we aspire to leave no patient behind. Thanks to a growing body of evidence from our research partnerships, we're breaking down stigma, pushing for regulatory progress, and widening safer access to medical cannabis through our commitment to excellence and essential scientific research."
+  },
+  "values": {
+    "title": "Our Values",
+    "excellence": {
+      "title": "Excellence",
+      "description": "We maintain pharmaceutical-grade standards across all operations, from cultivation in our South African facilities to distribution worldwide."
+    },
+    "patientFocused": {
+      "title": "Patient-Focused",
+      "description": "Patient well-being drives every decision we make, ensuring safe access to medical cannabis across all our markets."
+    },
+    "globalReach": {
+      "title": "Global Reach",
+      "description": "Operating across South Africa, UK, Thailand, and expanding to Portugal, we ensure quality cannabis medicine reaches patients worldwide."
+    },
+    "integrity": {
+      "title": "Integrity",
+      "description": "We operate with complete transparency and adherence to the highest regulatory standards in every jurisdiction."
+    }
+  },
+  "facilities": {
+    "title": "Our Global Facilities",
+    "description": "Operating across multiple continents with thousands of square meters of cultivation space, we select, grow, harvest, and process a comprehensive portfolio of pharmaceutical-grade cannabis products. Our facilities combine traditional horticultural expertise with cutting-edge technology and rigorous quality control protocols.",
+    "southAfrica": {
+      "title": "South Africa",
+      "description": "Our flagship South African facility serves as the cornerstone of our operations, featuring advanced greenhouse technology optimized for the region's favorable climate and regulatory framework."
+    },
+    "uk": {
+      "title": "United Kingdom",
+      "description": "Our UK facility serves the European medical market with GMP-certified production capabilities, combining precision agriculture with pharmaceutical-grade standards."
+    },
+    "thailand": {
+      "title": "Thailand",
+      "description": "Leveraging Thailand's rich tradition of cannabis cultivation knowledge, our facility combines local expertise with modern cultivation methodologies for the Asian market."
+    },
+    "portugal": {
+      "title": "Portugal (Expanding)",
+      "description": "Our upcoming Portuguese facility will strategically position us in Southern Europe, combining traditional European cultivation methods with our proven quality protocols."
+    }
+  },
+  "cta": {
+    "title": "Join us in shaping the future of medical cannabis",
+    "description": "Whether you're a patient, healthcare provider, or potential partner across our South African, UK, Thai, or Portuguese markets, we'd love to hear from you.",
+    "button": "Get in touch"
+  }
+}

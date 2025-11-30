@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
@@ -15,6 +16,7 @@ import clinicPortugal from "@/assets/clinic-portugal.jpg";
 import clinicDoctorPatient from "@/assets/clinic-doctor-patient.jpg";
 
 const MedicalClinics = () => {
+  const { t } = useTranslation('clinics');
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -41,10 +43,10 @@ const MedicalClinics = () => {
             <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center">
               <ScrollAnimation>
                 <h1 className="text-5xl md:text-6xl font-semibold text-foreground mb-4">
-                  Medical Cannabis Clinics
+                  {t('hero.title')}
                 </h1>
                 <p className="text-xl text-muted-foreground/80 max-w-2xl">
-                  Led by doctors trained in cannabis medicine across South Africa, UK, Thailand, and Portugal
+                  {t('hero.subtitle')}
                 </p>
               </ScrollAnimation>
             </div>
@@ -63,13 +65,13 @@ const MedicalClinics = () => {
                 </ScrollAnimation>
                 <ScrollAnimation delay={0.2}>
                   <h2 className="text-4xl font-semibold text-foreground leading-tight mb-6">
-                    We bring people together
+                    {t('together.title')}
                   </h2>
                   <p className="text-lg text-muted-foreground/80 leading-relaxed mb-4">
-                    Because access to quality medical cannabis care requires specialized clinical expertise, our network of clinics across South Africa, the UK, Thailand, and Portugal connect patients with experienced cannabis-trained physicians.
+                    {t('together.paragraph1')}
                   </p>
                   <p className="text-lg text-muted-foreground/80 leading-relaxed">
-                    It's not just about cannabis—it's about helping people find the life-changing relief they deserve through personalized, evidence-based care.
+                    {t('together.paragraph2')}
                   </p>
                 </ScrollAnimation>
               </div>
@@ -81,9 +83,9 @@ const MedicalClinics = () => {
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <ScrollAnimation>
                 <div className="flex justify-between items-center mb-12 max-w-6xl mx-auto">
-                  <h2 className="text-4xl font-semibold text-white">Our Services</h2>
+                  <h2 className="text-4xl font-semibold text-white">{t('services.title')}</h2>
                   <button className="btn-linear text-white border border-white/30 hover:bg-white/10 px-6 py-2">
-                    Learn more →
+                    {t('services.learnMore')} →
                   </button>
                 </div>
               </ScrollAnimation>
@@ -94,9 +96,9 @@ const MedicalClinics = () => {
                     <div className="w-16 h-16 bg-gradient-to-br from-white/30 to-white/10 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:shadow-xl transition-all duration-200 group-hover:scale-110">
                       <Users className="w-8 h-8 text-white" strokeWidth={2} />
                     </div>
-                    <h3 className="text-2xl font-semibold text-white mb-4">Expert consultations</h3>
+                    <h3 className="text-2xl font-semibold text-white mb-4">{t('services.consultations.title')}</h3>
                     <p className="text-white/90 leading-relaxed flex-grow">
-                      Our physicians are medical doctors trained as cannabis specialists, providing evidence-based guidance for your treatment.
+                      {t('services.consultations.description')}
                     </p>
                   </div>
                 </ScrollAnimation>
@@ -106,9 +108,9 @@ const MedicalClinics = () => {
                     <div className="w-16 h-16 bg-gradient-to-br from-white/30 to-white/10 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:shadow-xl transition-all duration-200 group-hover:scale-110">
                       <FileText className="w-8 h-8 text-white" strokeWidth={2} />
                     </div>
-                    <h3 className="text-2xl font-semibold text-white mb-4">Personalized treatment plans</h3>
+                    <h3 className="text-2xl font-semibold text-white mb-4">{t('services.treatment.title')}</h3>
                     <p className="text-white/90 leading-relaxed flex-grow">
-                      Our physicians begin with a comprehensive review of your medical history to create tailored cannabis treatment plans.
+                      {t('services.treatment.description')}
                     </p>
                   </div>
                 </ScrollAnimation>
@@ -118,9 +120,9 @@ const MedicalClinics = () => {
                     <div className="w-16 h-16 bg-gradient-to-br from-white/30 to-white/10 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:shadow-xl transition-all duration-200 group-hover:scale-110">
                       <Heart className="w-8 h-8 text-white" strokeWidth={2} />
                     </div>
-                    <h3 className="text-2xl font-semibold text-white mb-4">Ongoing patient support</h3>
+                    <h3 className="text-2xl font-semibold text-white mb-4">{t('services.support.title')}</h3>
                     <p className="text-white/90 leading-relaxed flex-grow">
-                      Continuous follow-up care throughout your cannabis treatment journey with expert clinical support from our physicians.
+                      {t('services.support.description')}
                     </p>
                   </div>
                 </ScrollAnimation>
@@ -142,12 +144,12 @@ const MedicalClinics = () => {
                     />
                   </ScrollAnimation>
                   <ScrollAnimation delay={0.2}>
-                    <h2 className="text-4xl font-semibold text-foreground mb-6">In South Africa</h2>
+                    <h2 className="text-4xl font-semibold text-foreground mb-6">{t('regions.southAfrica.title')}</h2>
                     <p className="text-lg text-muted-foreground/80 leading-relaxed mb-6">
-                      Our South African clinics provide access to medical cannabis treatment through a network of trained specialists. Working within local regulations, we support patients seeking alternative therapies for chronic conditions.
+                      {t('regions.southAfrica.paragraph1')}
                     </p>
                     <p className="text-lg text-muted-foreground/80 leading-relaxed mb-8">
-                      Comprehensive consultations and ongoing support ensure patients receive appropriate care tailored to their needs.
+                      {t('regions.southAfrica.paragraph2')}
                     </p>
                   </ScrollAnimation>
                 </div>
@@ -155,12 +157,12 @@ const MedicalClinics = () => {
                 {/* United Kingdom */}
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                   <ScrollAnimation>
-                    <h2 className="text-4xl font-semibold text-foreground mb-6">In the United Kingdom</h2>
+                    <h2 className="text-4xl font-semibold text-foreground mb-6">{t('regions.uk.title')}</h2>
                     <p className="text-lg text-muted-foreground/80 leading-relaxed mb-6">
-                      Since 2018, medical cannabis has been available in the UK through specialist prescribers. Our UK clinics are led by GMC-registered doctors with extensive training in cannabis therapeutics.
+                      {t('regions.uk.paragraph1')}
                     </p>
                     <p className="text-lg text-muted-foreground/80 leading-relaxed mb-8">
-                      We offer consultant-led assessments and access schemes to ensure affordable treatment for eligible patients across England, Scotland, Wales, and Northern Ireland.
+                      {t('regions.uk.paragraph2')}
                     </p>
                   </ScrollAnimation>
                   <ScrollAnimation delay={0.2}>
@@ -182,12 +184,12 @@ const MedicalClinics = () => {
                     />
                   </ScrollAnimation>
                   <ScrollAnimation delay={0.2}>
-                    <h2 className="text-4xl font-semibold text-foreground mb-6">In Thailand</h2>
+                    <h2 className="text-4xl font-semibold text-foreground mb-6">{t('regions.thailand.title')}</h2>
                     <p className="text-lg text-muted-foreground/80 leading-relaxed mb-6">
-                      Thailand's progressive cannabis regulations enable our clinics to provide medical cannabis consultations and prescriptions through licensed healthcare facilities.
+                      {t('regions.thailand.paragraph1')}
                     </p>
                     <p className="text-lg text-muted-foreground/80 leading-relaxed mb-8">
-                      Our Thai medical teams combine traditional medicine knowledge with modern cannabis therapeutics to serve local and international patients.
+                      {t('regions.thailand.paragraph2')}
                     </p>
                   </ScrollAnimation>
                 </div>
@@ -195,12 +197,12 @@ const MedicalClinics = () => {
                 {/* Portugal */}
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                   <ScrollAnimation>
-                    <h2 className="text-4xl font-semibold text-foreground mb-6">In Portugal</h2>
+                    <h2 className="text-4xl font-semibold text-foreground mb-6">{t('regions.portugal.title')}</h2>
                     <p className="text-lg text-muted-foreground/80 leading-relaxed mb-6">
-                      Portugal's medical cannabis framework allows our clinics to prescribe cannabis-based medicines for qualified patients. Our Portuguese operations expand access across Southern Europe.
+                      {t('regions.portugal.paragraph1')}
                     </p>
                     <p className="text-lg text-muted-foreground/80 leading-relaxed mb-8">
-                      Expert consultations in Portuguese and English ensure comprehensive care for residents and medical tourists seeking cannabis treatment.
+                      {t('regions.portugal.paragraph2')}
                     </p>
                   </ScrollAnimation>
                   <ScrollAnimation delay={0.2}>
@@ -221,13 +223,13 @@ const MedicalClinics = () => {
               <div className="max-w-4xl mx-auto">
                 <ScrollAnimation>
                   <blockquote className="text-3xl font-semibold text-foreground mb-8 text-center">
-                    "I love the idea of contributing to the growing evidence which no doubt will help many others in the future."
+                    "{t('testimonial.quote')}"
                   </blockquote>
                   <div className="flex items-center justify-center gap-4">
                     <div className="w-16 h-16 bg-muted rounded-full" />
                     <div>
-                      <p className="font-semibold text-foreground">Laura Drummond</p>
-                      <p className="text-muted-foreground/80">Patient, UK</p>
+                      <p className="font-semibold text-foreground">{t('testimonial.name')}</p>
+                      <p className="text-muted-foreground/80">{t('testimonial.role')}</p>
                     </div>
                   </div>
                 </ScrollAnimation>
@@ -249,17 +251,17 @@ const MedicalClinics = () => {
                   </ScrollAnimation>
                   <ScrollAnimation delay={0.2}>
                     <h2 className="text-3xl font-semibold text-foreground mb-6">
-                      Learn more about our medical cannabis clinics
+                      {t('cta.title')}
                     </h2>
                     <p className="text-muted-foreground/80 mb-8">
-                      Explore our network of clinics across South Africa, the UK, Thailand, and Portugal. Find expert cannabis care near you.
+                      {t('cta.description')}
                     </p>
                     <div className="flex flex-wrap gap-3">
                       <button className="btn-primary px-6 py-2.5">
-                        Contact us →
+                        {t('cta.contactButton')} →
                       </button>
                       <button className="btn-outline px-6 py-2.5">
-                        Check eligibility →
+                        {t('cta.eligibilityButton')} →
                       </button>
                     </div>
                   </ScrollAnimation>

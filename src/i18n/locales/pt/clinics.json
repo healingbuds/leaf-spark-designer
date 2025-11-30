@@ -1,0 +1,60 @@
+{
+  "hero": {
+    "title": "Clínicas de Cannabis Medicinal",
+    "subtitle": "Lideradas por médicos formados em medicina de cannabis na África do Sul, Reino Unido, Tailândia e Portugal"
+  },
+  "together": {
+    "title": "Unimos pessoas",
+    "paragraph1": "Porque o acesso a cuidados de cannabis medicinal de qualidade requer experiência clínica especializada, a nossa rede de clínicas na África do Sul, Reino Unido, Tailândia e Portugal conecta pacientes com médicos experientes formados em cannabis.",
+    "paragraph2": "Não se trata apenas de cannabis — trata-se de ajudar as pessoas a encontrar o alívio transformador que merecem através de cuidados personalizados e baseados em evidências."
+  },
+  "services": {
+    "title": "Os Nossos Serviços",
+    "learnMore": "Saber mais",
+    "consultations": {
+      "title": "Consultas especializadas",
+      "description": "Os nossos médicos são profissionais de medicina formados como especialistas em cannabis, fornecendo orientação baseada em evidências para o seu tratamento."
+    },
+    "treatment": {
+      "title": "Planos de tratamento personalizados",
+      "description": "Os nossos médicos começam com uma revisão abrangente do seu histórico médico para criar planos de tratamento de cannabis personalizados."
+    },
+    "support": {
+      "title": "Apoio contínuo ao paciente",
+      "description": "Acompanhamento contínuo ao longo da sua jornada de tratamento com cannabis, com apoio clínico especializado dos nossos médicos."
+    }
+  },
+  "regions": {
+    "southAfrica": {
+      "title": "Na África do Sul",
+      "paragraph1": "As nossas clínicas na África do Sul fornecem acesso ao tratamento com cannabis medicinal através de uma rede de especialistas formados. Trabalhando dentro das regulamentações locais, apoiamos pacientes que procuram terapias alternativas para condições crónicas.",
+      "paragraph2": "Consultas abrangentes e apoio contínuo garantem que os pacientes recebam cuidados apropriados adaptados às suas necessidades."
+    },
+    "uk": {
+      "title": "No Reino Unido",
+      "paragraph1": "Desde 2018, a cannabis medicinal está disponível no Reino Unido através de prescritores especializados. As nossas clínicas no Reino Unido são lideradas por médicos registados no GMC com extensa formação em terapêutica de cannabis.",
+      "paragraph2": "Oferecemos avaliações lideradas por consultores e esquemas de acesso para garantir tratamento acessível para pacientes elegíveis em Inglaterra, Escócia, País de Gales e Irlanda do Norte."
+    },
+    "thailand": {
+      "title": "Na Tailândia",
+      "paragraph1": "As regulamentações progressivas da Tailândia sobre cannabis permitem que as nossas clínicas forneçam consultas e prescrições de cannabis medicinal através de instalações de saúde licenciadas.",
+      "paragraph2": "As nossas equipas médicas tailandesas combinam conhecimento de medicina tradicional com terapêutica moderna de cannabis para servir pacientes locais e internacionais."
+    },
+    "portugal": {
+      "title": "Em Portugal",
+      "paragraph1": "O enquadramento de cannabis medicinal de Portugal permite que as nossas clínicas prescrevam medicamentos à base de cannabis para pacientes qualificados. As nossas operações portuguesas expandem o acesso pelo Sul da Europa.",
+      "paragraph2": "Consultas especializadas em português e inglês garantem cuidados abrangentes para residentes e turistas médicos que procuram tratamento com cannabis."
+    }
+  },
+  "testimonial": {
+    "quote": "Adoro a ideia de contribuir para as evidências crescentes que sem dúvida ajudarão muitos outros no futuro.",
+    "name": "Laura Drummond",
+    "role": "Paciente, Reino Unido"
+  },
+  "cta": {
+    "title": "Saiba mais sobre as nossas clínicas de cannabis medicinal",
+    "description": "Explore a nossa rede de clínicas na África do Sul, Reino Unido, Tailândia e Portugal. Encontre cuidados especializados em cannabis perto de si.",
+    "contactButton": "Contacte-nos",
+    "eligibilityButton": "Verificar elegibilidade"
+  }
+}

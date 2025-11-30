@@ -1,0 +1,49 @@
+{
+  "hero": {
+    "title": "O Que Fazemos",
+    "subtitle": "Moldando o futuro da cannabis através do cultivo, investigação e inovação"
+  },
+  "intro": {
+    "title": "Healing Buds: Liderando o Mundo na Cannabis",
+    "description": "Entregando consistentemente produtos e serviços superiores e impulsionando a aceitação global da cannabis. Na Healing Buds, estamos na vanguarda da inovação em cannabis, desde o cultivo até ao cuidado do paciente."
+  },
+  "services": {
+    "title": "Os Nossos Serviços",
+    "cultivating": {
+      "title": "Cultivo e Processamento",
+      "description": "Nas nossas extensas instalações no Canadá e Portugal, cobrindo mais de 30.000 m², selecionamos, cultivamos, colhemos e processamos um amplo portfólio de produtos de cannabis de grau farmacêutico. Com controlo cuidadoso sobre cada aspeto da produção, testamos, aparamos, secamos, curamos e embalamos cannabis medicinal de alta qualidade que passa em testes de terceiros, lote após lote."
+    },
+    "manufacture": {
+      "title": "Fabrico e Distribuição",
+      "description": "Com uma cadeia de fornecimento global perene e profunda compreensão regulatória, os nossos produtos médicos certificados EU GMP chegam aos pacientes através do fornecimento a clínicas e farmácias em todo o mundo. Distribuição estabelecida para mais de 15 países na Europa, Austrália e Nova Zelândia."
+    },
+    "clinics": {
+      "title": "Clínicas de Cannabis Medicinal",
+      "description": "Estamos a liderar uma nova era de acesso ao paciente, fazendo a ponte entre profissionais de saúde e aqueles que podem beneficiar da cannabis medicinal. As nossas clínicas fornecem consultas especializadas e planos de tratamento personalizados."
+    },
+    "pharmacy": {
+      "title": "Farmácia Online de Cannabis Medicinal",
+      "description": "Fornecemos um caminho contínuo desde a prescrição até à entrega direta e segura de cannabis medicinal certificada EU GMP, através da nossa rede de farmácias registadas e clínicas especializadas."
+    }
+  },
+  "values": {
+    "title": "Cultivamos além da cannabis",
+    "betterStandards": {
+      "title": "Melhores Padrões",
+      "description": "Da planta ao paciente, cada passo do cultivo, extração e produção recebe o nosso cuidado e atenção – nenhum detalhe é demasiado pequeno. É por isso que os nossos produtos são certificados EU GMP e confiáveis em todo o mundo."
+    },
+    "patientAccess": {
+      "title": "Acesso ao Paciente",
+      "description": "À medida que crescemos, aspiramos a não deixar nenhum paciente para trás. Graças a um crescente corpo de evidências, estamos a derrubar o estigma, a impulsionar o progresso e a ampliar o acesso mais seguro à cannabis medicinal."
+    },
+    "essentialResearch": {
+      "title": "Investigação Essencial",
+      "description": "Fazemos parcerias com instituições líderes como o Imperial College London e a Universidade da Pensilvânia, para aprofundar a compreensão clínica da medicina à base de cannabis. A investigação científica não é apenas o que fazemos – é tudo o que defendemos."
+    }
+  },
+  "cta": {
+    "title": "Porquê fazer parceria connosco?",
+    "description": "Reunimos cultivadores especializados, investigadores de classe mundial e um compromisso com a qualidade que nos distingue na indústria da cannabis.",
+    "button": "Entre em contacto"
+  }
+}

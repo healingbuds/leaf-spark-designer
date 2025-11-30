@@ -1,0 +1,56 @@
+{
+  "hero": {
+    "title": "Sobre a Healing Buds",
+    "subtitle": "Liderando o caminho na produção de cannabis de grau farmacêutico"
+  },
+  "story": {
+    "title": "A Nossa História",
+    "paragraph1": "A Healing Buds foi fundada com uma missão clara: entregar consistentemente produtos e serviços superiores enquanto impulsiona a aceitação global da cannabis medicinal. Lançando a partir da África do Sul, expandimos as nossas operações de cultivo e processamento pelo Reino Unido e Tailândia, com desenvolvimentos emocionantes em curso em Portugal. As nossas instalações produzem cannabis medicinal certificada EU GMP que cumpre os mais rigorosos padrões de qualidade farmacêutica.",
+    "paragraph2": "Da planta ao paciente, cada passo do cultivo, extração e produção recebe o nosso cuidado e atenção meticulosos – nenhum detalhe é demasiado pequeno. Este compromisso inabalável com a qualidade é a razão pela qual os nossos produtos são confiados por profissionais de saúde em múltiplos continentes.",
+    "paragraph3": "À medida que crescemos a nossa presença internacional, aspiramos a não deixar nenhum paciente para trás. Graças a um crescente corpo de evidências das nossas parcerias de investigação, estamos a derrubar o estigma, a impulsionar o progresso regulatório e a ampliar o acesso mais seguro à cannabis medicinal através do nosso compromisso com a excelência e investigação científica essencial."
+  },
+  "values": {
+    "title": "Os Nossos Valores",
+    "excellence": {
+      "title": "Excelência",
+      "description": "Mantemos padrões de grau farmacêutico em todas as operações, desde o cultivo nas nossas instalações na África do Sul até à distribuição mundial."
+    },
+    "patientFocused": {
+      "title": "Focado no Paciente",
+      "description": "O bem-estar do paciente guia cada decisão que tomamos, garantindo acesso seguro à cannabis medicinal em todos os nossos mercados."
+    },
+    "globalReach": {
+      "title": "Alcance Global",
+      "description": "Operando na África do Sul, Reino Unido, Tailândia e expandindo para Portugal, garantimos que a medicina de cannabis de qualidade chegue aos pacientes em todo o mundo."
+    },
+    "integrity": {
+      "title": "Integridade",
+      "description": "Operamos com total transparência e adesão aos mais altos padrões regulatórios em todas as jurisdições."
+    }
+  },
+  "facilities": {
+    "title": "As Nossas Instalações Globais",
+    "description": "Operando em múltiplos continentes com milhares de metros quadrados de espaço de cultivo, selecionamos, cultivamos, colhemos e processamos um portfólio abrangente de produtos de cannabis de grau farmacêutico. As nossas instalações combinam experiência hortícola tradicional com tecnologia de ponta e protocolos rigorosos de controlo de qualidade.",
+    "southAfrica": {
+      "title": "África do Sul",
+      "description": "A nossa instalação principal na África do Sul serve como pedra angular das nossas operações, apresentando tecnologia de estufa avançada otimizada para o clima favorável da região e enquadramento regulatório."
+    },
+    "uk": {
+      "title": "Reino Unido",
+      "description": "A nossa instalação no Reino Unido serve o mercado médico europeu com capacidades de produção certificadas GMP, combinando agricultura de precisão com padrões de grau farmacêutico."
+    },
+    "thailand": {
+      "title": "Tailândia",
+      "description": "Aproveitando a rica tradição da Tailândia em conhecimento de cultivo de cannabis, a nossa instalação combina experiência local com metodologias modernas de cultivo para o mercado asiático."
+    },
+    "portugal": {
+      "title": "Portugal (Em Expansão)",
+      "description": "A nossa próxima instalação portuguesa irá posicionar-nos estrategicamente no Sul da Europa, combinando métodos tradicionais de cultivo europeus com os nossos protocolos de qualidade comprovados."
+    }
+  },
+  "cta": {
+    "title": "Junte-se a nós a moldar o futuro da cannabis medicinal",
+    "description": "Seja paciente, profissional de saúde ou potencial parceiro nos nossos mercados da África do Sul, Reino Unido, Tailândia ou Portugal, adoraríamos ouvir de si.",
+    "button": "Entre em contacto"
+  }
+}

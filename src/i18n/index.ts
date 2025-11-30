@@ -7,6 +7,9 @@ import enAuth from './locales/en/auth.json';
 import enResearch from './locales/en/research.json';
 import enContact from './locales/en/contact.json';
 import enConditions from './locales/en/conditions.json';
+import enWhatWeDo from './locales/en/whatWeDo.json';
+import enAboutUs from './locales/en/aboutUs.json';
+import enClinics from './locales/en/clinics.json';
 
 import ptCommon from './locales/pt/common.json';
 import ptHome from './locales/pt/home.json';
@@ -14,6 +17,9 @@ import ptAuth from './locales/pt/auth.json';
 import ptResearch from './locales/pt/research.json';
 import ptContact from './locales/pt/contact.json';
 import ptConditions from './locales/pt/conditions.json';
+import ptWhatWeDo from './locales/pt/whatWeDo.json';
+import ptAboutUs from './locales/pt/aboutUs.json';
+import ptClinics from './locales/pt/clinics.json';
 
 const resources = {
   en: {
@@ -23,6 +29,9 @@ const resources = {
     research: enResearch,
     contact: enContact,
     conditions: enConditions,
+    whatWeDo: enWhatWeDo,
+    aboutUs: enAboutUs,
+    clinics: enClinics,
   },
   pt: {
     common: ptCommon,
@@ -31,6 +40,9 @@ const resources = {
     research: ptResearch,
     contact: ptContact,
     conditions: ptConditions,
+    whatWeDo: ptWhatWeDo,
+    aboutUs: ptAboutUs,
+    clinics: ptClinics,
   },
 };
 
@@ -65,7 +77,7 @@ i18n
     lng: getInitialLanguage(),
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'home', 'auth', 'research', 'contact', 'conditions'],
+    ns: ['common', 'home', 'auth', 'research', 'contact', 'conditions', 'whatWeDo', 'aboutUs', 'clinics'],
     interpolation: {
       escapeValue: false,
     },

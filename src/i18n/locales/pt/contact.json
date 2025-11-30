@@ -1,0 +1,25 @@
+{
+  "hero": {
+    "title": "Contacte-nos",
+    "subtitle": "Entre em contacto com a nossa equipa"
+  },
+  "connect": {
+    "title": "Vamos Conectar",
+    "subtitle": "Seja paciente, profissional de saúde ou potencial parceiro, estamos aqui para ajudar. Contacte-nos através de qualquer um dos canais abaixo.",
+    "email": "Email",
+    "phone": "Telefone",
+    "location": "Localização"
+  },
+  "form": {
+    "title": "Envie-nos uma mensagem",
+    "name": "Nome",
+    "namePlaceholder": "O seu nome",
+    "email": "Email",
+    "emailPlaceholder": "seu@email.com",
+    "subject": "Assunto",
+    "subjectPlaceholder": "Sobre o que é?",
+    "message": "Mensagem",
+    "messagePlaceholder": "A sua mensagem...",
+    "submit": "Enviar Mensagem"
+  }
+}

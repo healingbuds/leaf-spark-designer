@@ -1,0 +1,37 @@
+{
+  "hero": {
+    "title": "Condições Elegíveis",
+    "subtitle": "Na Healing Buds, atendemos pacientes quando a cannabis prescrita é uma opção de tratamento apropriada. A cannabis medicinal pode ser prescrita para uma ampla gama de condições onde outros tratamentos falharam.",
+    "note": "Se a sua condição não estiver listada abaixo, entre em contacto. Ainda podemos ajudar."
+  },
+  "search": {
+    "placeholder": "Pesquisar condições..."
+  },
+  "categories": {
+    "all": "Todas",
+    "painManagement": "Gestão da Dor",
+    "mentalHealth": "Saúde Mental",
+    "neurological": "Neurológico",
+    "sleepDisorders": "Distúrbios do Sono"
+  },
+  "conditionNames": {
+    "anxiety": "Ansiedade",
+    "chronicPain": "Dor Crónica",
+    "arthritis": "Artrite",
+    "backPain": "Dor nas Costas",
+    "crps": "Síndrome de Dor Regional Complexa",
+    "epilepsy": "Epilepsia",
+    "insomnia": "Insónia",
+    "migraines": "Enxaquecas",
+    "multipleSclerosis": "Esclerose Múltipla",
+    "neuropathicPain": "Dor Neuropática",
+    "parkinsons": "Doença de Parkinson",
+    "ptsd": "PTSD"
+  },
+  "noResults": "Nenhuma condição encontrada correspondente à sua pesquisa. Por favor, tente um termo de pesquisa diferente ou contacte-nos para assistência.",
+  "cta": {
+    "title": "Não vê a sua condição listada?",
+    "subtitle": "Ainda podemos ajudar. Contacte a nossa equipa para discutir a sua condição específica e opções de tratamento.",
+    "button": "Entre em contacto"
+  }
+}

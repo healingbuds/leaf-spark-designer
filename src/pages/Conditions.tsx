@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
@@ -20,89 +21,96 @@ import conditionNeuropathicPain from "@/assets/condition-neuropathic-pain.jpg";
 import conditionParkinsons from "@/assets/condition-parkinsons.jpg";
 import conditionPTSD from "@/assets/condition-ptsd.jpg";
 
-const conditions = [
-  { 
-    id: "anxiety", 
-    name: "Anxiety", 
-    image: conditionAnxiety,
-    category: "Mental Health"
-  },
-  { 
-    id: "chronic-pain", 
-    name: "Chronic Pain", 
-    image: conditionChronicPain,
-    category: "Pain Management"
-  },
-  { 
-    id: "arthritis", 
-    name: "Arthritis", 
-    image: conditionArthritis,
-    category: "Pain Management"
-  },
-  { 
-    id: "back-pain", 
-    name: "Back Pain", 
-    image: conditionBackPain,
-    category: "Pain Management"
-  },
-  { 
-    id: "complex-regional-pain-syndrome", 
-    name: "Complex Regional Pain Syndrome", 
-    image: conditionCRPS,
-    category: "Pain Management"
-  },
-  { 
-    id: "epilepsy", 
-    name: "Epilepsy", 
-    image: conditionEpilepsy,
-    category: "Neurological"
-  },
-  { 
-    id: "insomnia", 
-    name: "Insomnia", 
-    image: conditionInsomnia,
-    category: "Sleep Disorders"
-  },
-  { 
-    id: "migraines", 
-    name: "Migraines", 
-    image: conditionMigraines,
-    category: "Pain Management"
-  },
-  { 
-    id: "multiple-sclerosis", 
-    name: "Multiple Sclerosis", 
-    image: conditionMS,
-    category: "Neurological"
-  },
-  { 
-    id: "neuropathic-pain", 
-    name: "Neuropathic Pain", 
-    image: conditionNeuropathicPain,
-    category: "Pain Management"
-  },
-  { 
-    id: "parkinsons-disease", 
-    name: "Parkinson's Disease", 
-    image: conditionParkinsons,
-    category: "Neurological"
-  },
-  { 
-    id: "ptsd", 
-    name: "PTSD", 
-    image: conditionPTSD,
-    category: "Mental Health"
-  },
-];
-
-const categories = ["All", "Pain Management", "Mental Health", "Neurological", "Sleep Disorders"];
-
 const Conditions = () => {
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const { t } = useTranslation('conditions');
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
+  const categoryKeys = ["all", "painManagement", "mentalHealth", "neurological", "sleepDisorders"];
+
+  const conditionsData = [
+    { 
+      id: "anxiety", 
+      nameKey: "anxiety", 
+      image: conditionAnxiety,
+      categoryKey: "mentalHealth"
+    },
+    { 
+      id: "chronic-pain", 
+      nameKey: "chronicPain", 
+      image: conditionChronicPain,
+      categoryKey: "painManagement"
+    },
+    { 
+      id: "arthritis", 
+      nameKey: "arthritis", 
+      image: conditionArthritis,
+      categoryKey: "painManagement"
+    },
+    { 
+      id: "back-pain", 
+      nameKey: "backPain", 
+      image: conditionBackPain,
+      categoryKey: "painManagement"
+    },
+    { 
+      id: "complex-regional-pain-syndrome", 
+      nameKey: "crps", 
+      image: conditionCRPS,
+      categoryKey: "painManagement"
+    },
+    { 
+      id: "epilepsy", 
+      nameKey: "epilepsy", 
+      image: conditionEpilepsy,
+      categoryKey: "neurological"
+    },
+    { 
+      id: "insomnia", 
+      nameKey: "insomnia", 
+      image: conditionInsomnia,
+      categoryKey: "sleepDisorders"
+    },
+    { 
+      id: "migraines", 
+      nameKey: "migraines", 
+      image: conditionMigraines,
+      categoryKey: "painManagement"
+    },
+    { 
+      id: "multiple-sclerosis", 
+      nameKey: "multipleSclerosis", 
+      image: conditionMS,
+      categoryKey: "neurological"
+    },
+    { 
+      id: "neuropathic-pain", 
+      nameKey: "neuropathicPain", 
+      image: conditionNeuropathicPain,
+      categoryKey: "painManagement"
+    },
+    { 
+      id: "parkinsons-disease", 
+      nameKey: "parkinsons", 
+      image: conditionParkinsons,
+      categoryKey: "neurological"
+    },
+    { 
+      id: "ptsd", 
+      nameKey: "ptsd", 
+      image: conditionPTSD,
+      categoryKey: "mentalHealth"
+    },
+  ];
+
+  const conditions = conditionsData.map(condition => ({
+    ...condition,
+    name: t(`conditionNames.${condition.nameKey}`),
+    category: t(`categories.${condition.categoryKey}`)
+  }));
+
   const filteredConditions = conditions.filter(condition => {
-    const matchesCategory = selectedCategory === "All" || condition.category === selectedCategory;
+    const matchesCategory = selectedCategory === "all" || condition.categoryKey === selectedCategory;
     const matchesSearch = condition.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
@@ -118,13 +126,13 @@ const Conditions = () => {
               <ScrollAnimation>
                 <div className="max-w-5xl">
                   <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 tracking-tight leading-[1.1]">
-                    Eligible Conditions
+                    {t('hero.title')}
                   </h1>
                   <p className="text-xl md:text-2xl text-muted-foreground/80 max-w-3xl font-light mb-8">
-                    At Healing Buds, we see patients when prescribed cannabis is an appropriate treatment option. Medical cannabis can be prescribed for a wide range of conditions where other treatments have failed.
+                    {t('hero.subtitle')}
                   </p>
                   <p className="text-lg text-muted-foreground/80 max-w-3xl font-light">
-                    If your condition is not listed below, please get in touch. We may still be able to help.
+                    {t('hero.note')}
                   </p>
                 </div>
               </ScrollAnimation>
@@ -141,7 +149,7 @@ const Conditions = () => {
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                     <input
                       type="text"
-                      placeholder="Search conditions..."
+                      placeholder={t('search.placeholder')}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full pl-12 pr-4 py-4 rounded-xl bg-background border border-border/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 text-foreground"
@@ -150,17 +158,17 @@ const Conditions = () => {
 
                   {/* Category Filters */}
                   <div className="flex flex-wrap gap-3">
-                    {categories.map((category) => (
+                    {categoryKeys.map((categoryKey) => (
                       <button
-                        key={category}
-                        onClick={() => setSelectedCategory(category)}
+                        key={categoryKey}
+                        onClick={() => setSelectedCategory(categoryKey)}
                         className={`px-5 py-2.5 rounded-full font-medium transition-all duration-200 ${
-                          selectedCategory === category
+                          selectedCategory === categoryKey
                             ? "bg-primary text-white shadow-lg"
                             : "bg-background border border-border/40 text-foreground hover:border-primary/50 hover:bg-primary/5"
                         }`}
                       >
-                        {category}
+                        {t(`categories.${categoryKey}`)}
                       </button>
                     ))}
                   </div>
@@ -216,7 +224,7 @@ const Conditions = () => {
                 <ScrollAnimation>
                   <div className="text-center py-16">
                     <p className="text-xl text-muted-foreground">
-                      No conditions found matching your search. Please try a different search term or contact us for assistance.
+                      {t('noResults')}
                     </p>
                   </div>
                 </ScrollAnimation>
@@ -230,14 +238,14 @@ const Conditions = () => {
               <ScrollAnimation>
                 <div className="max-w-4xl mx-auto text-center">
                   <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white mb-6 tracking-tight">
-                    Don't see your condition listed?
+                    {t('cta.title')}
                   </h2>
                   <p className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-                    We may still be able to help. Contact our team to discuss your specific condition and treatment options.
+                    {t('cta.subtitle')}
                   </p>
                   <Link to="/contact">
                     <button className="btn-linear text-white border border-white/30 hover:bg-white/10 px-8 py-3 text-lg">
-                      Get in touch →
+                      {t('cta.button')} →
                     </button>
                   </Link>
                 </div>

@@ -1,0 +1,64 @@
+{
+  "hero": {
+    "title": "Investigação & Desenvolvimento",
+    "subtitle": "Avançando a ciência da cannabis através de investigação rigorosa e ensaios clínicos"
+  },
+  "essentialResearch": {
+    "title": "Investigação Essencial",
+    "paragraph1": "A nossa colaboração com instituições de investigação de classe mundial, incluindo o Imperial College London e o Instituto Superior de Agronomia de Lisboa, proporciona-nos uma compreensão científica avançada da cannabis e dos seus benefícios. A investigação científica não é apenas o que fazemos – é tudo o que defendemos.",
+    "paragraph2": "A nossa divisão de investigação realiza ensaios clínicos rigorosos para avançar a compreensão científica dos canabinóides e as suas aplicações médicas, contribuindo para um crescente corpo de evidências que derruba o estigma e impulsiona o progresso."
+  },
+  "cards": {
+    "clinicalTrials": {
+      "title": "Ensaios Clínicos",
+      "description": "Realizamos ensaios clínicos rigorosos examinando a eficácia e segurança de medicamentos à base de cannabis para várias condições médicas."
+    },
+    "publications": {
+      "title": "Publicações",
+      "description": "A nossa equipa de investigação publica descobertas em revistas científicas revistas por pares, contribuindo para a compreensão global da medicina de cannabis."
+    },
+    "recognition": {
+      "title": "Reconhecimento",
+      "description": "O nosso trabalho foi reconhecido com múltiplos prémios pelas contribuições para a ciência da cannabis e inovação médica."
+    },
+    "collaboration": {
+      "title": "Colaboração",
+      "description": "Fazemos parcerias com universidades e instituições de investigação líderes mundiais para acelerar a investigação da cannabis."
+    }
+  },
+  "conditions": {
+    "title": "Condições Elegíveis que Tratamos",
+    "subtitle": "Investigação de cannabis medicinal em áreas terapêuticas chave",
+    "searchPlaceholder": "Pesquisar condições...",
+    "noResults": "Nenhuma condição encontrada correspondente à sua pesquisa.",
+    "learnMore": "Saber mais",
+    "notListed": "Não vê a sua condição listada? Ainda podemos ajudar.",
+    "contactUs": "Contacte-nos"
+  },
+  "categories": {
+    "all": "Todas",
+    "painManagement": "Gestão da Dor",
+    "mentalHealth": "Saúde Mental",
+    "neurological": "Neurológico",
+    "sleepDisorders": "Distúrbios do Sono"
+  },
+  "conditionNames": {
+    "chronicPain": "Dor Crónica",
+    "arthritis": "Artrite",
+    "backPain": "Dor nas Costas",
+    "crps": "Síndrome de Dor Regional Complexa",
+    "migraines": "Enxaquecas",
+    "neuropathicPain": "Dor Neuropática",
+    "anxiety": "Ansiedade",
+    "ptsd": "PTSD",
+    "epilepsy": "Epilepsia",
+    "multipleSclerosis": "Esclerose Múltipla",
+    "parkinsons": "Doença de Parkinson",
+    "insomnia": "Insónia"
+  },
+  "cta": {
+    "title": "Interessado na nossa investigação?",
+    "subtitle": "Saiba mais sobre os nossos estudos em curso e como estamos a avançar a ciência da cannabis.",
+    "button": "Contactar a nossa equipa de investigação"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "hero": {
+    "title": "Research & Development",
+    "subtitle": "Advancing cannabis science through rigorous research and clinical trials"
+  },
+  "essentialResearch": {
+    "title": "Essential Research",
+    "paragraph1": "Our collaboration with world-class research institutions including Imperial College London and the Lisbon School of Agriculture gives us advanced scientific understanding of cannabis and its benefits. Scientific research isn't just what we do – it's everything we stand for.",
+    "paragraph2": "Our research division conducts rigorous clinical trials to advance the scientific understanding of cannabinoids and their medical applications, contributing to a growing body of evidence that breaks down stigma and pushes for progress."
+  },
+  "cards": {
+    "clinicalTrials": {
+      "title": "Clinical Trials",
+      "description": "We conduct rigorous clinical trials examining the efficacy and safety of cannabis-based medicines for various medical conditions."
+    },
+    "publications": {
+      "title": "Publications",
+      "description": "Our research team publishes findings in peer-reviewed journals, contributing to the global understanding of cannabis medicine."
+    },
+    "recognition": {
+      "title": "Recognition",
+      "description": "Our work has been recognized with multiple awards for contributions to cannabis science and medical innovation."
+    },
+    "collaboration": {
+      "title": "Collaboration",
+      "description": "We partner with leading universities and research institutions worldwide to accelerate cannabis research."
+    }
+  },
+  "conditions": {
+    "title": "Eligible Conditions We Treat",
+    "subtitle": "Medical cannabis research across key therapeutic areas",
+    "searchPlaceholder": "Search conditions...",
+    "noResults": "No conditions found matching your search.",
+    "learnMore": "Learn more",
+    "notListed": "Don't see your condition listed? We may still be able to help.",
+    "contactUs": "Contact Us"
+  },
+  "categories": {
+    "all": "All",
+    "painManagement": "Pain Management",
+    "mentalHealth": "Mental Health",
+    "neurological": "Neurological",
+    "sleepDisorders": "Sleep Disorders"
+  },
+  "conditionNames": {
+    "chronicPain": "Chronic Pain",
+    "arthritis": "Arthritis",
+    "backPain": "Back Pain",
+    "crps": "Complex Regional Pain Syndrome",
+    "migraines": "Migraines",
+    "neuropathicPain": "Neuropathic Pain",
+    "anxiety": "Anxiety",
+    "ptsd": "PTSD",
+    "epilepsy": "Epilepsy",
+    "multipleSclerosis": "Multiple Sclerosis",
+    "parkinsons": "Parkinson's Disease",
+    "insomnia": "Insomnia"
+  },
+  "cta": {
+    "title": "Interested in our research?",
+    "subtitle": "Learn more about our ongoing studies and how we're advancing cannabis science.",
+    "button": "Contact our research team"
+  }
+}

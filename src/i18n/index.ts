@@ -4,21 +4,33 @@ import { initReactI18next } from 'react-i18next';
 import enCommon from './locales/en/common.json';
 import enHome from './locales/en/home.json';
 import enAuth from './locales/en/auth.json';
+import enResearch from './locales/en/research.json';
+import enContact from './locales/en/contact.json';
+import enConditions from './locales/en/conditions.json';
 
 import ptCommon from './locales/pt/common.json';
 import ptHome from './locales/pt/home.json';
 import ptAuth from './locales/pt/auth.json';
+import ptResearch from './locales/pt/research.json';
+import ptContact from './locales/pt/contact.json';
+import ptConditions from './locales/pt/conditions.json';
 
 const resources = {
   en: {
     common: enCommon,
     home: enHome,
     auth: enAuth,
+    research: enResearch,
+    contact: enContact,
+    conditions: enConditions,
   },
   pt: {
     common: ptCommon,
     home: ptHome,
     auth: ptAuth,
+    research: ptResearch,
+    contact: ptContact,
+    conditions: ptConditions,
   },
 };
 
@@ -53,7 +65,7 @@ i18n
     lng: getInitialLanguage(),
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'home', 'auth'],
+    ns: ['common', 'home', 'auth', 'research', 'contact', 'conditions'],
     interpolation: {
       escapeValue: false,
     },

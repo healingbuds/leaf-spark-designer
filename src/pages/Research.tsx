@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
@@ -21,53 +22,59 @@ import conditionNeuropathicPain from "@/assets/condition-neuropathic-pain.jpg";
 import conditionParkinsons from "@/assets/condition-parkinsons.jpg";
 import conditionPTSD from "@/assets/condition-ptsd.jpg";
 
-const conditionsByCategory = {
-  "Pain Management": [
-    { id: "chronic-pain", name: "Chronic Pain", image: conditionChronicPain },
-    { id: "arthritis", name: "Arthritis", image: conditionArthritis },
-    { id: "back-pain", name: "Back Pain", image: conditionBackPain },
-    { id: "complex-regional-pain-syndrome", name: "Complex Regional Pain Syndrome", image: conditionCRPS },
-    { id: "migraines", name: "Migraines", image: conditionMigraines },
-    { id: "neuropathic-pain", name: "Neuropathic Pain", image: conditionNeuropathicPain },
-  ],
-  "Mental Health": [
-    { id: "anxiety", name: "Anxiety", image: conditionAnxiety },
-    { id: "ptsd", name: "PTSD", image: conditionPTSD },
-  ],
-  "Neurological": [
-    { id: "epilepsy", name: "Epilepsy", image: conditionEpilepsy },
-    { id: "multiple-sclerosis", name: "Multiple Sclerosis", image: conditionMS },
-    { id: "parkinsons-disease", name: "Parkinson's Disease", image: conditionParkinsons },
-  ],
-  "Sleep Disorders": [
-    { id: "insomnia", name: "Insomnia", image: conditionInsomnia },
-  ],
-};
-
 const Research = () => {
+  const { t } = useTranslation('research');
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const categories = ["All", ...Object.keys(conditionsByCategory)];
+  const categoryKeys = ["all", "painManagement", "mentalHealth", "neurological", "sleepDisorders"];
+
+  const conditionsByCategory = {
+    painManagement: [
+      { id: "chronic-pain", nameKey: "chronicPain", image: conditionChronicPain },
+      { id: "arthritis", nameKey: "arthritis", image: conditionArthritis },
+      { id: "back-pain", nameKey: "backPain", image: conditionBackPain },
+      { id: "complex-regional-pain-syndrome", nameKey: "crps", image: conditionCRPS },
+      { id: "migraines", nameKey: "migraines", image: conditionMigraines },
+      { id: "neuropathic-pain", nameKey: "neuropathicPain", image: conditionNeuropathicPain },
+    ],
+    mentalHealth: [
+      { id: "anxiety", nameKey: "anxiety", image: conditionAnxiety },
+      { id: "ptsd", nameKey: "ptsd", image: conditionPTSD },
+    ],
+    neurological: [
+      { id: "epilepsy", nameKey: "epilepsy", image: conditionEpilepsy },
+      { id: "multiple-sclerosis", nameKey: "multipleSclerosis", image: conditionMS },
+      { id: "parkinsons-disease", nameKey: "parkinsons", image: conditionParkinsons },
+    ],
+    sleepDisorders: [
+      { id: "insomnia", nameKey: "insomnia", image: conditionInsomnia },
+    ],
+  };
 
   // Flatten all conditions with their categories for filtering
-  const allConditions = Object.entries(conditionsByCategory).flatMap(([category, conditions]) =>
-    conditions.map(condition => ({ ...condition, category }))
+  const allConditions = Object.entries(conditionsByCategory).flatMap(([categoryKey, conditions]) =>
+    conditions.map(condition => ({ 
+      ...condition, 
+      categoryKey,
+      name: t(`conditionNames.${condition.nameKey}`),
+      category: t(`categories.${categoryKey}`)
+    }))
   );
 
   // Filter conditions based on search and category
   const filteredConditions = allConditions.filter((condition) => {
     const matchesSearch = condition.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === "All" || condition.category === selectedCategory;
+    const matchesCategory = selectedCategory === "all" || condition.categoryKey === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
   // Group filtered conditions by category
   const filteredByCategory = filteredConditions.reduce((acc, condition) => {
-    if (!acc[condition.category]) {
-      acc[condition.category] = [];
+    if (!acc[condition.categoryKey]) {
+      acc[condition.categoryKey] = [];
     }
-    acc[condition.category].push(condition);
+    acc[condition.categoryKey].push(condition);
     return acc;
   }, {} as Record<string, typeof allConditions>);
 
@@ -82,10 +89,10 @@ const Research = () => {
             <ScrollAnimation>
               <div className="max-w-5xl">
                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 tracking-tight leading-[1.1]">
-                  Research & Development
+                  {t('hero.title')}
                 </h1>
                 <p className="text-xl md:text-2xl text-muted-foreground/80 max-w-3xl font-light">
-                  Advancing cannabis science through rigorous research and clinical trials
+                  {t('hero.subtitle')}
                 </p>
               </div>
             </ScrollAnimation>
@@ -110,42 +117,42 @@ const Research = () => {
             <ScrollAnimation>
               <div className="max-w-4xl mx-auto">
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground mb-6 tracking-tight">
-                  Essential Research
+                  {t('essentialResearch.title')}
                 </h2>
                 <p className="text-base md:text-lg text-muted-foreground/80 leading-relaxed mb-6">
-                  Our collaboration with world-class research institutions including Imperial College London and the Lisbon School of Agriculture gives us advanced scientific understanding of cannabis and its benefits. Scientific research isn't just what we do – it's everything we stand for.
+                  {t('essentialResearch.paragraph1')}
                 </p>
                 <p className="text-base md:text-lg text-muted-foreground/80 leading-relaxed mb-16">
-                  Our research division conducts rigorous clinical trials to advance the scientific understanding of cannabinoids and their medical applications, contributing to a growing body of evidence that breaks down stigma and pushes for progress.
+                  {t('essentialResearch.paragraph2')}
                 </p>
                 
                 <div className="grid md:grid-cols-2 gap-6 mb-16">
                 <div className="card-linear p-7 hover-lift">
                   <Microscope className="w-10 h-10 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold text-foreground mb-3 tracking-tight">Clinical Trials</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-3 tracking-tight">{t('cards.clinicalTrials.title')}</h3>
                   <p className="text-muted-foreground/80 leading-relaxed text-sm">
-                    We conduct rigorous clinical trials examining the efficacy and safety of cannabis-based medicines for various medical conditions.
+                    {t('cards.clinicalTrials.description')}
                   </p>
                 </div>
                 <div className="card-linear p-7 hover-lift">
                   <FileText className="w-10 h-10 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold text-foreground mb-3 tracking-tight">Publications</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-3 tracking-tight">{t('cards.publications.title')}</h3>
                   <p className="text-muted-foreground/80 leading-relaxed text-sm">
-                    Our research team publishes findings in peer-reviewed journals, contributing to the global understanding of cannabis medicine.
+                    {t('cards.publications.description')}
                   </p>
                 </div>
                 <div className="card-linear p-7 hover-lift">
                   <Award className="w-10 h-10 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold text-foreground mb-3 tracking-tight">Recognition</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-3 tracking-tight">{t('cards.recognition.title')}</h3>
                   <p className="text-muted-foreground/80 leading-relaxed text-sm">
-                    Our work has been recognized with multiple awards for contributions to cannabis science and medical innovation.
+                    {t('cards.recognition.description')}
                   </p>
                 </div>
                 <div className="card-linear p-7 hover-lift">
                   <Users className="w-10 h-10 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold text-foreground mb-3 tracking-tight">Collaboration</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-3 tracking-tight">{t('cards.collaboration.title')}</h3>
                   <p className="text-muted-foreground/80 leading-relaxed text-sm">
-                    We partner with leading universities and research institutions worldwide to accelerate cannabis research.
+                    {t('cards.collaboration.description')}
                   </p>
                 </div>
                 </div>
@@ -159,10 +166,10 @@ const Research = () => {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <ScrollAnimation>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground text-center mb-6 tracking-tight">
-                Eligible Conditions We Treat
+                {t('conditions.title')}
               </h2>
               <p className="text-lg text-muted-foreground/80 text-center max-w-3xl mx-auto mb-12">
-                Medical cannabis research across key therapeutic areas
+                {t('conditions.subtitle')}
               </p>
             </ScrollAnimation>
 
@@ -173,7 +180,7 @@ const Research = () => {
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     type="text"
-                    placeholder="Search conditions..."
+                    placeholder={t('conditions.searchPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-12 h-12 text-base bg-card border-border/50 focus:border-primary"
@@ -183,17 +190,17 @@ const Research = () => {
 
               <ScrollAnimation>
                 <div className="flex flex-wrap gap-3 justify-center">
-                  {categories.map((category) => (
+                  {categoryKeys.map((categoryKey) => (
                     <button
-                      key={category}
-                      onClick={() => setSelectedCategory(category)}
+                      key={categoryKey}
+                      onClick={() => setSelectedCategory(categoryKey)}
                       className={`px-5 py-2.5 rounded-lg font-medium transition-all duration-200 ${
-                        selectedCategory === category
+                        selectedCategory === categoryKey
                           ? "bg-primary text-primary-foreground shadow-md"
                           : "bg-card text-foreground hover:bg-muted border border-border/50"
                       }`}
                     >
-                      {category}
+                      {t(`categories.${categoryKey}`)}
                     </button>
                   ))}
                 </div>
@@ -204,16 +211,16 @@ const Research = () => {
             {filteredConditions.length === 0 ? (
               <div className="text-center py-16">
                 <p className="text-lg text-muted-foreground">
-                  No conditions found matching your search.
+                  {t('conditions.noResults')}
                 </p>
               </div>
             ) : (
               <div className="space-y-16 max-w-7xl mx-auto">
-                {Object.entries(filteredByCategory).map(([category, conditions]) => (
-                  <div key={category}>
+                {Object.entries(filteredByCategory).map(([categoryKey, conditions]) => (
+                  <div key={categoryKey}>
                     <ScrollAnimation>
                       <h3 className="text-2xl md:text-3xl font-semibold text-foreground mb-8 tracking-tight">
-                        {category}
+                        {t(`categories.${categoryKey}`)}
                       </h3>
                     </ScrollAnimation>
                     
@@ -241,13 +248,13 @@ const Research = () => {
                             <div className="absolute inset-0 p-6 flex flex-col justify-end">
                               <div className="transform transition-transform duration-300 group-hover:translate-y-[-4px]">
                                 <span className="inline-block px-3 py-1 text-xs font-medium bg-white/10 backdrop-blur-sm text-white/90 rounded-full mb-3 border border-white/10">
-                                  {category}
+                                  {condition.category}
                                 </span>
                                 <h3 className="text-xl font-semibold text-white mb-2 tracking-tight">
                                   {condition.name}
                                 </h3>
                                 <div className="flex items-center text-white/70 text-sm font-medium group-hover:text-white transition-colors">
-                                  <span>Learn more</span>
+                                  <span>{t('conditions.learnMore')}</span>
                                   <svg className="w-4 h-4 ml-1 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                   </svg>
@@ -269,11 +276,11 @@ const Research = () => {
             <ScrollAnimation>
               <div className="mt-20 text-center">
                 <p className="text-lg text-muted-foreground/80 mb-6">
-                  Don't see your condition listed? We may still be able to help.
+                  {t('conditions.notListed')}
                 </p>
                 <Link to="/contact">
                   <button className="btn-primary px-8 py-3 text-lg">
-                    Contact Us →
+                    {t('conditions.contactUs')} →
                   </button>
                 </Link>
               </div>
@@ -285,14 +292,14 @@ const Research = () => {
         <section className="py-20 md:py-32 bg-background">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground mb-6 tracking-tight">
-              Interested in our research?
+              {t('cta.title')}
             </h2>
             <p className="text-base md:text-lg text-muted-foreground/80 max-w-3xl mx-auto mb-10">
-              Learn more about our ongoing studies and how we're advancing cannabis science.
+              {t('cta.subtitle')}
             </p>
             <Link to="/contact">
               <button className="btn-primary px-7 py-3">
-                Contact our research team →
+                {t('cta.button')} →
               </button>
             </Link>
           </div>

@@ -1,0 +1,37 @@
+{
+  "hero": {
+    "title": "Eligible Conditions",
+    "subtitle": "At Healing Buds, we see patients when prescribed cannabis is an appropriate treatment option. Medical cannabis can be prescribed for a wide range of conditions where other treatments have failed.",
+    "note": "If your condition is not listed below, please get in touch. We may still be able to help."
+  },
+  "search": {
+    "placeholder": "Search conditions..."
+  },
+  "categories": {
+    "all": "All",
+    "painManagement": "Pain Management",
+    "mentalHealth": "Mental Health",
+    "neurological": "Neurological",
+    "sleepDisorders": "Sleep Disorders"
+  },
+  "conditionNames": {
+    "anxiety": "Anxiety",
+    "chronicPain": "Chronic Pain",
+    "arthritis": "Arthritis",
+    "backPain": "Back Pain",
+    "crps": "Complex Regional Pain Syndrome",
+    "epilepsy": "Epilepsy",
+    "insomnia": "Insomnia",
+    "migraines": "Migraines",
+    "multipleSclerosis": "Multiple Sclerosis",
+    "neuropathicPain": "Neuropathic Pain",
+    "parkinsons": "Parkinson's Disease",
+    "ptsd": "PTSD"
+  },
+  "noResults": "No conditions found matching your search. Please try a different search term or contact us for assistance.",
+  "cta": {
+    "title": "Don't see your condition listed?",
+    "subtitle": "We may still be able to help. Contact our team to discuss your specific condition and treatment options.",
+    "button": "Get in touch"
+  }
+}

@@ -56,7 +56,7 @@ const MobileBottomActions = () => {
             {user ? (
               <button 
                 onClick={handleLogout}
-                className="flex-1 font-body font-semibold px-6 py-3.5 rounded-full transition-all duration-300 active:scale-95 shadow-lg hover:shadow-2xl backdrop-blur-2xl bg-gradient-to-br from-white/20 via-white/15 to-white/10 dark:from-white/15 dark:via-white/10 dark:to-white/5 border border-white/30 hover:border-white/50 text-foreground hover:bg-white/25 flex items-center justify-center gap-2"
+                className="flex-1 font-body font-semibold px-6 py-3.5 rounded-full transition-all duration-300 active:scale-95 shadow-lg hover:shadow-2xl backdrop-blur-2xl bg-gradient-to-br from-white/20 via-white/15 to-white/10 dark:from-white/15 dark:via-white/10 dark:to-white/5 border border-white/30 hover:border-white/50 text-white hover:bg-white/25 flex items-center justify-center gap-2"
               >
                 <LogOut className="w-4 h-4" />
                 Sign Out
@@ -64,7 +64,7 @@ const MobileBottomActions = () => {
             ) : (
               <Link 
                 to="/auth"
-                className="flex-1 font-body font-semibold px-6 py-3.5 rounded-full transition-all duration-300 active:scale-95 shadow-lg hover:shadow-2xl backdrop-blur-2xl bg-gradient-to-br from-white/20 via-white/15 to-white/10 dark:from-white/15 dark:via-white/10 dark:to-white/5 border border-white/30 hover:border-white/50 text-foreground hover:bg-white/25 text-center"
+                className="flex-1 font-body font-semibold px-6 py-3.5 rounded-full transition-all duration-300 active:scale-95 shadow-lg hover:shadow-2xl backdrop-blur-2xl bg-gradient-to-br from-white/20 via-white/15 to-white/10 dark:from-white/15 dark:via-white/10 dark:to-white/5 border border-white/30 hover:border-white/50 text-white hover:bg-white/25 text-center"
               >
                 Patient Login
               </Link>

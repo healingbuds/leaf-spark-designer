@@ -109,7 +109,7 @@ const Header = () => {
           
           {/* Desktop Navigation */}
           <nav className={cn(
-            "hidden md:flex items-center transition-all duration-500 ease-out",
+            "hidden lg:flex items-center transition-all duration-500 ease-out",
             scrolled ? "space-x-4" : "space-x-6"
           )}>
             <div 
@@ -308,7 +308,7 @@ const Header = () => {
           {/* Mobile Menu Button */}
           <button
             className={cn(
-              "md:hidden text-white p-2 transition-all duration-300 hover:scale-110 active:scale-95",
+              "lg:hidden text-white p-2 transition-all duration-300 hover:scale-110 active:scale-95",
               scrolled && "p-1.5"
             )}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -325,7 +325,7 @@ const Header = () => {
         {/* Mobile Navigation */}
         <nav 
           className={cn(
-            "md:hidden overflow-y-auto max-h-[calc(100vh-140px)] transition-all duration-300 ease-in-out border-t border-white/10",
+            "lg:hidden overflow-y-auto max-h-[calc(100vh-140px)] transition-all duration-300 ease-in-out border-t border-white/10",
             mobileMenuOpen ? "py-4 opacity-100" : "max-h-0 py-0 opacity-0"
           )}
         >

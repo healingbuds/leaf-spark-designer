@@ -38,12 +38,12 @@ const MobileBottomActions = () => {
 
   return (
     <>
-      {/* Fixed Bottom Action Bar - Mobile Only */}
+      {/* Fixed Bottom Action Bar - Mobile and Tablet */}
       <motion.div 
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.3 }}
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-background via-background to-background/95 backdrop-blur-xl border-t border-border/50 shadow-2xl"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-background via-background to-background/95 backdrop-blur-xl border-t border-border/50 shadow-2xl"
       >
         <div className="container mx-auto px-4 py-3">
           <div className="flex gap-3">

@@ -71,9 +71,9 @@ const countries: Record<string, Country> = {
     name: 'Portugal',
     center: [-8.2245, 39.3999],
     zoom: 6,
-    status: 'NEXT',
+    status: 'UPCOMING',
     order: 2,
-    description: 'Licensed EU partner facility - Primary European medical cannabis hub with full regulatory compliance',
+    description: 'Coming Soon - Licensed EU partner facility with full regulatory compliance',
     locations: [
       { 
         name: 'Lisbon', 
@@ -173,7 +173,7 @@ const InteractiveMap = ({ selectedCountry, onCountrySelect }: InteractiveMapProp
           id: 'background',
           type: 'background',
           paint: {
-            'background-color': 'hsl(171, 12%, 88%)' // Slightly darker muted background
+            'background-color': 'hsl(171, 15%, 82%)' // Darker muted background for more contrast
           }
         },
         {
@@ -183,19 +183,19 @@ const InteractiveMap = ({ selectedCountry, onCountrySelect }: InteractiveMapProp
           minzoom: 0,
           maxzoom: 22,
           paint: {
-            'raster-opacity': 0.75, // Increased opacity for better visibility
-            'raster-saturation': -0.3, // Less desaturation
-            'raster-contrast': 0.05, // Slight contrast boost
-            'raster-brightness-min': 0.25,
-            'raster-brightness-max': 0.85
+            'raster-opacity': 0.85, // Higher opacity for better visibility
+            'raster-saturation': -0.15, // Less desaturation for more color
+            'raster-contrast': 0.2, // Higher contrast boost
+            'raster-brightness-min': 0.2,
+            'raster-brightness-max': 0.8
           }
         },
         {
           id: 'brand-overlay',
           type: 'background',
           paint: {
-            'background-color': 'hsl(178, 48%, 33%)', // Secondary green overlay
-            'background-opacity': 0.06
+            'background-color': 'hsl(178, 48%, 28%)', // Darker green overlay
+            'background-opacity': 0.08
           }
         }
       ]

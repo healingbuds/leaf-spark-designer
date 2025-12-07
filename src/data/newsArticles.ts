@@ -37,21 +37,21 @@ export const newsArticles: NewsArticle[] = [
     ],
   },
   {
-    id: "university-competition-cannabis-innovation",
+    id: "university-apprenticeship-programme",
     category: "Healing Buds",
-    title: "€500,000 University Competition: Healing Buds Invests in Tomorrow's Cannabis Industry Leaders",
-    description: "A groundbreaking initiative offers students in Business, Computer Science, Marketing, Bio Science, Pharmaceutical Sciences, and Agricultural Technology the chance to win funding, equity, and guaranteed career pathways.",
+    title: "University Apprenticeship Programme: Healing Buds Invests in Tomorrow's Cannabis Industry Leaders",
+    description: "A groundbreaking initiative offers students in Business, Computer Science, Marketing, Bio Science, Pharmaceutical Sciences, and Agricultural Technology the chance to gain hands-on experience through apprenticeships and partnership opportunities.",
     image: researchLab,
     featured: false,
-    tags: ["Healing Buds", "University", "Innovation", "Funding", "Education"],
+    tags: ["Healing Buds", "University", "Innovation", "Apprenticeship", "Education"],
     author: "Healing Buds Editorial",
     date: "Nov 22, 2024",
     content: [
-      "The cannabis industry faces a talent crisis. As legalization expands globally, companies struggle to find qualified professionals who understand both the science and the business of regulated cannabis. Healing Buds Global is addressing this head-on with a €500,000 university competition designed to identify and develop the next generation of industry leaders.",
-      "The competition welcomes students from diverse disciplines, recognizing that the cannabis industry needs more than just botanists. Business Studies students can tackle market expansion strategies. Computer Science students can improve blockchain traceability systems. Marketing students can develop compliant promotional frameworks. Bio Science and Pharmaceutical Sciences students can advance personalized medicine approaches. Agricultural Technology students can optimize sustainable cultivation methods.",
-      "Winners receive more than prize money. The top performers earn equity shares in participating ventures within the Healing Buds ecosystem, creating genuine ownership stakes in the industry they'll help build. Guaranteed internships and career pathways ensure that talented graduates have clear routes into meaningful roles.",
-      "The competition structure includes regional rounds across European universities, culminating in a final event at Portuguese facilities where finalists present to industry leaders. Mentorship from technologists, operators, and scientists supports participants throughout.",
-      "Beyond the competition itself, this initiative signals a maturation of the cannabis industry. By engaging with traditional academic institutions, Healing Buds is building bridges between cannabis entrepreneurship and mainstream career paths—exactly the normalization that long-term industry success requires."
+      "The cannabis industry faces a talent crisis. As legalization expands globally, companies struggle to find qualified professionals who understand both the science and the business of regulated cannabis. Healing Buds Global is addressing this head-on with a university apprenticeship and partnership programme designed to identify and develop the next generation of industry leaders.",
+      "The programme welcomes students from diverse disciplines, recognizing that the cannabis industry needs more than just botanists. Business Studies students can tackle market expansion strategies. Computer Science students can improve blockchain traceability systems. Marketing students can develop compliant promotional frameworks. Bio Science and Pharmaceutical Sciences students can advance personalized medicine approaches. Agricultural Technology students can optimize sustainable cultivation methods.",
+      "Participants receive more than just experience. Top performers earn equity shares in participating ventures within the Healing Buds ecosystem, creating genuine ownership stakes in the industry they'll help build. Guaranteed apprenticeships and partnership pathways ensure that talented graduates have clear routes into meaningful roles.",
+      "The programme structure includes regional rounds across European universities, culminating in placement opportunities at our Portuguese and South African facilities where apprentices work alongside industry leaders. Mentorship from technologists, operators, and scientists supports participants throughout.",
+      "Beyond the apprenticeship itself, this initiative signals a maturation of the cannabis industry. By engaging with traditional academic institutions, Healing Buds is building bridges between cannabis entrepreneurship and mainstream career paths—exactly the normalization that long-term industry success requires."
     ],
   },
   {

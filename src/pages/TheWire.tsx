@@ -42,13 +42,19 @@ const TheWire = () => {
                 <Link to={`/the-wire/${featuredArticle.id}`}>
                   <Card className="group overflow-hidden rounded-3xl border-border/50 hover:shadow-2xl transition-all duration-500">
                     <div className="grid md:grid-cols-2 gap-0">
-                      <div className="relative h-[300px] md:h-[400px] overflow-hidden">
+                      <div className="relative h-[300px] md:h-[400px] overflow-hidden bg-muted">
                         <img
                           src={featuredArticle.image}
                           alt={featuredArticle.title}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          loading="eager"
+                          onError={(e) => {
+                            // Fallback handling if image fails
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
                         />
-                        <div className="absolute top-4 left-4">
+                        <div className="absolute top-4 left-4 z-10">
                           <Badge className="bg-primary text-primary-foreground rounded-full px-4 py-1 font-semibold">
                             {t("featured")}
                           </Badge>
@@ -101,11 +107,12 @@ const TheWire = () => {
                 <ScrollAnimation key={article.id} delay={index * 0.1}>
                   <Link to={`/the-wire/${article.id}`}>
                     <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-border/50 rounded-2xl cursor-pointer hover:-translate-y-2 h-full flex flex-col">
-                      <div className="relative h-56 overflow-hidden">
+                      <div className="relative h-56 overflow-hidden bg-muted">
                         <img
                           src={article.image}
                           alt={article.title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          loading="lazy"
                         />
                       </div>
                       <div className="p-6 flex flex-col flex-grow">

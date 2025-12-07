@@ -9,6 +9,7 @@ const Hero = () => {
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const containerRef = React.useRef<HTMLElement>(null);
   const { t } = useTranslation('home');
+  const [videoEnded, setVideoEnded] = React.useState(false);
   
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -25,9 +26,15 @@ const Hero = () => {
     if (videoRef.current) {
       videoRef.current.play().catch(error => {
         console.log("Video autoplay failed:", error);
+        // If video can't autoplay, show the static image
+        setVideoEnded(true);
       });
     }
   }, []);
+
+  const handleVideoEnded = () => {
+    setVideoEnded(true);
+  };
 
   const scrollToContent = () => {
     window.scrollTo({
@@ -46,17 +53,31 @@ const Hero = () => {
         style={{ y: videoY }}
         className="absolute left-2 right-2 top-24 sm:top-28 md:top-32 bottom-4 rounded-2xl sm:rounded-3xl overflow-hidden z-0 shadow-2xl"
       >
-        <video 
+        {/* Static image that shows after video ends or as fallback */}
+        <motion.img
+          src={heroVideoBg}
+          alt=""
+          initial={{ opacity: 0 }}
+          animate={{ opacity: videoEnded ? 1 : 0 }}
+          transition={{ duration: 1.5, ease: "easeInOut" }}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        
+        {/* Video that plays first then fades out */}
+        <motion.video 
           ref={videoRef}
           autoPlay 
           muted 
-          loop 
           playsInline
-          poster={heroVideoBg}
-          className="w-full h-full object-cover"
+          onEnded={handleVideoEnded}
+          initial={{ opacity: 1 }}
+          animate={{ opacity: videoEnded ? 0 : 1 }}
+          transition={{ duration: 1.5, ease: "easeInOut" }}
+          className="absolute inset-0 w-full h-full object-cover"
         >
           <source src="/hero-video.mp4" type="video/mp4" />
-        </video>
+        </motion.video>
+        
         {/* Enhanced gradient overlay for better text contrast */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#1F2A25]/60 to-[#13303D]/55" />
       </motion.div>

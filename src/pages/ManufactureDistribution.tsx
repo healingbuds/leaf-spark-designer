@@ -99,7 +99,7 @@ const ManufactureDistribution = () => {
                       </div>
                       <h3 className="text-xl font-semibold text-foreground mb-3">Global Reach</h3>
                       <p className="text-muted-foreground/80 leading-relaxed">
-                        Distribution network across South Africa, UK, Thailand, and Portugal
+                        Distribution network across South Africa, UK, Thailand, and Portugal (coming soon)
                       </p>
                     </div>
                   </ScrollAnimation>
@@ -200,7 +200,7 @@ const ManufactureDistribution = () => {
                     Distribution & Wholesale
                   </h2>
                   <p className="text-lg text-muted-foreground/80 leading-relaxed">
-                    We support healthcare providers, pharmacies, and clinics with reliable supply chains that help patients access medical cannabis seamlessly. Our specialized distribution partners ensure secure shipment and comprehensive digital health guidance throughout South Africa, the United Kingdom, Thailand, and Portugal.
+                    We support healthcare providers, pharmacies, and clinics with reliable supply chains that help patients access medical cannabis seamlessly. Our specialized distribution partners ensure secure shipment and comprehensive digital health guidance throughout South Africa, the United Kingdom, and Thailand. Portugal distribution coming soon.
                   </p>
                 </ScrollAnimation>
               </div>

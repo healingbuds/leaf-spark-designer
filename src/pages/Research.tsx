@@ -6,6 +6,7 @@ import PageTransition from "@/components/PageTransition";
 import ScrollAnimation from "@/components/ScrollAnimation";
 import BackToTop from "@/components/BackToTop";
 import MobileBottomActions from "@/components/MobileBottomActions";
+import { BotanicalDecoration } from "@/components/BotanicalDecoration";
 import { Microscope, FileText, Award, Users, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -110,6 +111,14 @@ const Research = () => {
               className="absolute inset-0 w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background/10 to-transparent" />
+            
+            {/* Botanical line-art decorations */}
+            <div className="absolute top-4 left-4 opacity-[0.08] pointer-events-none">
+              <BotanicalDecoration variant="cannabis-leaf-elegant" className="w-24 md:w-32 h-auto text-white" />
+            </div>
+            <div className="absolute bottom-4 right-4 opacity-[0.08] pointer-events-none">
+              <BotanicalDecoration variant="cannabis-bud" className="w-20 md:w-28 h-auto text-white" />
+            </div>
           </div>
         </section>
 

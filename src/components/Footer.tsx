@@ -9,62 +9,148 @@ const Footer = () => {
   
   return (
     <footer id="contact" className="text-white relative overflow-hidden" style={{ backgroundColor: 'hsl(var(--section-color))' }}>
-      {/* Continuous line-art cannabis leaf decoration */}
-      <div className="absolute bottom-0 left-0 right-0 opacity-[0.04] pointer-events-none overflow-hidden">
+      {/* Continuous single-line cannabis leaf - exact match to reference */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 opacity-[0.06] pointer-events-none">
         <svg 
-          viewBox="0 0 800 200" 
+          viewBox="0 0 400 140" 
           fill="none" 
-          className="w-full h-auto text-white"
-          preserveAspectRatio="xMidYMax meet"
+          className="w-[600px] md:w-[800px] h-auto text-white"
         >
-          {/* Continuous single-line cannabis leaf with flowing line */}
+          {/* Flowing horizontal line from left */}
           <path 
-            d="M0 180 
-               C80 180 120 175 180 170 
-               Q200 168 220 160
-               C230 140 235 120 250 100
-               Q260 80 280 65
-               C290 55 305 50 320 55
-               Q340 62 355 80
-               C360 90 358 105 350 115
-               Q340 130 325 135
-               C310 140 290 135 280 125
-               Q270 115 275 100
-               C280 85 295 75 310 80
-               Q320 83 325 95
-               C330 75 340 55 360 45
-               Q380 35 400 40
-               C420 45 435 60 440 80
-               Q445 100 435 115
-               C425 130 405 138 385 135
-               Q365 132 355 115
-               C345 100 350 80 365 75
-               Q378 70 390 80
-               C400 50 420 30 450 28
-               Q480 26 500 40
-               C520 55 530 80 525 105
-               Q520 130 495 145
-               C470 160 440 155 420 140
-               Q400 125 405 100
-               C410 75 435 65 455 75
-               Q470 82 475 100
-               C488 70 510 45 545 40
-               Q580 35 605 55
-               C630 75 640 105 630 135
-               Q620 165 585 175
-               C550 185 515 175 495 155
-               Q475 135 485 105
-               C495 80 525 70 550 85
-               Q570 95 575 120
-               C590 100 615 85 650 90
-               Q685 95 705 120
-               C720 140 718 165 700 175
-               Q680 185 720 180
-               C760 178 800 180 800 180"
+            d="M0 120 
+               Q30 118 60 115
+               Q90 112 110 105
+               Q130 98 145 90"
             stroke="currentColor" 
-            strokeWidth="1.5" 
+            strokeWidth="1.2" 
             strokeLinecap="round"
-            strokeLinejoin="round"
+            fill="none"
+          />
+          
+          {/* Decorative curl/loop at start of leaf */}
+          <path 
+            d="M145 90
+               Q135 95 130 105
+               Q128 115 135 120
+               Q145 125 155 118
+               Q165 110 160 95
+               Q158 85 165 80"
+            stroke="currentColor" 
+            strokeWidth="1.2" 
+            strokeLinecap="round"
+            fill="none"
+          />
+          
+          {/* 7-fingered cannabis leaf - continuous line with serrated edges */}
+          {/* Left outer leaflet (finger 1) */}
+          <path 
+            d="M165 80
+               Q155 75 145 60
+               Q142 55 140 48
+               Q138 42 142 38
+               Q145 35 148 38
+               Q152 42 155 50
+               Q158 58 168 65"
+            stroke="currentColor" 
+            strokeWidth="1.2" 
+            strokeLinecap="round"
+            fill="none"
+          />
+          
+          {/* Left middle leaflet (finger 2) */}
+          <path 
+            d="M168 65
+               Q160 55 155 40
+               Q152 30 155 22
+               Q158 16 162 20
+               Q166 26 170 38
+               Q174 50 180 58"
+            stroke="currentColor" 
+            strokeWidth="1.2" 
+            strokeLinecap="round"
+            fill="none"
+          />
+          
+          {/* Left inner leaflet (finger 3) */}
+          <path 
+            d="M180 58
+               Q175 45 178 28
+               Q180 18 185 12
+               Q190 8 194 14
+               Q198 22 196 38
+               Q194 52 195 60"
+            stroke="currentColor" 
+            strokeWidth="1.2" 
+            strokeLinecap="round"
+            fill="none"
+          />
+          
+          {/* Center leaflet (finger 4 - tallest) */}
+          <path 
+            d="M195 60
+               Q195 42 200 22
+               Q203 10 208 5
+               Q213 2 218 8
+               Q223 16 222 32
+               Q220 48 225 58"
+            stroke="currentColor" 
+            strokeWidth="1.2" 
+            strokeLinecap="round"
+            fill="none"
+          />
+          
+          {/* Right inner leaflet (finger 5) */}
+          <path 
+            d="M225 58
+               Q228 45 235 28
+               Q240 18 248 14
+               Q254 10 258 18
+               Q260 28 255 45
+               Q250 58 252 65"
+            stroke="currentColor" 
+            strokeWidth="1.2" 
+            strokeLinecap="round"
+            fill="none"
+          />
+          
+          {/* Right middle leaflet (finger 6) */}
+          <path 
+            d="M252 65
+               Q258 50 268 38
+               Q275 28 282 26
+               Q288 24 290 32
+               Q290 42 282 55
+               Q275 65 272 72"
+            stroke="currentColor" 
+            strokeWidth="1.2" 
+            strokeLinecap="round"
+            fill="none"
+          />
+          
+          {/* Right outer leaflet (finger 7) */}
+          <path 
+            d="M272 72
+               Q280 62 290 55
+               Q298 50 305 52
+               Q310 56 308 64
+               Q304 72 295 78
+               Q285 84 278 85"
+            stroke="currentColor" 
+            strokeWidth="1.2" 
+            strokeLinecap="round"
+            fill="none"
+          />
+          
+          {/* Stem connecting to right flowing line */}
+          <path 
+            d="M278 85
+               Q285 92 295 100
+               Q310 110 330 115
+               Q360 120 400 120"
+            stroke="currentColor" 
+            strokeWidth="1.2" 
+            strokeLinecap="round"
             fill="none"
           />
         </svg>

@@ -8,6 +8,7 @@ import BackToTop from "@/components/BackToTop";
 import MobileBottomActions from "@/components/MobileBottomActions";
 import { Users, Heart, FileText } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
 import medicalProducts from "@/assets/medical-products-hq.jpg";
 import clinicConsultation from "@/assets/clinic-consultation.jpg";
 import clinicSouthAfrica from "@/assets/clinic-south-africa.jpg";
@@ -15,6 +16,19 @@ import clinicUK from "@/assets/clinic-uk.jpg";
 import clinicThailand from "@/assets/clinic-thailand.jpg";
 import clinicPortugal from "@/assets/clinic-portugal.jpg";
 import clinicDoctorPatient from "@/assets/clinic-doctor-patient.jpg";
+
+type RegionStatus = 'live' | 'coming-soon' | 'factory-ops';
+
+const getStatusBadge = (status: RegionStatus) => {
+  switch (status) {
+    case 'live':
+      return <Badge className="bg-green-500/90 text-white border-0 hover:bg-green-500">Live</Badge>;
+    case 'coming-soon':
+      return <Badge className="bg-amber-500/90 text-white border-0 hover:bg-amber-500">Coming Soon</Badge>;
+    case 'factory-ops':
+      return <Badge className="bg-blue-500/90 text-white border-0 hover:bg-blue-500">Factory Operations</Badge>;
+  }
+};
 
 const MedicalClinics = () => {
   const { t } = useTranslation('clinics');
@@ -146,7 +160,10 @@ const MedicalClinics = () => {
                     />
                   </ScrollAnimation>
                   <ScrollAnimation delay={0.2}>
-                    <h2 className="text-4xl font-semibold text-foreground mb-6">{t('regions.southAfrica.title')}</h2>
+                    <div className="flex items-center gap-3 mb-6">
+                      <h2 className="text-4xl font-semibold text-foreground">{t('regions.southAfrica.title')}</h2>
+                      {getStatusBadge('live')}
+                    </div>
                     <p className="text-lg text-muted-foreground/80 leading-relaxed mb-6">
                       {t('regions.southAfrica.paragraph1')}
                     </p>
@@ -159,7 +176,10 @@ const MedicalClinics = () => {
                 {/* United Kingdom */}
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                   <ScrollAnimation>
-                    <h2 className="text-4xl font-semibold text-foreground mb-6">{t('regions.uk.title')}</h2>
+                    <div className="flex items-center gap-3 mb-6">
+                      <h2 className="text-4xl font-semibold text-foreground">{t('regions.uk.title')}</h2>
+                      {getStatusBadge('coming-soon')}
+                    </div>
                     <p className="text-lg text-muted-foreground/80 leading-relaxed mb-6">
                       {t('regions.uk.paragraph1')}
                     </p>
@@ -186,7 +206,10 @@ const MedicalClinics = () => {
                     />
                   </ScrollAnimation>
                   <ScrollAnimation delay={0.2}>
-                    <h2 className="text-4xl font-semibold text-foreground mb-6">{t('regions.thailand.title')}</h2>
+                    <div className="flex items-center gap-3 mb-6">
+                      <h2 className="text-4xl font-semibold text-foreground">{t('regions.thailand.title')}</h2>
+                      {getStatusBadge('factory-ops')}
+                    </div>
                     <p className="text-lg text-muted-foreground/80 leading-relaxed mb-6">
                       {t('regions.thailand.paragraph1')}
                     </p>
@@ -199,7 +222,10 @@ const MedicalClinics = () => {
                 {/* Portugal */}
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                   <ScrollAnimation>
-                    <h2 className="text-4xl font-semibold text-foreground mb-6">{t('regions.portugal.title')}</h2>
+                    <div className="flex items-center gap-3 mb-6">
+                      <h2 className="text-4xl font-semibold text-foreground">{t('regions.portugal.title')}</h2>
+                      {getStatusBadge('coming-soon')}
+                    </div>
                     <p className="text-lg text-muted-foreground/80 leading-relaxed mb-6">
                       {t('regions.portugal.paragraph1')}
                     </p>

@@ -226,7 +226,7 @@ const InteractiveMap = ({ selectedCountry, onCountrySelect }: InteractiveMapProp
           id: 'brand-overlay',
           type: 'background',
           paint: {
-            'background-color': 'hsl(72, 22%, 46%)', // Olive green overlay
+            'background-color': 'hsl(72, 47%, 53%)', // Sage green overlay (#a2b756)
             'background-opacity': 0.06
           }
         }
@@ -403,9 +403,9 @@ const InteractiveMap = ({ selectedCountry, onCountrySelect }: InteractiveMapProp
         
         // Olive-based color palette for markers
         const colorMap: Record<LocationType, string> = {
-          'operations-sales': '#7A8266',   // Primary olive green
-          'export-only': '#97A275',        // Light olive/sage
-          'operations-only': '#666E54',    // Dark olive
+          'operations-sales': '#a2b756',   // Primary sage green
+          'export-only': '#b8c97a',        // Light sage
+          'operations-only': '#8a9e48',    // Dark sage
         };
         
         el.style.backgroundColor = colorMap[location.type];
@@ -428,24 +428,24 @@ const InteractiveMap = ({ selectedCountry, onCountrySelect }: InteractiveMapProp
           closeOnClick: false,
         })
           .setHTML(`
-            <div style="padding: 10px 14px; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: rgba(255, 255, 255, 0.97); backdrop-filter: blur(12px); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15), 0 0 0 1px rgba(122, 130, 102, 0.2); border: 1px solid rgba(122, 130, 102, 0.25);">
+            <div style="padding: 10px 14px; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: rgba(255, 255, 255, 0.97); backdrop-filter: blur(12px); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15), 0 0 0 1px rgba(162, 183, 86, 0.2); border: 1px solid rgba(162, 183, 86, 0.25);">
               <div style="font-weight: 700; font-size: 13px; margin-bottom: 4px; color: ${colorMap[location.type]}; letter-spacing: -0.2px;">${location.name}</div>
-              <div style="font-size: 11px; color: #666E54; margin-bottom: 6px;">${countryData.name}</div>
+              <div style="font-size: 11px; color: #8a9e48; margin-bottom: 6px;">${countryData.name}</div>
               ${location.cultivationArea ? `
                 <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 4px;">
-                  <span style="color: #97A275;">Area:</span>
+                  <span style="color: #b8c97a;">Area:</span>
                   <span style="color: #3A3E30; font-weight: 600;">${location.cultivationArea}</span>
                 </div>
               ` : ''}
               ${location.productionCapacity ? `
                 <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 4px;">
-                  <span style="color: #97A275;">Capacity:</span>
+                  <span style="color: #b8c97a;">Capacity:</span>
                   <span style="color: #3A3E30; font-weight: 600;">${location.productionCapacity}</span>
                 </div>
               ` : ''}
               ${location.certifications && location.certifications.length > 0 ? `
-                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(122, 130, 102, 0.2);">
-                  <div style="font-size: 9px; color: #97A275; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Certifications</div>
+                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(162, 183, 86, 0.2);">
+                  <div style="font-size: 9px; color: #b8c97a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Certifications</div>
                   <div style="display: flex; flex-wrap: wrap; gap: 4px;">
                     ${location.certifications.slice(0, 3).map(cert => 
                       `<span style="display: inline-block; background: ${colorMap[location.type]}; color: white; padding: 3px 8px; border-radius: 5px; font-size: 9px; font-weight: 600;">${cert}</span>`

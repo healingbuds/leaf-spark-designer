@@ -10,13 +10,24 @@ const Footer = () => {
   
   return (
     <footer id="contact" className="text-white relative overflow-hidden" style={{ backgroundColor: 'hsl(var(--section-color))' }}>
-      {/* Decorative flower line image */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 opacity-[0.15] pointer-events-none">
-        <img 
-          src={flowerLine}
-          alt=""
-          className="w-[600px] md:w-[800px] h-auto"
-        />
+      {/* Decorative flower line with extending horizontal lines */}
+      <div className="absolute bottom-[60px] left-0 right-0 pointer-events-none">
+        <div className="relative flex items-center justify-center">
+          {/* Left extending line */}
+          <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-white/15" />
+          
+          {/* Center flower image */}
+          <div className="relative px-0">
+            <img 
+              src={flowerLine}
+              alt=""
+              className="w-[200px] md:w-[300px] h-auto opacity-[0.15]"
+            />
+          </div>
+          
+          {/* Right extending line */}
+          <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-white/15 to-white/15" />
+        </div>
       </div>
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

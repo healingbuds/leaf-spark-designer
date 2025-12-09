@@ -19,6 +19,7 @@ interface HeaderProps {
 const Header = ({ onMenuStateChange }: HeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [whatWeDoOpen, setWhatWeDoOpen] = useState(false);
+  const [aboutUsOpen, setAboutUsOpen] = useState(false);
   const [mobileWhatWeDoOpen, setMobileWhatWeDoOpen] = useState(false);
   const [mobileAboutUsOpen, setMobileAboutUsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -79,7 +80,14 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
   
   const isWhatWeDoActive = ['/what-we-do', '/cultivating-processing', '/manufacture-distribution', '/medical-clinics', '/online-pharmacy'].includes(location.pathname);
   const isAboutUsActive = ['/about-us', '/blockchain-technology'].includes(location.pathname);
-  const [aboutUsOpen, setAboutUsOpen] = useState(false);
+
+  // Reset mobile dropdown states when menu closes
+  useEffect(() => {
+    if (!mobileMenuOpen) {
+      setMobileWhatWeDoOpen(false);
+      setMobileAboutUsOpen(false);
+    }
+  }, [mobileMenuOpen]);
 
   return (
     <>
@@ -128,13 +136,15 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
             scrolled ? "gap-2 xl:gap-3" : "gap-3 xl:gap-4"
           )}>
             <div 
-              className="relative"
+              className="relative group"
               onMouseEnter={() => setWhatWeDoOpen(true)}
               onMouseLeave={() => setWhatWeDoOpen(false)}
             >
-                <button 
+              <button 
+                type="button"
+                onClick={() => setWhatWeDoOpen(!whatWeDoOpen)}
                 className={cn(
-                  "font-body flex items-center gap-1 font-medium transition-all duration-300 ease-out relative rounded-md hover:scale-105 whitespace-nowrap",
+                  "font-body flex items-center gap-1 font-medium transition-all duration-300 ease-out relative rounded-md hover:scale-105 whitespace-nowrap cursor-pointer",
                   scrolled ? "text-xs xl:text-sm px-2 py-1" : "text-xs xl:text-sm px-2 xl:px-3 py-1.5",
                   isWhatWeDoActive
                     ? "text-white bg-white/10" 
@@ -211,13 +221,15 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
               {t('nav.theWire')}
             </Link>
             <div 
-              className="relative"
+              className="relative group"
               onMouseEnter={() => setAboutUsOpen(true)}
               onMouseLeave={() => setAboutUsOpen(false)}
             >
               <button 
+                type="button"
+                onClick={() => setAboutUsOpen(!aboutUsOpen)}
                 className={cn(
-                  "font-body flex items-center gap-1 font-medium transition-all duration-300 ease-out relative rounded-md hover:scale-105 whitespace-nowrap",
+                  "font-body flex items-center gap-1 font-medium transition-all duration-300 ease-out relative rounded-md hover:scale-105 whitespace-nowrap cursor-pointer",
                   scrolled ? "text-xs xl:text-sm px-2 py-1" : "text-xs xl:text-sm px-2 xl:px-3 py-1.5",
                   isAboutUsActive
                     ? "text-white bg-white/10" 
@@ -372,14 +384,19 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                     {/* What We Do Section - Collapsible */}
                     <div className="space-y-2">
                       <button 
-                        onClick={() => setMobileWhatWeDoOpen(!mobileWhatWeDoOpen)}
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setMobileWhatWeDoOpen(!mobileWhatWeDoOpen);
+                        }}
                         className={cn(
-                          "w-full font-semibold text-sm py-3 px-4 rounded-xl flex items-center justify-between transition-all",
+                          "w-full font-semibold text-sm py-3 px-4 rounded-xl flex items-center justify-between transition-all cursor-pointer touch-manipulation",
                           isWhatWeDoActive ? "text-white bg-white/10" : "text-white/90 hover:bg-white/5"
                         )}
                       >
                         {t('nav.whatWeDo')}
-                        <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", mobileWhatWeDoOpen && "rotate-180")} />
+                        <ChevronDown className={cn("w-4 h-4 transition-transform duration-200 pointer-events-none", mobileWhatWeDoOpen && "rotate-180")} />
                       </button>
                       <AnimatePresence>
                         {mobileWhatWeDoOpen && (
@@ -450,14 +467,19 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                     {/* About Us Section - Collapsible */}
                     <div className="space-y-2">
                       <button 
-                        onClick={() => setMobileAboutUsOpen(!mobileAboutUsOpen)}
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setMobileAboutUsOpen(!mobileAboutUsOpen);
+                        }}
                         className={cn(
-                          "w-full font-semibold text-sm py-3 px-4 rounded-xl flex items-center justify-between transition-all",
+                          "w-full font-semibold text-sm py-3 px-4 rounded-xl flex items-center justify-between transition-all cursor-pointer touch-manipulation",
                           isAboutUsActive ? "text-white bg-white/10" : "text-white/90 hover:bg-white/5"
                         )}
                       >
                         {t('nav.aboutUs')}
-                        <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", mobileAboutUsOpen && "rotate-180")} />
+                        <ChevronDown className={cn("w-4 h-4 transition-transform duration-200 pointer-events-none", mobileAboutUsOpen && "rotate-180")} />
                       </button>
                       <AnimatePresence>
                         {mobileAboutUsOpen && (

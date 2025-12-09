@@ -1,5 +1,4 @@
 import hbLogoWhite from "@/assets/hb-logo-white-new.png";
-import plantDecoration4 from "@/assets/plant-decoration-4.png";
 import { Link } from "react-router-dom";
 import { Mail, MapPin, Leaf } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -10,11 +9,6 @@ const Footer = () => {
   
   return (
     <footer id="contact" className="text-white relative overflow-hidden" style={{ backgroundColor: 'hsl(var(--section-color))' }}>
-      {/* Cannabis plant decoration - top right */}
-      <div className="absolute top-6 right-4 sm:right-12 opacity-[0.06] pointer-events-none">
-        <img src={plantDecoration4} alt="" className="w-40 sm:w-56 h-auto" />
-      </div>
-      
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Main Footer Content */}
         <div className="py-12 sm:py-16 border-b border-white/10">

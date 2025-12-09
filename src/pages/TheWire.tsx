@@ -10,6 +10,7 @@ import MobileBottomActions from "@/components/MobileBottomActions";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import SEOHead from "@/components/SEOHead";
 import { newsArticles } from "@/data/newsArticles";
 
 const TheWire = () => {
@@ -20,6 +21,12 @@ const TheWire = () => {
 
   return (
     <PageTransition>
+      <SEOHead 
+        title="The Wire - News & Updates | Healing Buds Global"
+        description="Stay updated with the latest news, research breakthroughs, and industry developments from Healing Buds Global. Expert insights on medical cannabis."
+        canonical="/the-wire"
+        keywords="cannabis news, medical cannabis updates, industry news, research breakthroughs, Healing Buds news"
+      />
       <div className="min-h-screen bg-background">
         <Header onMenuStateChange={setMenuOpen} />
         <main className="pt-24 pb-20">

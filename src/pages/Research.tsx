@@ -10,6 +10,7 @@ import { BotanicalDecoration } from "@/components/BotanicalDecoration";
 import { Microscope, FileText, Award, Users, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
+import SEOHead from "@/components/SEOHead";
 import researchLabImage from "@/assets/research-lab-hq.jpg";
 import conditionAnxiety from "@/assets/condition-anxiety.jpg";
 import conditionChronicPain from "@/assets/condition-chronic-pain.jpg";
@@ -83,6 +84,12 @@ const Research = () => {
 
   return (
     <PageTransition>
+      <SEOHead 
+        title="Research & Conditions | Healing Buds Global"
+        description="Explore our cannabis research initiatives and discover treatable conditions including chronic pain, anxiety, PTSD, epilepsy, and more. Evidence-based medical cannabis solutions."
+        canonical="/research"
+        keywords="cannabis research, medical conditions, chronic pain treatment, anxiety CBD, PTSD cannabis, epilepsy treatment, clinical trials"
+      />
       <div className="min-h-screen bg-background pb-24 lg:pb-0">
         <Header onMenuStateChange={setMenuOpen} />
       <main className="pt-28 md:pt-32">

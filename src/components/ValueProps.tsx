@@ -1,7 +1,6 @@
 import ScrollAnimation from "@/components/ScrollAnimation";
 import { Sprout, Users, FlaskConical } from "lucide-react";
-import plantDecoration1 from "@/assets/plant-decoration-1.png";
-import plantDecoration3 from "@/assets/plant-decoration-3.png";
+import plantLineArt from "@/assets/plant-line-art.png";
 
 const values = [
   {
@@ -28,14 +27,9 @@ const ValueProps = () => {
         className="py-16 sm:py-20 md:py-24 rounded-2xl sm:rounded-3xl relative overflow-hidden"
         style={{ backgroundColor: 'hsl(var(--section-color))' }}
       >
-        {/* Cannabis plant decoration - top left */}
-        <div className="absolute top-8 left-4 sm:left-8 opacity-[0.08] pointer-events-none">
-          <img src={plantDecoration1} alt="" className="w-48 sm:w-64 h-auto" />
-        </div>
-        
-        {/* Cannabis plant decoration - bottom right */}
-        <div className="absolute bottom-8 right-4 sm:right-8 opacity-[0.08] pointer-events-none">
-          <img src={plantDecoration3} alt="" className="w-40 sm:w-52 h-auto" />
+        {/* Cannabis plant decoration - bottom right - thin line art style */}
+        <div className="absolute bottom-8 right-8 sm:right-16 opacity-[0.12] pointer-events-none">
+          <img src={plantLineArt} alt="" className="w-32 sm:w-44 h-auto" />
         </div>
         
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

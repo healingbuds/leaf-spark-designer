@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import BackToTop from "@/components/BackToTop";
 import MobileBottomActions from "@/components/MobileBottomActions";
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 
 const Index = () => {
@@ -29,6 +30,11 @@ const Index = () => {
 
   return (
     <PageTransition>
+      <SEOHead 
+        title="Healing Buds Global | Pioneering Medical Cannabis Solutions"
+        description="Pioneering tomorrow's medical cannabis solutions with EU GMP-certified products, blockchain traceability, and global distribution across UK, South Africa, Thailand, and Portugal."
+        canonical="/"
+      />
       <div className="min-h-screen bg-background pb-20 lg:pb-0">
         <Header onMenuStateChange={setMenuOpen} />
         {/* Dynamic scroll-based fade overlay from hero bottom */}

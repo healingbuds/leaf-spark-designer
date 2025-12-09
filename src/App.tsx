@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import ScrollToTop from "@/components/ScrollToTop";
+import RouteProgress from "@/components/RouteProgress";
 import Index from "./pages/Index";
 import WhatWeDo from "./pages/WhatWeDo";
 import TheWire from "./pages/TheWire";
@@ -67,6 +68,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <RouteProgress />
           <AnimatedRoutes />
         </BrowserRouter>
       </TooltipProvider>

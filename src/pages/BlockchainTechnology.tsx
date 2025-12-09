@@ -6,12 +6,19 @@ import ScrollAnimation from "@/components/ScrollAnimation";
 import BackToTop from "@/components/BackToTop";
 import MobileBottomActions from "@/components/MobileBottomActions";
 import BlockchainTraceability from "@/components/BlockchainTraceability";
+import SEOHead from "@/components/SEOHead";
 
 const BlockchainTechnology = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <PageTransition>
+      <SEOHead 
+        title="Blockchain Technology | Healing Buds Global"
+        description="Pioneering transparency and traceability in medical cannabis through cutting-edge blockchain solutions. Seed-to-patient traceability with EU GMP certification."
+        canonical="/blockchain-technology"
+        keywords="blockchain cannabis, seed to patient traceability, EU GMP, cannabis tracking, anti-counterfeiting, medical cannabis blockchain"
+      />
       <div className="min-h-screen bg-background pb-24 lg:pb-0">
         <Header onMenuStateChange={setMenuOpen} />
         <main className="pt-28 md:pt-32">

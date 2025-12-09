@@ -153,18 +153,18 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
         <div className="container mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
           <div className={cn(
             "flex items-center justify-between transition-all duration-500 ease-out",
-            scrolled ? "h-16 md:h-18" : "h-18 md:h-24"
+            scrolled ? "h-20 md:h-22" : "h-24 md:h-28"
           )}>
             <Link to="/" className="flex items-center flex-shrink-0 group">
-            <img 
-              src={hbLogoWhite} 
-              alt="Healing Buds Logo" 
-              className={cn(
-                "w-auto object-contain transition-all duration-500 ease-out group-hover:scale-105",
-                scrolled ? "h-8 sm:h-10 md:h-12" : "h-10 sm:h-12 md:h-14"
-              )}
-            />
-          </Link>
+              <img 
+                src={hbLogoWhite} 
+                alt="Healing Buds Logo" 
+                className={cn(
+                  "w-auto object-contain transition-all duration-500 ease-out group-hover:scale-105",
+                  scrolled ? "h-12 sm:h-14 md:h-16" : "h-14 sm:h-16 md:h-20"
+                )}
+              />
+            </Link>
           
           {/* Desktop Navigation */}
           <nav className={cn(
@@ -395,20 +395,22 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
           <EligibilityDialog open={eligibilityDialogOpen} onOpenChange={setEligibilityDialogOpen} />
 
           {/* Mobile Menu Button & Theme Toggle */}
-          <div className="lg:hidden flex items-center gap-2">
+          <div className="lg:hidden flex items-center gap-3">
             <ThemeToggle />
             <button
+              type="button"
               className={cn(
-                "text-white p-2 transition-all duration-300 hover:scale-110 active:scale-95",
-                scrolled && "p-1.5"
+                "text-white p-3 rounded-xl transition-all duration-300 hover:scale-110 active:scale-95 touch-manipulation min-h-[48px] min-w-[48px] flex items-center justify-center",
+                "hover:bg-white/10 active:bg-white/20",
+                scrolled && "p-2.5"
               )}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? (
-                <X className={cn("transition-all duration-300", scrolled ? "w-5 h-5" : "w-6 h-6")} />
+                <X className={cn("transition-all duration-300", scrolled ? "w-6 h-6" : "w-7 h-7")} />
               ) : (
-                <Menu className={cn("transition-all duration-300", scrolled ? "w-5 h-5" : "w-6 h-6")} />
+                <Menu className={cn("transition-all duration-300", scrolled ? "w-6 h-6" : "w-7 h-7")} />
               )}
             </button>
           </div>
@@ -447,12 +449,12 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                           setMobileWhatWeDoOpen(!mobileWhatWeDoOpen);
                         }}
                         className={cn(
-                          "w-full font-semibold text-sm py-3 px-4 rounded-xl flex items-center justify-between transition-all cursor-pointer touch-manipulation",
-                          isWhatWeDoActive ? "text-white bg-white/10" : "text-white/90 hover:bg-white/5"
+                          "w-full font-semibold text-base py-4 px-5 rounded-xl flex items-center justify-between transition-all cursor-pointer touch-manipulation min-h-[56px] active:scale-[0.98]",
+                          isWhatWeDoActive ? "text-white bg-white/15" : "text-white/90 hover:bg-white/5 active:bg-white/10"
                         )}
                       >
                         {t('nav.whatWeDo')}
-                        <ChevronDown className={cn("w-4 h-4 transition-transform duration-200 pointer-events-none", mobileWhatWeDoOpen && "rotate-180")} />
+                        <ChevronDown className={cn("w-5 h-5 transition-transform duration-200 pointer-events-none", mobileWhatWeDoOpen && "rotate-180")} />
                       </button>
                       <AnimatePresence>
                         {mobileWhatWeDoOpen && (
@@ -463,31 +465,31 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                             transition={{ duration: 0.2 }}
                             className="overflow-hidden pl-4 border-l-2 border-white/20 ml-4"
                           >
-                            <div className="space-y-1 py-1">
+                            <div className="space-y-1 py-2">
                               <Link 
                                 to="/cultivating-processing" 
-                                className="block text-sm text-white/70 hover:text-white hover:bg-white/5 py-3 px-4 rounded-xl transition-all"
+                                className="block text-base text-white/70 hover:text-white hover:bg-white/5 active:bg-white/10 py-4 px-5 rounded-xl transition-all touch-manipulation min-h-[52px]"
                                 onClick={() => setMobileMenuOpen(false)}
                               >
                                 {t('dropdown.cultivating')}
                               </Link>
                               <Link 
                                 to="/manufacture-distribution" 
-                                className="block text-sm text-white/70 hover:text-white hover:bg-white/5 py-3 px-4 rounded-xl transition-all"
+                                className="block text-base text-white/70 hover:text-white hover:bg-white/5 active:bg-white/10 py-4 px-5 rounded-xl transition-all touch-manipulation min-h-[52px]"
                                 onClick={() => setMobileMenuOpen(false)}
                               >
                                 {t('dropdown.manufacture')}
                               </Link>
                               <Link 
                                 to="/medical-clinics" 
-                                className="block text-sm text-white/70 hover:text-white hover:bg-white/5 py-3 px-4 rounded-xl transition-all"
+                                className="block text-base text-white/70 hover:text-white hover:bg-white/5 active:bg-white/10 py-4 px-5 rounded-xl transition-all touch-manipulation min-h-[52px]"
                                 onClick={() => setMobileMenuOpen(false)}
                               >
                                 {t('dropdown.clinics')}
                               </Link>
                               <Link 
                                 to="/online-pharmacy" 
-                                className="block text-sm text-white/70 hover:text-white hover:bg-white/5 py-3 px-4 rounded-xl transition-all"
+                                className="block text-base text-white/70 hover:text-white hover:bg-white/5 active:bg-white/10 py-4 px-5 rounded-xl transition-all touch-manipulation min-h-[52px]"
                                 onClick={() => setMobileMenuOpen(false)}
                               >
                                 {t('dropdown.pharmacy')}
@@ -501,8 +503,8 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                     <Link 
                       to="/research" 
                       className={cn(
-                        "text-sm transition-all duration-200 py-3 px-4 rounded-xl",
-                        isActive("/research") ? "text-white font-semibold bg-white/10" : "text-white/70 hover:text-white hover:bg-white/5"
+                        "text-base transition-all duration-200 py-4 px-5 rounded-xl touch-manipulation min-h-[56px] flex items-center active:scale-[0.98]",
+                        isActive("/research") ? "text-white font-semibold bg-white/15" : "text-white/70 hover:text-white hover:bg-white/5 active:bg-white/10"
                       )}
                       onClick={() => setMobileMenuOpen(false)}
                     >
@@ -512,8 +514,8 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                     <Link 
                       to="/the-wire" 
                       className={cn(
-                        "text-sm transition-all duration-200 py-3 px-4 rounded-xl",
-                        isActive("/the-wire") || location.pathname.startsWith("/the-wire/") ? "text-white font-semibold bg-white/10" : "text-white/70 hover:text-white hover:bg-white/5"
+                        "text-base transition-all duration-200 py-4 px-5 rounded-xl touch-manipulation min-h-[56px] flex items-center active:scale-[0.98]",
+                        isActive("/the-wire") || location.pathname.startsWith("/the-wire/") ? "text-white font-semibold bg-white/15" : "text-white/70 hover:text-white hover:bg-white/5 active:bg-white/10"
                       )}
                       onClick={() => setMobileMenuOpen(false)}
                     >
@@ -530,12 +532,12 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                           setMobileAboutUsOpen(!mobileAboutUsOpen);
                         }}
                         className={cn(
-                          "w-full font-semibold text-sm py-3 px-4 rounded-xl flex items-center justify-between transition-all cursor-pointer touch-manipulation",
-                          isAboutUsActive ? "text-white bg-white/10" : "text-white/90 hover:bg-white/5"
+                          "w-full font-semibold text-base py-4 px-5 rounded-xl flex items-center justify-between transition-all cursor-pointer touch-manipulation min-h-[56px] active:scale-[0.98]",
+                          isAboutUsActive ? "text-white bg-white/15" : "text-white/90 hover:bg-white/5 active:bg-white/10"
                         )}
                       >
                         {t('nav.aboutUs')}
-                        <ChevronDown className={cn("w-4 h-4 transition-transform duration-200 pointer-events-none", mobileAboutUsOpen && "rotate-180")} />
+                        <ChevronDown className={cn("w-5 h-5 transition-transform duration-200 pointer-events-none", mobileAboutUsOpen && "rotate-180")} />
                       </button>
                       <AnimatePresence>
                         {mobileAboutUsOpen && (
@@ -546,17 +548,17 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                             transition={{ duration: 0.2 }}
                             className="overflow-hidden pl-4 border-l-2 border-white/20 ml-4"
                           >
-                            <div className="space-y-1 py-1">
+                            <div className="space-y-1 py-2">
                               <Link 
                                 to="/about-us" 
-                                className="block text-sm text-white/70 hover:text-white hover:bg-white/5 py-3 px-4 rounded-xl transition-all"
+                                className="block text-base text-white/70 hover:text-white hover:bg-white/5 active:bg-white/10 py-4 px-5 rounded-xl transition-all touch-manipulation min-h-[52px]"
                                 onClick={() => setMobileMenuOpen(false)}
                               >
                                 {t('dropdown.aboutHealing')}
                               </Link>
                               <Link 
                                 to="/blockchain-technology" 
-                                className="block text-sm text-white/70 hover:text-white hover:bg-white/5 py-3 px-4 rounded-xl transition-all"
+                                className="block text-base text-white/70 hover:text-white hover:bg-white/5 active:bg-white/10 py-4 px-5 rounded-xl transition-all touch-manipulation min-h-[52px]"
                                 onClick={() => setMobileMenuOpen(false)}
                               >
                                 {t('dropdown.blockchain')}
@@ -570,8 +572,8 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                     <Link 
                       to="/contact" 
                       className={cn(
-                        "text-sm transition-all duration-200 py-3 px-4 rounded-xl",
-                        isActive("/contact") ? "text-white font-semibold bg-white/10" : "text-white/70 hover:text-white hover:bg-white/5"
+                        "text-base transition-all duration-200 py-4 px-5 rounded-xl touch-manipulation min-h-[56px] flex items-center active:scale-[0.98]",
+                        isActive("/contact") ? "text-white font-semibold bg-white/15" : "text-white/70 hover:text-white hover:bg-white/5 active:bg-white/10"
                       )}
                       onClick={() => setMobileMenuOpen(false)}
                     >
@@ -583,29 +585,31 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                   <div className="my-6 border-t border-white/10" />
 
                   {/* Mobile CTAs inside menu */}
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <button
+                      type="button"
                       onClick={() => {
                         setEligibilityDialogOpen(true);
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full font-body font-semibold px-6 py-4 rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] shadow-lg backdrop-blur-2xl bg-gradient-to-br from-white/35 via-white/25 to-white/15 border border-white/50 text-white text-sm hover:from-white/45 hover:via-white/35 hover:to-white/25 hover:border-white/70 hover:shadow-xl focus-ring"
+                      className="w-full font-body font-semibold px-6 py-5 rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] shadow-lg backdrop-blur-2xl bg-gradient-to-br from-white/35 via-white/25 to-white/15 border border-white/50 text-white text-base hover:from-white/45 hover:via-white/35 hover:to-white/25 hover:border-white/70 hover:shadow-xl touch-manipulation min-h-[60px]"
                     >
                       {t('nav.checkEligibility')}
                     </button>
                     {user ? (
                       <button
+                        type="button"
                         onClick={handleLogout}
-                        className="w-full font-body font-semibold px-6 py-4 rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] shadow-lg backdrop-blur-2xl bg-gradient-to-br from-white/25 via-white/18 to-white/12 border border-white/40 text-white text-sm flex items-center justify-center gap-2 hover:from-white/35 hover:via-white/28 hover:to-white/22 hover:border-white/60 hover:shadow-xl focus-ring"
+                        className="w-full font-body font-semibold px-6 py-5 rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] shadow-lg backdrop-blur-2xl bg-gradient-to-br from-white/25 via-white/18 to-white/12 border border-white/40 text-white text-base flex items-center justify-center gap-2 hover:from-white/35 hover:via-white/28 hover:to-white/22 hover:border-white/60 hover:shadow-xl touch-manipulation min-h-[60px]"
                       >
-                        <LogOut className="w-4 h-4" />
+                        <LogOut className="w-5 h-5" />
                         {t('nav.signOut')}
                       </button>
                     ) : (
                       <Link
                         to="/auth"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="block w-full text-center font-body font-semibold px-6 py-4 rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] shadow-lg backdrop-blur-2xl bg-gradient-to-br from-white/25 via-white/18 to-white/12 border border-white/40 text-white text-sm hover:from-white/35 hover:via-white/28 hover:to-white/22 hover:border-white/60 hover:shadow-xl focus-ring"
+                        className="flex items-center justify-center w-full text-center font-body font-semibold px-6 py-5 rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] shadow-lg backdrop-blur-2xl bg-gradient-to-br from-white/25 via-white/18 to-white/12 border border-white/40 text-white text-base hover:from-white/35 hover:via-white/28 hover:to-white/22 hover:border-white/60 hover:shadow-xl touch-manipulation min-h-[60px]"
                       >
                         {t('nav.patientLogin')}
                       </Link>

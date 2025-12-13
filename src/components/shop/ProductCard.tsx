@@ -1,10 +1,13 @@
 import { motion } from 'framer-motion';
-import { ShoppingCart, Info, Leaf, Droplets } from 'lucide-react';
+import { ShoppingCart, Info, Leaf, Droplets, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { useShop } from '@/context/ShopContext';
 import { Product } from '@/hooks/useProducts';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 interface ProductCardProps {
   product: Product;
@@ -12,14 +15,43 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onViewDetails }: ProductCardProps) {
-  const { addToCart } = useShop();
+  const { addToCart, isEligible, drGreenClient } = useShop();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { t } = useTranslation('shop');
 
   const handleAddToCart = () => {
+    // Check if user has started registration
+    if (!drGreenClient) {
+      toast({
+        title: t('eligibility.required'),
+        description: t('eligibility.requiredDescription'),
+        variant: "destructive",
+      });
+      navigate('/shop/register');
+      return;
+    }
+
+    // Check eligibility
+    if (!isEligible) {
+      toast({
+        title: t('eligibility.pending'),
+        description: t('eligibility.kycPending'),
+        variant: "destructive",
+      });
+      return;
+    }
+
     addToCart({
       strain_id: product.id,
       strain_name: product.name,
       quantity: 1,
       unit_price: product.retailPrice,
+    });
+
+    toast({
+      title: "Added to cart",
+      description: `${product.name} has been added to your cart.`,
     });
   };
 
@@ -36,6 +68,42 @@ export function ProductCard({ product, onViewDetails }: ProductCardProps) {
       default:
         return 'bg-muted text-muted-foreground';
     }
+  };
+
+  const getButtonContent = () => {
+    if (!product.availability) {
+      return (
+        <>
+          <ShoppingCart className="mr-2 h-4 w-4" />
+          {t('outOfStock')}
+        </>
+      );
+    }
+    
+    if (!drGreenClient) {
+      return (
+        <>
+          <Lock className="mr-2 h-4 w-4" />
+          Register to Buy
+        </>
+      );
+    }
+    
+    if (!isEligible) {
+      return (
+        <>
+          <Lock className="mr-2 h-4 w-4" />
+          Verification Required
+        </>
+      );
+    }
+    
+    return (
+      <>
+        <ShoppingCart className="mr-2 h-4 w-4" />
+        {t('addToCart')}
+      </>
+    );
   };
 
   return (
@@ -58,7 +126,7 @@ export function ProductCard({ product, onViewDetails }: ProductCardProps) {
           {!product.availability && (
             <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center">
               <Badge variant="destructive" className="text-sm">
-                Out of Stock
+                {t('outOfStock')}
               </Badge>
             </div>
           )}
@@ -121,10 +189,10 @@ export function ProductCard({ product, onViewDetails }: ProductCardProps) {
           <Button
             className="w-full mt-2"
             disabled={!product.availability}
+            variant={!drGreenClient || !isEligible ? "secondary" : "default"}
             onClick={handleAddToCart}
           >
-            <ShoppingCart className="mr-2 h-4 w-4" />
-            Add to Cart
+            {getButtonContent()}
           </Button>
         </CardContent>
       </Card>

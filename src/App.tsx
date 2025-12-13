@@ -34,6 +34,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Shop = lazy(() => import("./pages/Shop"));
 const ShopRegister = lazy(() => import("./pages/ShopRegister"));
+const Checkout = lazy(() => import("./pages/Checkout"));
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const AnimatedRoutes = () => {
           <Route path="/auth" element={<Auth />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/shop/register" element={<ShopRegister />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/what-we-do" element={<WhatWeDo />} />
           <Route path="/cultivating-processing" element={<CultivatingProcessing />} />
           <Route path="/manufacture-distribution" element={<ManufactureDistribution />} />

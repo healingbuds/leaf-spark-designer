@@ -322,6 +322,18 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
               </AnimatePresence>
             </div>
             <Link 
+              to="/shop" 
+              className={cn(
+                "font-body font-medium transition-all duration-300 ease-out rounded-md hover:scale-105 whitespace-nowrap",
+                scrolled ? "text-xs xl:text-sm px-2 py-1" : "text-xs xl:text-sm px-2 xl:px-3 py-1.5",
+                isActive("/shop") || location.pathname.startsWith("/shop/")
+                  ? "text-white bg-white/10" 
+                  : "text-white/70 hover:text-white hover:bg-white/5"
+              )}
+            >
+              {t('nav.shop')}
+            </Link>
+            <Link 
               to="/contact" 
               className={cn(
                 "font-body font-medium transition-all duration-300 ease-out rounded-md hover:scale-105 whitespace-nowrap",
@@ -568,6 +580,17 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                         )}
                       </AnimatePresence>
                     </div>
+
+                    <Link 
+                      to="/shop" 
+                      className={cn(
+                        "text-base transition-all duration-200 py-4 px-5 rounded-xl touch-manipulation min-h-[56px] flex items-center active:scale-[0.98]",
+                        isActive("/shop") || location.pathname.startsWith("/shop/") ? "text-white font-semibold bg-white/15" : "text-white/70 hover:text-white hover:bg-white/5 active:bg-white/10"
+                      )}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {t('nav.shop')}
+                    </Link>
 
                     <Link 
                       to="/contact" 

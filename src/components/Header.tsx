@@ -166,10 +166,10 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
               />
             </Link>
           
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - Only show on xl screens to prevent overlap */}
           <nav className={cn(
-            "hidden lg:flex items-center flex-1 justify-end transition-all duration-500 ease-out",
-            scrolled ? "gap-2 xl:gap-3" : "gap-3 xl:gap-4"
+            "hidden xl:flex items-center flex-1 justify-end transition-all duration-500 ease-out",
+            scrolled ? "gap-1 2xl:gap-2" : "gap-2 2xl:gap-3"
           )}>
             <div 
               ref={whatWeDoRef}
@@ -186,7 +186,7 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                 }}
                 className={cn(
                   "font-body flex items-center gap-1 font-medium transition-all duration-300 ease-out relative rounded-md hover:scale-105 whitespace-nowrap cursor-pointer select-none",
-                  scrolled ? "text-xs xl:text-sm px-2 py-1" : "text-xs xl:text-sm px-2 xl:px-3 py-1.5",
+                  scrolled ? "text-[11px] 2xl:text-xs px-1.5 py-1" : "text-[11px] 2xl:text-xs px-2 py-1.5",
                   isWhatWeDoActive
                     ? "text-white bg-white/10" 
                     : "text-white/70 hover:text-white hover:bg-white/5"
@@ -246,7 +246,7 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
               to="/research" 
               className={cn(
                 "font-body font-medium transition-all duration-300 ease-out rounded-md hover:scale-105 whitespace-nowrap",
-                scrolled ? "text-xs xl:text-sm px-2 py-1" : "text-xs xl:text-sm px-2 xl:px-3 py-1.5",
+                scrolled ? "text-[11px] 2xl:text-xs px-1.5 py-1" : "text-[11px] 2xl:text-xs px-2 py-1.5",
                 isActive("/research") 
                   ? "text-white bg-white/10" 
                   : "text-white/70 hover:text-white hover:bg-white/5"
@@ -258,7 +258,7 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
               to="/the-wire" 
               className={cn(
                 "font-body font-medium transition-all duration-300 ease-out rounded-md hover:scale-105 whitespace-nowrap",
-                scrolled ? "text-xs xl:text-sm px-2 py-1" : "text-xs xl:text-sm px-2 xl:px-3 py-1.5",
+                scrolled ? "text-[11px] 2xl:text-xs px-1.5 py-1" : "text-[11px] 2xl:text-xs px-2 py-1.5",
                 isActive("/the-wire") || location.pathname.startsWith("/the-wire/")
                   ? "text-white bg-white/10" 
                   : "text-white/70 hover:text-white hover:bg-white/5"
@@ -281,7 +281,7 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                 }}
                 className={cn(
                   "font-body flex items-center gap-1 font-medium transition-all duration-300 ease-out relative rounded-md hover:scale-105 whitespace-nowrap cursor-pointer select-none",
-                  scrolled ? "text-xs xl:text-sm px-2 py-1" : "text-xs xl:text-sm px-2 xl:px-3 py-1.5",
+                  scrolled ? "text-[11px] 2xl:text-xs px-1.5 py-1" : "text-[11px] 2xl:text-xs px-2 py-1.5",
                   isAboutUsActive
                     ? "text-white bg-white/10" 
                     : "text-white/70 hover:text-white hover:bg-white/5"
@@ -325,7 +325,7 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
               to="/shop" 
               className={cn(
                 "font-body font-medium transition-all duration-300 ease-out rounded-md hover:scale-105 whitespace-nowrap",
-                scrolled ? "text-xs xl:text-sm px-2 py-1" : "text-xs xl:text-sm px-2 xl:px-3 py-1.5",
+                scrolled ? "text-[11px] 2xl:text-xs px-1.5 py-1" : "text-[11px] 2xl:text-xs px-2 py-1.5",
                 isActive("/shop") || location.pathname.startsWith("/shop/")
                   ? "text-white bg-white/10" 
                   : "text-white/70 hover:text-white hover:bg-white/5"
@@ -337,7 +337,7 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
               to="/contact" 
               className={cn(
                 "font-body font-medium transition-all duration-300 ease-out rounded-md hover:scale-105 whitespace-nowrap",
-                scrolled ? "text-xs xl:text-sm px-2 py-1" : "text-xs xl:text-sm px-2 xl:px-3 py-1.5",
+                scrolled ? "text-[11px] 2xl:text-xs px-1.5 py-1" : "text-[11px] 2xl:text-xs px-2 py-1.5",
                 isActive("/contact") 
                   ? "text-white bg-white/10" 
                   : "text-white/70 hover:text-white hover:bg-white/5"
@@ -353,51 +353,51 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
             <ThemeToggle />
 
             {/* Desktop Action Buttons */}
-            <div className="flex items-center gap-1.5 lg:gap-2 ml-1 lg:ml-2 flex-shrink-0 flex-wrap justify-end">
+            <div className="flex items-center gap-1 2xl:gap-1.5 ml-1 flex-shrink-0">
               <button
                 onClick={() => setEligibilityDialogOpen(true)}
-                className={cn(
-                  "font-body font-semibold px-2 lg:px-3 xl:px-4 py-1.5 lg:py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl relative z-10 whitespace-nowrap",
-                  "backdrop-blur-2xl bg-gradient-to-br from-white/35 via-white/25 to-white/15",
-                  "dark:from-white/25 dark:via-white/15 dark:to-white/10",
-                  "border border-white/50 shadow-lg hover:border-white/70",
-                  "text-white hover:bg-white/35",
-                  "text-[10px] lg:text-xs xl:text-sm"
-                )}
+                  className={cn(
+                    "font-body font-semibold px-2 2xl:px-3 py-1.5 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl relative z-10 whitespace-nowrap",
+                    "backdrop-blur-2xl bg-gradient-to-br from-white/35 via-white/25 to-white/15",
+                    "dark:from-white/25 dark:via-white/15 dark:to-white/10",
+                    "border border-white/50 shadow-lg hover:border-white/70",
+                    "text-white hover:bg-white/35",
+                    "text-[10px] 2xl:text-xs"
+                  )}
               >
-                <span className="hidden xl:inline">{t('nav.checkEligibility')}</span>
-                <span className="xl:hidden">Eligibility</span>
+                  <span className="hidden 2xl:inline">{t('nav.checkEligibility')}</span>
+                  <span className="2xl:hidden">Eligibility</span>
               </button>
               {user ? (
                 <button
                   onClick={handleLogout}
-                  className={cn(
-                    "font-body font-semibold px-2 lg:px-3 xl:px-4 py-1.5 lg:py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl relative z-10 whitespace-nowrap",
-                    "backdrop-blur-2xl bg-gradient-to-br from-white/25 via-white/18 to-white/12",
-                    "dark:from-white/20 dark:via-white/12 dark:to-white/8",
-                    "border border-white/40 shadow-lg hover:border-white/60",
-                    "text-white hover:bg-white/30 flex items-center gap-1",
-                    "text-[10px] lg:text-xs xl:text-sm"
-                  )}
+                    className={cn(
+                      "font-body font-semibold px-2 2xl:px-3 py-1.5 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl relative z-10 whitespace-nowrap",
+                      "backdrop-blur-2xl bg-gradient-to-br from-white/25 via-white/18 to-white/12",
+                      "dark:from-white/20 dark:via-white/12 dark:to-white/8",
+                      "border border-white/40 shadow-lg hover:border-white/60",
+                      "text-white hover:bg-white/30 flex items-center gap-1",
+                      "text-[10px] 2xl:text-xs"
+                    )}
                 >
-                  <LogOut className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
-                  <span className="hidden xl:inline">{t('nav.signOut')}</span>
-                  <span className="xl:hidden">Out</span>
-                </button>
+                    <LogOut className="w-3 h-3" />
+                    <span className="hidden 2xl:inline">{t('nav.signOut')}</span>
+                    <span className="2xl:hidden">Out</span>
+                  </button>
               ) : (
                 <Link
                   to="/auth"
-                  className={cn(
-                    "font-body font-semibold px-2 lg:px-3 xl:px-4 py-1.5 lg:py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl relative z-10 whitespace-nowrap",
-                    "backdrop-blur-2xl bg-gradient-to-br from-white/25 via-white/18 to-white/12",
-                    "dark:from-white/20 dark:via-white/12 dark:to-white/8",
-                    "border border-white/40 shadow-lg hover:border-white/60",
-                    "text-white hover:bg-white/30",
-                    "text-[10px] lg:text-xs xl:text-sm"
-                  )}
+                    className={cn(
+                      "font-body font-semibold px-2 2xl:px-3 py-1.5 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl relative z-10 whitespace-nowrap",
+                      "backdrop-blur-2xl bg-gradient-to-br from-white/25 via-white/18 to-white/12",
+                      "dark:from-white/20 dark:via-white/12 dark:to-white/8",
+                      "border border-white/40 shadow-lg hover:border-white/60",
+                      "text-white hover:bg-white/30",
+                      "text-[10px] 2xl:text-xs"
+                    )}
                 >
-                  <span className="hidden xl:inline">{t('nav.patientLogin')}</span>
-                  <span className="xl:hidden">Login</span>
+                    <span className="hidden 2xl:inline">{t('nav.patientLogin')}</span>
+                    <span className="2xl:hidden">Login</span>
                 </Link>
               )}
             </div>
@@ -407,7 +407,7 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
           <EligibilityDialog open={eligibilityDialogOpen} onOpenChange={setEligibilityDialogOpen} />
 
           {/* Mobile Menu Button & Theme Toggle */}
-          <div className="lg:hidden flex items-center gap-3">
+          <div className="xl:hidden flex items-center gap-3">
             <ThemeToggle />
             <button
               type="button"
@@ -438,7 +438,7 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-[-1]"
+                className="xl:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-[-1]"
                 onClick={() => setMobileMenuOpen(false)}
               />
               <motion.nav 
@@ -446,7 +446,7 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="lg:hidden overflow-hidden border-t border-white/10"
+                className="xl:hidden overflow-hidden border-t border-white/10"
               >
                 <div className="flex flex-col py-6 px-5 max-h-[calc(100vh-140px)] overflow-y-auto">
                   {/* Navigation Links */}

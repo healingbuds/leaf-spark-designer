@@ -11,8 +11,10 @@ import {
   FileText,
   ArrowRight,
   Loader2,
-  ExternalLink
+  ExternalLink,
+  Upload
 } from 'lucide-react';
+import PrescriptionManager from '@/components/dashboard/PrescriptionManager';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -194,6 +196,9 @@ const PatientDashboard = () => {
                     )}
                   </CardContent>
                 </Card>
+
+                {/* Prescription Manager */}
+                <PrescriptionManager />
 
                 {/* Recent Orders */}
                 <Card className="bg-card/50 backdrop-blur-sm border-border/50">

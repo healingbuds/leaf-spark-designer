@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ChevronDown, Menu, X, LogOut } from "lucide-react";
+import { ChevronDown, Menu, X, LogOut, LayoutDashboard } from "lucide-react";
 import hbLogoWhite from "@/assets/hb-logo-white-new.png";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { cn } from "@/lib/utils";
@@ -369,8 +369,23 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                   <span className="2xl:hidden">Eligibility</span>
               </button>
               {user ? (
-                <button
-                  onClick={handleLogout}
+                <>
+                  <Link
+                    to="/dashboard"
+                    className={cn(
+                      "font-body font-semibold px-2 2xl:px-3 py-1.5 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl relative z-10 whitespace-nowrap",
+                      "backdrop-blur-2xl bg-gradient-to-br from-primary/40 via-primary/30 to-primary/20",
+                      "border border-primary/50 shadow-lg hover:border-primary/70",
+                      "text-white hover:bg-primary/40 flex items-center gap-1",
+                      "text-[10px] 2xl:text-xs"
+                    )}
+                  >
+                    <LayoutDashboard className="w-3 h-3" />
+                    <span className="hidden 2xl:inline">{t('nav.dashboard')}</span>
+                    <span className="2xl:hidden">Dash</span>
+                  </Link>
+                  <button
+                    onClick={handleLogout}
                     className={cn(
                       "font-body font-semibold px-2 2xl:px-3 py-1.5 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl relative z-10 whitespace-nowrap",
                       "backdrop-blur-2xl bg-gradient-to-br from-white/25 via-white/18 to-white/12",
@@ -379,11 +394,12 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                       "text-white hover:bg-white/30 flex items-center gap-1",
                       "text-[10px] 2xl:text-xs"
                     )}
-                >
+                  >
                     <LogOut className="w-3 h-3" />
                     <span className="hidden 2xl:inline">{t('nav.signOut')}</span>
                     <span className="2xl:hidden">Out</span>
                   </button>
+                </>
               ) : (
                 <Link
                   to="/auth"
@@ -620,14 +636,24 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                       {t('nav.checkEligibility')}
                     </button>
                     {user ? (
-                      <button
-                        type="button"
-                        onClick={handleLogout}
-                        className="w-full font-body font-semibold px-6 py-5 rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] shadow-lg backdrop-blur-2xl bg-gradient-to-br from-white/25 via-white/18 to-white/12 border border-white/40 text-white text-base flex items-center justify-center gap-2 hover:from-white/35 hover:via-white/28 hover:to-white/22 hover:border-white/60 hover:shadow-xl touch-manipulation min-h-[60px]"
-                      >
-                        <LogOut className="w-5 h-5" />
-                        {t('nav.signOut')}
-                      </button>
+                      <>
+                        <Link
+                          to="/dashboard"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="w-full font-body font-semibold px-6 py-5 rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] shadow-lg backdrop-blur-2xl bg-gradient-to-br from-primary/40 via-primary/30 to-primary/20 border border-primary/50 text-white text-base flex items-center justify-center gap-2 hover:border-primary/70 hover:shadow-xl touch-manipulation min-h-[60px]"
+                        >
+                          <LayoutDashboard className="w-5 h-5" />
+                          {t('nav.dashboard')}
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={handleLogout}
+                          className="w-full font-body font-semibold px-6 py-5 rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] shadow-lg backdrop-blur-2xl bg-gradient-to-br from-white/25 via-white/18 to-white/12 border border-white/40 text-white text-base flex items-center justify-center gap-2 hover:from-white/35 hover:via-white/28 hover:to-white/22 hover:border-white/60 hover:shadow-xl touch-manipulation min-h-[60px]"
+                        >
+                          <LogOut className="w-5 h-5" />
+                          {t('nav.signOut')}
+                        </button>
+                      </>
                     ) : (
                       <Link
                         to="/auth"

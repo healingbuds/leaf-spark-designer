@@ -83,6 +83,42 @@ export type Database = {
         }
         Relationships: []
       }
+      drgreen_orders: {
+        Row: {
+          created_at: string
+          drgreen_order_id: string
+          id: string
+          items: Json
+          payment_status: string
+          status: string
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          drgreen_order_id: string
+          id?: string
+          items?: Json
+          payment_status?: string
+          status?: string
+          total_amount: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          drgreen_order_id?: string
+          id?: string
+          items?: Json
+          payment_status?: string
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

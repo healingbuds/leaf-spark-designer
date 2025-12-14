@@ -1,24 +1,14 @@
-import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Package, ArrowLeft, Clock, CheckCircle2, XCircle, Truck, Loader2 } from 'lucide-react';
+import { Package, ArrowLeft, Clock, CheckCircle2, XCircle, Truck, Loader2, RefreshCw, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { useShop } from '@/context/ShopContext';
 import { EligibilityGate } from '@/components/shop/EligibilityGate';
-import { useDrGreenApi } from '@/hooks/useDrGreenApi';
-import { useTranslation } from 'react-i18next';
-
-interface Order {
-  orderId: string;
-  status: string;
-  totalAmount: number;
-  createdAt: string;
-  paymentStatus: string;
-}
+import { useOrderTracking } from '@/hooks/useOrderTracking';
+import { useShop } from '@/context/ShopContext';
 
 const getStatusIcon = (status: string) => {
   switch (status.toUpperCase()) {
@@ -57,36 +47,13 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
 
 const Orders = () => {
   const navigate = useNavigate();
-  const { drGreenClient } = useShop();
-  const { getOrders } = useDrGreenApi();
-  const { t } = useTranslation('shop');
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { orders, isLoading, reorder } = useOrderTracking();
+  const { setIsCartOpen, isEligible } = useShop();
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      if (!drGreenClient?.drgreen_client_id) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const result = await getOrders(drGreenClient.drgreen_client_id);
-        if (result.error) {
-          setError(result.error);
-        } else {
-          setOrders(result.data || []);
-        }
-      } catch (err) {
-        setError('Failed to load orders');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchOrders();
-  }, [drGreenClient, getOrders]);
+  const handleReorder = async (order: typeof orders[0]) => {
+    await reorder(order);
+    setIsCartOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -114,24 +81,15 @@ const Orders = () => {
                   <CardTitle className="flex items-center gap-2">
                     <Package className="h-5 w-5" />
                     Order History
+                    <Badge variant="outline" className="ml-2 text-xs">
+                      Live Updates
+                    </Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {isLoading ? (
                     <div className="flex items-center justify-center py-12">
                       <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    </div>
-                  ) : error ? (
-                    <div className="text-center py-12">
-                      <XCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
-                      <p className="text-muted-foreground">{error}</p>
-                      <Button
-                        variant="outline"
-                        className="mt-4"
-                        onClick={() => window.location.reload()}
-                      >
-                        Try Again
-                      </Button>
                     </div>
                   ) : orders.length === 0 ? (
                     <div className="text-center py-12">
@@ -150,46 +108,77 @@ const Orders = () => {
                     <div className="space-y-4">
                       {orders.map((order, index) => (
                         <motion.div
-                          key={order.orderId}
+                          key={order.id}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.1 }}
                           className="p-4 rounded-lg border border-border/50 bg-muted/20 hover:bg-muted/30 transition-colors"
                         >
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2">
-                                <span className="font-mono text-sm text-primary">
-                                  #{order.orderId.slice(0, 8)}...
-                                </span>
-                                <Badge variant={getStatusVariant(order.status)}>
-                                  {getStatusIcon(order.status)}
-                                  <span className="ml-1">{order.status}</span>
-                                </Badge>
-                              </div>
-                              <p className="text-sm text-muted-foreground">
-                                {new Date(order.createdAt).toLocaleDateString('en-GB', {
-                                  day: 'numeric',
-                                  month: 'short',
-                                  year: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                })}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-4">
-                              <div className="text-right">
-                                <p className="font-semibold text-foreground">
-                                  €{order.totalAmount.toFixed(2)}
+                          <div className="flex flex-col gap-4">
+                            {/* Order header */}
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-mono text-sm text-primary">
+                                    #{order.drgreen_order_id.slice(0, 8)}...
+                                  </span>
+                                  <Badge variant={getStatusVariant(order.status)}>
+                                    {getStatusIcon(order.status)}
+                                    <span className="ml-1">{order.status}</span>
+                                  </Badge>
+                                  <Badge
+                                    variant={getStatusVariant(order.payment_status)}
+                                    className="text-xs"
+                                  >
+                                    {order.payment_status}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                  {new Date(order.created_at).toLocaleDateString('en-GB', {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}
                                 </p>
-                                <Badge
-                                  variant={getStatusVariant(order.paymentStatus)}
-                                  className="text-xs"
-                                >
-                                  {order.paymentStatus}
-                                </Badge>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <p className="font-semibold text-foreground text-lg">
+                                  €{order.total_amount.toFixed(2)}
+                                </p>
                               </div>
                             </div>
+
+                            {/* Order items */}
+                            {order.items && order.items.length > 0 && (
+                              <div className="bg-background/50 rounded-md p-3">
+                                <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Items</p>
+                                <div className="space-y-1">
+                                  {order.items.map((item, idx) => (
+                                    <div key={idx} className="flex justify-between text-sm">
+                                      <span className="text-foreground">{item.strain_name}</span>
+                                      <span className="text-muted-foreground">
+                                        {item.quantity}g × €{item.unit_price.toFixed(2)}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Reorder button */}
+                            {isEligible && order.items && order.items.length > 0 && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full sm:w-auto self-end"
+                                onClick={() => handleReorder(order)}
+                              >
+                                <RefreshCw className="mr-2 h-4 w-4" />
+                                Reorder
+                              </Button>
+                            )}
                           </div>
                         </motion.div>
                       ))}

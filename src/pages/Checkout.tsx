@@ -12,6 +12,7 @@ import { EligibilityGate } from '@/components/shop/EligibilityGate';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
 import { useDrGreenApi } from '@/hooks/useDrGreenApi';
+import { useOrderTracking } from '@/hooks/useOrderTracking';
 
 const Checkout = () => {
   const { cart, cartTotal, clearCart, drGreenClient } = useShop();
@@ -19,6 +20,7 @@ const Checkout = () => {
   const { t } = useTranslation('shop');
   const { toast } = useToast();
   const { createOrder, createPayment, getPayment } = useDrGreenApi();
+  const { saveOrder } = useOrderTracking();
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -68,6 +70,8 @@ const Checkout = () => {
       // Step 3: Poll for payment status (simplified - in production would use webhooks)
       let attempts = 0;
       const maxAttempts = 10;
+      let finalStatus = 'PENDING';
+      let finalPaymentStatus = 'PENDING';
       
       while (attempts < maxAttempts) {
         await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -75,15 +79,9 @@ const Checkout = () => {
         const statusResult = await getPayment(paymentId);
         
         if (statusResult.data?.status === 'PAID') {
-          setOrderId(createdOrderId);
-          setOrderComplete(true);
-          clearCart();
-          
-          toast({
-            title: 'Order Placed Successfully',
-            description: `Your order ${createdOrderId} has been confirmed.`,
-          });
-          return;
+          finalStatus = 'CONFIRMED';
+          finalPaymentStatus = 'PAID';
+          break;
         } else if (statusResult.data?.status === 'FAILED' || statusResult.data?.status === 'CANCELLED') {
           throw new Error('Payment was not successful');
         }
@@ -91,14 +89,27 @@ const Checkout = () => {
         attempts++;
       }
 
-      // If we exit the loop without confirmation, treat as pending
+      // Save order locally for tracking
+      await saveOrder({
+        drgreen_order_id: createdOrderId,
+        status: finalStatus,
+        payment_status: finalPaymentStatus,
+        total_amount: cartTotal,
+        items: cart.map(item => ({
+          strain_id: item.strain_id,
+          strain_name: item.strain_name,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+        })),
+      });
+
       setOrderId(createdOrderId);
       setOrderComplete(true);
       clearCart();
       
       toast({
-        title: 'Order Submitted',
-        description: `Your order ${createdOrderId} is being processed. You will receive confirmation shortly.`,
+        title: finalPaymentStatus === 'PAID' ? 'Order Placed Successfully' : 'Order Submitted',
+        description: `Your order ${createdOrderId} has been ${finalPaymentStatus === 'PAID' ? 'confirmed' : 'submitted for processing'}.`,
       });
     } catch (error) {
       console.error('Checkout error:', error);

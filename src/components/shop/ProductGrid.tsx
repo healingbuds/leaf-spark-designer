@@ -145,38 +145,45 @@ export function ProductGrid() {
         </Sheet>
       </div>
 
-      {/* Desktop category filters */}
-      <div className="hidden sm:flex items-center gap-4">
-        <div className="flex items-center gap-2">
+      {/* Category filter buttons */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2 mr-2">
           <Leaf className="h-4 w-4 text-primary" />
-          <span className="text-sm font-medium">Category:</span>
+          <span className="text-sm font-medium text-muted-foreground">Strain Type:</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {categories.map((category) => (
-            <Badge
+            <Button
               key={category}
               variant={selectedCategory === category ? 'default' : 'outline'}
-              className="cursor-pointer transition-colors hover:bg-primary/20"
+              size="sm"
               onClick={() => setSelectedCategory(category)}
+              className={`
+                rounded-full px-4 py-2 text-sm font-medium transition-all duration-200
+                ${selectedCategory === category 
+                  ? 'bg-primary text-primary-foreground shadow-md shadow-primary/25 scale-105' 
+                  : 'bg-background/50 hover:bg-primary/10 hover:border-primary/50 border-border/50'
+                }
+              `}
             >
               {category}
-            </Badge>
+            </Button>
           ))}
         </div>
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="hidden sm:flex items-center gap-2 ml-auto">
           <input
             type="checkbox"
             id="available-desktop"
             checked={showAvailableOnly}
             onChange={(e) => setShowAvailableOnly(e.target.checked)}
-            className="rounded"
+            className="rounded accent-primary"
           />
-          <label htmlFor="available-desktop" className="text-sm">
+          <label htmlFor="available-desktop" className="text-sm text-muted-foreground">
             Available only
           </label>
         </div>
         {hasActiveFilters && (
-          <Button variant="ghost" size="sm" onClick={clearFilters}>
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground hover:text-foreground">
             <X className="mr-1 h-3 w-3" />
             Clear
           </Button>

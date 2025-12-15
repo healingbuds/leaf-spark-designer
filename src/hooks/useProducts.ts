@@ -141,20 +141,31 @@ export function useProducts(countryCode: string = 'PT') {
     const alpha3Code = countryCodeMap[countryCode] || 'PRT';
 
     try {
-      // Try to fetch from Dr Green API via edge function
-      const { data, error: fnError } = await supabase.functions.invoke('drgreen-proxy', {
+      // First try country-specific strains
+      console.log(`Fetching strains for country: ${alpha3Code}`);
+      let { data, error: fnError } = await supabase.functions.invoke('drgreen-proxy', {
         body: {
           action: 'get-strains',
           countryCode: alpha3Code,
         },
       });
 
+      // If country-specific returns empty, try global catalog
+      if (!fnError && (!data?.data?.strains?.length)) {
+        console.log('No country-specific strains, trying global catalog...');
+        const fallbackResult = await supabase.functions.invoke('drgreen-proxy', {
+          body: { action: 'get-all-strains' },
+        });
+        if (!fallbackResult.error) {
+          data = fallbackResult.data;
+        }
+      }
+
       if (fnError) {
-        console.warn('Dr Green API unavailable, using mock data:', fnError);
+        console.warn('Dr Green API unavailable, using fallback data:', fnError);
         setProducts(mockProducts);
       } else if (data?.success && data?.data?.strains?.length > 0) {
         // Transform API response to our Product interface
-        // API returns: { success, statusCode, data: { strains: [...] } }
         const transformedProducts: Product[] = data.data.strains.map((strain: any) => ({
           id: strain.id || strain._id,
           name: strain.name,
@@ -171,13 +182,12 @@ export function useProducts(countryCode: string = 'PT') {
         }));
         setProducts(transformedProducts);
       } else {
-        // Use mock data if no strains returned from API
-        console.log('No strains from API, using mock data');
+        // Use fallback data if no strains returned from API
+        console.log('No strains from API, using fallback data');
         setProducts(mockProducts);
       }
     } catch (err) {
       console.error('Error fetching products:', err);
-      // Fallback to mock data
       setProducts(mockProducts);
     } finally {
       setIsLoading(false);

@@ -104,8 +104,16 @@ serve(async (req) => {
       
       // Strain/Product operations
       case "get-strains": {
-        const countryCode = body?.countryCode || "PT";
+        const countryCode = body?.countryCode || "PRT";
+        console.log(`Fetching strains for country: ${countryCode}`);
         response = await drGreenRequest(`/strains?countryCode=${countryCode}`, "GET");
+        break;
+      }
+      
+      case "get-all-strains": {
+        // Fetch all strains without country filtering (global catalog)
+        console.log("Fetching all strains (no country filter)");
+        response = await drGreenRequest("/strains", "GET");
         break;
       }
       

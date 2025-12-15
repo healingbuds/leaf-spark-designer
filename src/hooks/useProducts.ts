@@ -16,7 +16,7 @@ export interface Product {
   category: string;
 }
 
-// Real Dr Green strain data with S3 images
+// Real Dr Green strain data with verified S3 images
 const S3_BASE = 'https://prod-profiles-backend.s3.amazonaws.com/';
 
 const mockProducts: Product[] = [
@@ -51,13 +51,13 @@ const mockProducts: Product[] = [
   {
     id: 'drg-nfs-12',
     name: 'NFS 12',
-    description: 'Super potent indica with heavy sedation effects. Best for experienced users seeking deep relaxation and pain relief. Strong body buzz.',
+    description: 'Piney, earthy aroma with diesel and spice. Heavy head buzz with strong body sedation. Best for nighttime use and chronic pain relief.',
     thcContent: 30.0,
     cbdContent: 0.2,
     retailPrice: 18.00,
     availability: true,
     stock: 20,
-    imageUrl: `${S3_BASE}d38ba5e0-fa91-4fef-9da4-62f450b9049d-NFS%2012.png`,
+    imageUrl: `${S3_BASE}2cd72ff7-bb9c-45c8-8e6e-7729def59248-nfsheeshjpg.png`,
     effects: ['Sedating', 'Pain Relief', 'Heavy Buzz', 'Relaxing'],
     terpenes: ['Myrcene', 'Caryophyllene', 'Linalool'],
     category: 'Indica',
@@ -65,7 +65,7 @@ const mockProducts: Product[] = [
   {
     id: 'drg-blockberry',
     name: 'BlockBerry',
-    description: 'Berry-forward flavor profile with balanced effects. Happy, clear-headed high perfect for social situations and creative activities.',
+    description: 'Berry, vanilla, and citrus aromas. Happy, clear-headed high with functional relaxation. Good for social settings or creative work.',
     thcContent: 20.0,
     cbdContent: 1.0,
     retailPrice: 14.00,
@@ -79,44 +79,44 @@ const mockProducts: Product[] = [
   {
     id: 'drg-femme-fatale',
     name: 'Femme Fatale',
-    description: 'Smooth, calming indica-leaning hybrid. Elegant flavor profile with floral notes. Perfect for evening relaxation without heavy sedation.',
+    description: 'Grape, tropical fruits, pear, and berry flavors. Smooth, calming experience. Great for light evening use without overwhelming sedation.',
     thcContent: 19.0,
     cbdContent: 2.0,
     retailPrice: 15.00,
     availability: true,
     stock: 30,
-    imageUrl: `${S3_BASE}7cf3a9e3-ef12-4d33-b6c1-0d1e24f8d8a2-femme-fatale.png`,
+    imageUrl: `${S3_BASE}33eac80b-58c4-46d3-a82b-b70c875d333f-cakes%20n%20cream.png`,
     effects: ['Calming', 'Smooth', 'Relaxing', 'Evening'],
     terpenes: ['Linalool', 'Myrcene', 'Caryophyllene'],
-    category: 'Hybrid',
+    category: 'Indica',
   },
   {
     id: 'drg-blue-zushi',
     name: 'Blue Zushi',
-    description: 'Exotic strain with unique blueberry and sweet flavors. Euphoric and creative effects ideal for stress relief and mood elevation.',
+    description: 'Fruit, mint, and fuel terpene profile. Euphoric uplift transitioning to calm relaxation. Ideal for creative activities and stress relief.',
     thcContent: 25.0,
     cbdContent: 0.5,
     retailPrice: 17.00,
     availability: true,
     stock: 25,
-    imageUrl: `${S3_BASE}a1b2c3d4-blue-zushi-strain.png`,
-    effects: ['Euphoric', 'Creative', 'Stress Relief', 'Mood Boost'],
+    imageUrl: `${S3_BASE}39a46b1f-ae7b-4677-b5c8-11b301d34de1-Blue%20Zushi.png`,
+    effects: ['Euphoric', 'Creative', 'Stress Relief', 'Calming'],
     terpenes: ['Limonene', 'Caryophyllene', 'Myrcene'],
     category: 'Hybrid',
   },
   {
     id: 'drg-peanut-butter-breath',
     name: 'Peanut Butter Breath',
-    description: 'Nutty, earthy flavor with hints of herbs. Deeply relaxing indica perfect for appetite stimulation and sleep support.',
+    description: 'Nutty, earthy flavors. Cerebral lift followed by full body relaxation. Excellent for appetite loss, stress, nausea, and insomnia.',
     thcContent: 24.0,
     cbdContent: 0.8,
     retailPrice: 16.00,
     availability: true,
     stock: 40,
-    imageUrl: `${S3_BASE}e5f6g7h8-peanut-butter-breath.png`,
+    imageUrl: `${S3_BASE}56e1c80b-3670-4b76-a9bf-8bd1c9859966-Peanut-Butter-Breath-Main.png`,
     effects: ['Relaxing', 'Appetite', 'Sleep Aid', 'Calming'],
     terpenes: ['Caryophyllene', 'Limonene', 'Linalool'],
-    category: 'Indica',
+    category: 'Hybrid',
   },
 ];
 

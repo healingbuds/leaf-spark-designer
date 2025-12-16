@@ -141,18 +141,19 @@ export function ProductCard({ product, onViewDetails, showDataSource = false }: 
         {/* Gradient overlay for premium depth */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/20 pointer-events-none" />
         
-        {/* Image container - fixed aspect ratio with consistent shadow treatment */}
-        <div className="relative aspect-square overflow-hidden bg-gradient-to-b from-slate-900/30 to-slate-900/60 flex items-center justify-center">
-          {/* Background glow effect for depth */}
-          <div className="absolute inset-0 bg-gradient-radial from-white/5 via-transparent to-transparent opacity-50" />
+        {/* Image container - fixed aspect ratio with uniform sizing */}
+        <div className="relative aspect-square overflow-hidden bg-gradient-to-b from-slate-900/20 to-slate-900/50 flex items-center justify-center">
+          {/* Ambient background glow for visual weight */}
+          <div className="absolute inset-0 bg-gradient-radial from-primary/8 via-transparent to-transparent opacity-60" />
+          <div className="absolute inset-[15%] rounded-full bg-gradient-radial from-white/10 via-white/3 to-transparent blur-2xl" />
           
           <img
             src={product.imageUrl}
             alt={product.name}
-            className="w-[80%] h-[80%] object-contain transition-all duration-700 group-hover:scale-110 group-hover:rotate-1"
+            className="w-[85%] h-[85%] min-w-[70%] min-h-[70%] max-w-[92%] max-h-[92%] object-contain transition-all duration-700 group-hover:scale-110 group-hover:rotate-1 sm:w-[88%] sm:h-[88%]"
             loading="lazy"
             style={{ 
-              filter: 'drop-shadow(0 12px 28px rgba(0,0,0,0.5)) drop-shadow(0 4px 8px rgba(0,0,0,0.3))',
+              filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.55)) drop-shadow(0 8px 16px rgba(0,0,0,0.4)) drop-shadow(0 3px 6px rgba(0,0,0,0.3))',
             }}
           />
           

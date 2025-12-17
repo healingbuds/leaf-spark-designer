@@ -1,0 +1,64 @@
+name: Deploy via cPanel Git
+
+on:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
+
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Build
+              run: npm run build
+
+            - name: Add .cpanel.yml to dist
+              # Ensure cpanel config is in the build artifact
+              run: |
+                  if [ -f public/.cpanel.yml ]; then
+                    cp public/.cpanel.yml dist/
+                  else
+                    echo "creating default .cpanel.yml"
+                    echo "---" > dist/.cpanel.yml
+                    echo "deployment:" >> dist/.cpanel.yml
+                    echo "  tasks:" >> dist/.cpanel.yml
+                    echo "    - export DEPLOYPATH=/home/${{ secrets.CPANEL_USER }}/public_html/" >> dist/.cpanel.yml
+                    echo "    - /bin/cp -R * \$DEPLOYPATH" >> dist/.cpanel.yml
+                  fi
+
+            - name: Deploy to cPanel Git
+              env:
+                  SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+              run: |
+                  mkdir -p ~/.ssh
+                  ssh-keyscan ${{ secrets.CPANEL_HOST }} >> ~/.ssh/known_hosts
+                  eval `ssh-agent -s`
+                  ssh-add - <<< "${{ secrets.CPANEL_SSH_KEY }}"
+
+                  # Prepare dist as a git repo
+                  cd dist
+                  git init
+                  git config user.name "GitHub Action"
+                  git config user.email "action@github.com"
+                  git add .
+                  git commit -m "Deploy build artifact"
+
+                  # Push to cPanel
+                  # URL construction based on secrets and screenshot
+                  # Assuming repo name 'healingshop'
+                  git remote add cpanel "ssh://${{ secrets.CPANEL_USER }}@${{ secrets.CPANEL_HOST }}/home/${{ secrets.CPANEL_USER }}/healingshop"
+
+                  echo "Pushing to cPanel..."
+                  git push --force cpanel master

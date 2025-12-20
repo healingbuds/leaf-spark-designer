@@ -5,12 +5,12 @@ import PageTransition from "@/components/PageTransition";
 import ScrollAnimation from "@/components/ScrollAnimation";
 import BackToTop from "@/components/BackToTop";
 import MobileBottomActions from "@/components/MobileBottomActions";
-import StatisticsSection from "@/components/StatisticsSection";
+import AnimatedStatistics from "@/components/AnimatedStatistics";
 import { Target, Heart, Globe, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import researchLabImage from "@/assets/research-lab-hq.jpg";
 import { useState, useRef } from "react";
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const AboutUs = () => {
   const { t } = useTranslation('aboutUs');
@@ -205,8 +205,8 @@ const AboutUs = () => {
             </div>
           </section>
 
-          {/* Statistics Section */}
-          <StatisticsSection />
+          {/* Animated Statistics Section */}
+          <AnimatedStatistics />
 
           {/* Our Values with staggered cards */}
           <section className="py-20 md:py-32 bg-muted/30 overflow-hidden">

@@ -536,7 +536,7 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
             {/* Eligibility Dialog */}
             <EligibilityDialog open={eligibilityDialogOpen} onOpenChange={setEligibilityDialogOpen} />
 
-            {/* Mobile Menu Button & Theme Toggle */}
+          {/* Mobile Menu Button & Theme Toggle */}
             <div className="xl:hidden flex items-center gap-3 justify-self-end">
               <ThemeToggle />
               <button
@@ -561,71 +561,81 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
               </button>
             </div>
           </div>
+        </div>
+      </header>
 
-          {/* Mobile Navigation - Full Viewport Overlay with Focus Trap */}
-          <AnimatePresence>
-            {mobileMenuOpen && (
-              <>
-                {/* Backdrop - fully opaque to block all background content */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                  className="xl:hidden fixed inset-0 z-[9998]"
-                  style={{ backgroundColor: 'hsl(var(--overlay-bg) / var(--overlay-opacity))' }}
-                  onClick={() => setMobileMenuOpen(false)}
-                  aria-hidden="true"
-                />
-                
-                {/* Menu Surface - highest z-index, owns entire viewport */}
-                <motion.nav 
-                  ref={focusTrapRef as React.RefObject<HTMLElement>}
-                  initial={{ opacity: 0, x: '100%' }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: '100%' }}
-                  transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                  className="xl:hidden fixed inset-0 z-[9999] flex flex-col"
-                  style={{ backgroundColor: 'hsl(var(--nav-surface))' }}
-                  role="dialog"
-                  aria-modal="true"
-                  aria-label="Navigation menu"
+      {/* MOBILE NAVIGATION - OUTSIDE HEADER for true full-viewport ownership */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            {/* Backdrop - solid opaque to completely block background */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="xl:hidden fixed inset-0 z-[9998]"
+              style={{ backgroundColor: 'rgba(0, 0, 0, 0.98)' }}
+              onClick={() => setMobileMenuOpen(false)}
+              aria-hidden="true"
+            />
+            
+            {/* Menu Surface - highest z-index, owns entire viewport */}
+            <motion.nav 
+              ref={focusTrapRef as React.RefObject<HTMLElement>}
+              initial={{ opacity: 0, x: '100%' }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: '100%' }}
+              transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+              className="xl:hidden fixed inset-0 z-[9999] flex flex-col"
+              style={{ 
+                backgroundColor: 'hsl(178 35% 22%)',
+                height: '100dvh',
+                minHeight: '100vh'
+              }}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Navigation menu"
+            >
+              {/* Menu Header - fixed height */}
+              <div 
+                className="flex-shrink-0 flex items-center justify-between px-5"
+                style={{ 
+                  height: '72px', 
+                  backgroundColor: 'hsl(178 35% 18%)',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.15)'
+                }}
+              >
+                <Link 
+                  to="/" 
+                  onClick={() => setMobileMenuOpen(false)} 
+                  className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded-lg"
                 >
-                  {/* Menu Header - fixed height */}
-                  <div 
-                    className="flex-shrink-0 flex items-center justify-between px-5"
-                    style={{ 
-                      height: '72px', 
-                      backgroundColor: 'hsl(var(--nav-surface-elevated))',
-                      borderBottom: '1px solid hsl(var(--nav-border) / var(--nav-border-opacity))'
-                    }}
-                  >
-                    <Link 
-                      to="/" 
-                      onClick={() => setMobileMenuOpen(false)} 
-                      className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded-lg"
-                    >
-                      <img 
-                        src={hbLogoWhite} 
-                        alt="Healing Buds Logo" 
-                        className="h-12 w-auto object-contain"
-                      />
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="p-2.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
-                      aria-label="Close menu"
-                    >
-                      <X className="w-6 h-6 text-white" />
-                    </button>
-                  </div>
-                  
-                  {/* Scrollable menu content */}
-                  <div 
-                    className="flex-1 overflow-y-auto py-6 px-5 scrollbar-thin"
-                    style={{ maxHeight: 'calc(100dvh - 72px)' }}
-                  >
+                  <img 
+                    src={hbLogoWhite} 
+                    alt="Healing Buds Logo" 
+                    className="h-12 w-auto object-contain"
+                  />
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-2.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+                  aria-label="Close menu"
+                >
+                  <X className="w-6 h-6 text-white" />
+                </button>
+              </div>
+              
+              {/* Scrollable menu content - explicit height with iOS safe area */}
+              <div 
+                className="flex-1 overflow-y-auto py-6 px-5"
+                style={{ 
+                  height: 'calc(100dvh - 72px)',
+                  minHeight: 'calc(100vh - 72px)',
+                  paddingBottom: 'max(24px, env(safe-area-inset-bottom, 24px))'
+                }}
+              >
                     {/* Navigation Links */}
                     <div className="flex flex-col space-y-1">
                       {/* What We Do Section */}
@@ -904,10 +914,11 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
               </>
             )}
           </AnimatePresence>
-        </div>
-      </header>
-    </>
-  );
-};
+
+          {/* Eligibility Dialog */}
+          <EligibilityDialog open={eligibilityDialogOpen} onOpenChange={setEligibilityDialogOpen} />
+        </>
+      );
+    };
 
 export default Header;

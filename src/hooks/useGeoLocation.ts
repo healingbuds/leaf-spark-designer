@@ -125,18 +125,26 @@ const languageToCountry: Record<string, string> = {
   'th-TH': 'TH',
 };
 
-// Detect country from domain
+// Detect country from domain - UK is default for lovable.app and unknown domains
 const getCountryFromDomain = (): string | null => {
   if (typeof window === 'undefined') return null;
   
   const hostname = window.location.hostname;
   
+  // Lovable staging/preview domains → use DEFAULT (GB)
+  if (hostname.includes('lovable.app') || hostname.includes('lovable.dev')) return null;
+  
+  // Check specific country TLDs BEFORE generic .com
   if (hostname.endsWith('.pt') || hostname.includes('.pt.')) return 'PT';
   if (hostname.endsWith('.co.uk') || hostname.includes('.co.uk.')) return 'GB';
   if (hostname.endsWith('.co.za') || hostname.includes('.co.za.')) return 'ZA';
   if (hostname.endsWith('.co.th') || hostname.includes('.co.th.')) return 'TH';
-  if (hostname.endsWith('.com') || hostname.endsWith('.us')) return 'US';
   
+  // Only match explicit US domains - not generic .com
+  if (hostname.endsWith('.us')) return 'US';
+  if (hostname === 'healingbuds.com' || hostname === 'www.healingbuds.com') return 'US';
+  
+  // All other domains (including generic .com) → use DEFAULT (GB)
   return null;
 };
 

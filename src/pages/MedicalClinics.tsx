@@ -1,14 +1,14 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
+import PageHero from "@/components/PageHero";
 import ScrollAnimation from "@/components/ScrollAnimation";
 import BackToTop from "@/components/BackToTop";
 import MobileBottomActions from "@/components/MobileBottomActions";
 import AnimatedStatistics from "@/components/AnimatedStatistics";
 import { Users, Heart, FileText } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import medicalProducts from "@/assets/medical-products-hq.jpg";
 import clinicConsultation from "@/assets/clinic-consultation.jpg";
@@ -34,80 +34,23 @@ const getStatusBadge = (status: RegionStatus) => {
 const MedicalClinics = () => {
   const { t } = useTranslation('clinics');
   const [menuOpen, setMenuOpen] = useState(false);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"]
-  });
-  
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
-  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.3]);
 
   return (
     <PageTransition>
       <div className="min-h-screen bg-background pb-24 lg:pb-0">
         <Header onMenuStateChange={setMenuOpen} />
         <main className="pt-24">
-          {/* Hero Section with Parallax & Edge Fade */}
-          <section ref={heroRef} className="relative h-[500px] overflow-hidden">
-            <motion.img 
-              src={medicalProducts}
-              alt="Medical cannabis clinic" 
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ y, opacity }}
-            />
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background z-[1]" />
-            
-            {/* Animated edge fade vignette */}
-            <motion.div 
-              className="absolute inset-0 pointer-events-none z-[2]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1.2, delay: 0.3 }}
-              style={{
-                background: `
-                  radial-gradient(ellipse 120% 80% at 50% 50%, transparent 40%, hsl(var(--background) / 0.3) 70%, hsl(var(--background) / 0.7) 100%)
-                `
-              }}
-            />
-            
-            {/* Subtle animated glow on edges */}
-            <motion.div 
-              className="absolute inset-0 pointer-events-none z-[2]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0.3, 0.5, 0.3] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              style={{
-                boxShadow: 'inset 0 0 80px 30px hsl(var(--background) / 0.5)'
-              }}
-            />
-            
-            <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center z-[3]">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
-              >
-                <motion.h1 
-                  className="text-5xl md:text-6xl font-semibold text-foreground mb-4"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.1 }}
-                >
-                  {t('hero.title')}
-                </motion.h1>
-                <motion.p 
-                  className="text-xl text-muted-foreground/80 max-w-2xl"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                >
-                  {t('hero.subtitle')}
-                </motion.p>
-              </motion.div>
-            </div>
-          </section>
+          {/* Hero Section using PageHero component */}
+          <PageHero
+            title={t('hero.title')}
+            subtitle={t('hero.subtitle')}
+            image={medicalProducts}
+            imageAlt="Medical cannabis clinic"
+            variant="overlay"
+            showAnimatedGlow
+            imageHeight="md"
+            parallaxIntensity="strong"
+          />
 
           {/* We Bring People Together Section */}
           <section className="py-20 md:py-32 bg-background">

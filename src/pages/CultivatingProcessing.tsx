@@ -1,12 +1,13 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
+import PageHero from "@/components/PageHero";
 import ScrollAnimation from "@/components/ScrollAnimation";
 import BackToTop from "@/components/BackToTop";
 import MobileBottomActions from "@/components/MobileBottomActions";
 import { Plus } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import cultivationImage from "@/assets/greenhouse-exterior-hq.jpg";
 import greenhouseRows from "@/assets/greenhouse-exterior-path.jpg";
 import productionImage from "@/assets/water-irrigation-system.jpg";
@@ -21,14 +22,6 @@ const CultivatingProcessing = () => {
   const [activeTab, setActiveTab] = useState<"southafrica" | "uk" | "thailand" | "portugal">("southafrica");
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"]
-  });
-  
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
-  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.3]);
 
   const toggleItem = (item: string) => {
     setExpandedItem(expandedItem === item ? null : item);
@@ -39,75 +32,17 @@ const CultivatingProcessing = () => {
       <div className="min-h-screen bg-background pb-24 lg:pb-0">
         <Header onMenuStateChange={setMenuOpen} />
         <main className="pt-28 md:pt-32">
-          {/* Hero Section with Staggered Animation */}
-          <section className="bg-background py-16 md:py-20">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-              <motion.div 
-                className="max-w-5xl"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
-              >
-                <motion.h1 
-                  className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 tracking-tight leading-[1.1]"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.1 }}
-                >
-                  Cultivating & Processing
-                </motion.h1>
-                <motion.p 
-                  className="text-xl md:text-2xl text-muted-foreground/80 max-w-3xl font-light"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                >
-                  Excellence in cultivation from South Africa to the world.
-                </motion.p>
-              </motion.div>
-            </div>
-          </section>
-
-          {/* Hero Image with Parallax & Edge Fade */}
-          <section className="container mx-auto px-4 sm:px-6 lg:px-8 pb-16 md:pb-20">
-            <motion.div 
-              ref={heroRef}
-              className="relative h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden rounded-2xl"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-            >
-              <motion.img 
-                src={cultivationImage}
-                alt="Cannabis cultivation facility" 
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ y, opacity }}
-              />
-              {/* Animated edge fade vignette */}
-              <motion.div 
-                className="absolute inset-0 pointer-events-none z-10"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1.2, delay: 0.5 }}
-                style={{
-                  background: `
-                    radial-gradient(ellipse 120% 80% at 50% 50%, transparent 40%, hsl(var(--background) / 0.3) 70%, hsl(var(--background) / 0.7) 100%),
-                    linear-gradient(to bottom, transparent 60%, hsl(var(--background) / 0.5) 100%)
-                  `
-                }}
-              />
-              {/* Subtle animated glow on edges */}
-              <motion.div 
-                className="absolute inset-0 pointer-events-none z-10 rounded-2xl"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0.3, 0.5, 0.3] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                style={{
-                  boxShadow: 'inset 0 0 60px 20px hsl(var(--background) / 0.4)'
-                }}
-              />
-            </motion.div>
-          </section>
+          {/* Hero Section using PageHero component */}
+          <PageHero
+            title="Cultivating & Processing"
+            subtitle="Excellence in cultivation from South Africa to the world."
+            image={cultivationImage}
+            imageAlt="Cannabis cultivation facility"
+            variant="split"
+            showAnimatedGlow
+            imageHeight="lg"
+            parallaxIntensity="strong"
+          />
 
           {/* Intro Section - Linear style */}
           <section className="py-20 md:py-32 bg-background">
@@ -321,16 +256,6 @@ const CultivatingProcessing = () => {
                     South Africa
                   </button>
                   <button
-                    onClick={() => setActiveTab("thailand")}
-                    className={`px-6 md:px-8 py-2.5 font-medium transition-all duration-200 rounded-lg ${
-                      activeTab === "thailand"
-                        ? "text-foreground bg-foreground/5"
-                        : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
-                    }`}
-                  >
-                    Thailand
-                  </button>
-                  <button
                     onClick={() => setActiveTab("uk")}
                     className={`px-6 md:px-8 py-2.5 font-medium transition-all duration-200 rounded-lg ${
                       activeTab === "uk"
@@ -339,6 +264,16 @@ const CultivatingProcessing = () => {
                     }`}
                   >
                     United Kingdom
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("thailand")}
+                    className={`px-6 md:px-8 py-2.5 font-medium transition-all duration-200 rounded-lg ${
+                      activeTab === "thailand"
+                        ? "text-foreground bg-foreground/5"
+                        : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
+                    }`}
+                  >
+                    Thailand
                   </button>
                   <button
                     onClick={() => setActiveTab("portugal")}
@@ -353,230 +288,179 @@ const CultivatingProcessing = () => {
                 </div>
               </ScrollAnimation>
 
-              {/* Content - Linear style */}
-              {activeTab === "southafrica" && (
-                <ScrollAnimation>
-                  <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center max-w-6xl mx-auto">
-                    <div className="order-2 md:order-1 space-y-6">
-                      <div className="flex items-center gap-3">
-                        <h3 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight">South Africa</h3>
-                        <Badge className="bg-green-500/20 text-green-600 dark:text-green-400 border-green-500/30 text-xs font-medium">Live</Badge>
+              {/* Tab Content */}
+              <div className="max-w-6xl mx-auto">
+                {activeTab === "southafrica" && (
+                  <ScrollAnimation key="southafrica">
+                    <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+                      <div>
+                        <div className="flex items-center gap-3 mb-6">
+                          <h3 className="text-3xl md:text-4xl font-semibold text-foreground tracking-tight">South Africa</h3>
+                          <Badge className="bg-green-500/90 text-white border-0 hover:bg-green-500">Live</Badge>
+                        </div>
+                        <p className="text-muted-foreground/80 leading-relaxed mb-6 text-base md:text-lg">
+                          Our flagship cultivation facility spans 50,000 square meters in the Western Cape, leveraging South Africa's ideal growing conditions. The facility features advanced greenhouse technology with automated climate control, delivering pharmaceutical-grade cannabis year-round.
+                        </p>
+                        <p className="text-muted-foreground/80 leading-relaxed text-base md:text-lg">
+                          Operating under full SAHPRA licensing, our South African operations include integrated extraction and processing capabilities, enabling complete seed-to-product control.
+                        </p>
                       </div>
-                      <p className="text-base md:text-lg text-muted-foreground/80 leading-relaxed">
-                        Our flagship South African facility represents the cornerstone of our African operations. Leveraging the region's favorable climate and progressive regulatory framework, we've established a sophisticated cultivation center that serves as our primary launch market. The facility employs advanced greenhouse technology optimized for the local environment, ensuring year-round production of premium medical cannabis.
-                      </p>
+                      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
+                        <img 
+                          src={greenhouseRows}
+                          alt="South African cultivation facility" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                     </div>
-                    <div className="rounded-xl overflow-hidden shadow-card order-1 md:order-2 border border-border/30 hover-lift">
-                      <img 
-                        src={greenhouseRows} 
-                        alt="South Africa cultivation facility" 
-                        className="w-full h-64 md:h-96 object-cover hover:scale-105 transition-transform duration-500 ease-out"
-                      />
-                    </div>
-                  </div>
-                </ScrollAnimation>
-              )}
+                  </ScrollAnimation>
+                )}
 
-              {activeTab === "thailand" && (
-                <ScrollAnimation>
-                  <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center max-w-6xl mx-auto">
-                    <div className="order-2 md:order-1 space-y-6">
-                      <h3 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight">Thailand</h3>
-                      <p className="text-base md:text-lg text-muted-foreground/80 leading-relaxed">
-                        Our Thai operations leverage Thailand's progressive cannabis regulations and deep-rooted cultivation traditions. Through strategic partnerships with local manufacturing facilities, we tap into generations of expertise while implementing our rigorous quality standards. The region's tropical climate provides ideal growing conditions, enabling year-round production of premium cannabis cultivars for the Asian and global markets.
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                          Factory Operations
-                        </span>
+                {activeTab === "uk" && (
+                  <ScrollAnimation key="uk">
+                    <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+                      <div>
+                        <div className="flex items-center gap-3 mb-6">
+                          <h3 className="text-3xl md:text-4xl font-semibold text-foreground tracking-tight">United Kingdom</h3>
+                          <Badge className="bg-amber-500/90 text-white border-0 hover:bg-amber-500">Coming Soon</Badge>
+                        </div>
+                        <p className="text-muted-foreground/80 leading-relaxed mb-6 text-base md:text-lg">
+                          Our UK facility is currently in development, designed to serve the growing European medical cannabis market. Located in a controlled environment, it will feature state-of-the-art indoor cultivation with full spectrum LED lighting and precision environmental controls.
+                        </p>
+                        <p className="text-muted-foreground/80 leading-relaxed text-base md:text-lg">
+                          The facility is being built to EU-GMP standards with integrated quality control laboratories, ensuring compliance with the strictest pharmaceutical regulations.
+                        </p>
+                      </div>
+                      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
+                        <img 
+                          src={indoorCultivation}
+                          alt="UK cultivation facility rendering" 
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                     </div>
-                    <div className="rounded-xl overflow-hidden shadow-card order-1 md:order-2 border border-border/30 hover-lift">
-                      <img 
-                        src={productionImage} 
-                        alt="Thailand partner manufacturing facility" 
-                        className="w-full h-64 md:h-96 object-cover hover:scale-105 transition-transform duration-500 ease-out"
-                      />
-                    </div>
-                  </div>
-                </ScrollAnimation>
-              )}
+                  </ScrollAnimation>
+                )}
 
-              {activeTab === "uk" && (
-                <ScrollAnimation>
-                  <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center max-w-6xl mx-auto">
-                    <div className="order-2 md:order-1 space-y-6">
-                      <h3 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight">United Kingdom</h3>
-                      <p className="text-base md:text-lg text-muted-foreground/80 leading-relaxed">
-                        Our UK facility serves the European medical market with GMP-certified production capabilities. Combining local agricultural expertise with our proven cultivation methodologies, we're positioned to meet the stringent regulatory requirements and growing market demands across Europe. The UK operations are launching soon, establishing a strong presence in one of the world's most regulated cannabis markets.
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
-                          Coming Soon
-                        </span>
+                {activeTab === "thailand" && (
+                  <ScrollAnimation key="thailand">
+                    <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+                      <div>
+                        <div className="flex items-center gap-3 mb-6">
+                          <h3 className="text-3xl md:text-4xl font-semibold text-foreground tracking-tight">Thailand</h3>
+                          <Badge className="bg-blue-500/90 text-white border-0 hover:bg-blue-500">Factory Operations</Badge>
+                        </div>
+                        <p className="text-muted-foreground/80 leading-relaxed mb-6 text-base md:text-lg">
+                          Our Thai operations focus on large-scale extraction and API production, leveraging Thailand's favorable regulatory environment for cannabis manufacturing. The facility specializes in isolate production and formulation development.
+                        </p>
+                        <p className="text-muted-foreground/80 leading-relaxed text-base md:text-lg">
+                          Working closely with Thai health authorities, we're developing innovative delivery methods and formulations tailored for the Asian market while maintaining global export capabilities.
+                        </p>
+                      </div>
+                      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
+                        <img 
+                          src={productionFacility}
+                          alt="Thailand production facility" 
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                     </div>
-                    <div className="rounded-xl overflow-hidden shadow-card order-1 md:order-2 border border-border/30 hover-lift">
-                      <img 
-                        src={indoorCultivation} 
-                        alt="UK cultivation facility" 
-                        className="w-full h-64 md:h-96 object-cover hover:scale-105 transition-transform duration-500 ease-out"
-                      />
-                    </div>
-                  </div>
-                </ScrollAnimation>
-              )}
+                  </ScrollAnimation>
+                )}
 
-              {activeTab === "portugal" && (
-                <ScrollAnimation>
-                  <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center max-w-6xl mx-auto">
-                    <div className="order-2 md:order-1 space-y-6">
-                      <h3 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight">Portugal</h3>
-                      <p className="text-base md:text-lg text-muted-foreground/80 leading-relaxed">
-                        Portugal serves as our main production, processing, and shipping hub for European markets. With EU-GMP certification and strategic location for continental distribution, the Portuguese facility is positioned to become the backbone of our European operations. Following the UK launch, Portugal will go fully live, providing seamless access to EU markets with premium medical cannabis products manufactured to the highest pharmaceutical standards.
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
-                          Coming Soon
-                        </span>
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary dark:bg-primary/20">
-                          EU Hub
-                        </span>
+                {activeTab === "portugal" && (
+                  <ScrollAnimation key="portugal">
+                    <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+                      <div>
+                        <div className="flex items-center gap-3 mb-6">
+                          <h3 className="text-3xl md:text-4xl font-semibold text-foreground tracking-tight">Portugal</h3>
+                          <Badge className="bg-amber-500/90 text-white border-0 hover:bg-amber-500">Coming Soon</Badge>
+                        </div>
+                        <p className="text-muted-foreground/80 leading-relaxed mb-6 text-base md:text-lg">
+                          Portugal serves as our main production, processing, and shipping hub for European distribution. The facility is designed for EU-GMP pharmaceutical manufacturing with direct access to European markets.
+                        </p>
+                        <p className="text-muted-foreground/80 leading-relaxed text-base md:text-lg">
+                          Strategic location enables efficient logistics and supply chain management, supporting our commitment to accessible medical cannabis across the European Union.
+                        </p>
+                      </div>
+                      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
+                        <img 
+                          src={researchLab}
+                          alt="Portugal processing facility" 
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                     </div>
-                    <div className="rounded-xl overflow-hidden shadow-card order-1 md:order-2 border border-border/30 hover-lift">
-                      <img 
-                        src={productionFacility} 
-                        alt="Portugal EU production hub" 
-                        className="w-full h-64 md:h-96 object-cover hover:scale-105 transition-transform duration-500 ease-out"
-                      />
-                    </div>
-                  </div>
-                </ScrollAnimation>
-              )}
+                  </ScrollAnimation>
+                )}
+              </div>
             </div>
           </section>
 
-          {/* Processing Section */}
-          <section className="py-16 md:py-24 bg-muted/20 relative overflow-hidden">
-            {/* Subtle line art decorations */}
-            <motion.img 
-              src={cannabisLineart2} 
-              alt="" 
-              className="absolute top-1/4 -right-16 w-40 md:w-56 h-auto opacity-[0.03] pointer-events-none -rotate-12"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 0.03 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1 }}
-            />
+          {/* Processing Excellence Section */}
+          <section className="py-20 md:py-32 bg-muted/30">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="max-w-6xl mx-auto">
+                <ScrollAnimation>
+                  <h2 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground text-center mb-16 md:mb-20 tracking-tight">
+                    Processing excellence
+                  </h2>
+                </ScrollAnimation>
+
+                <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+                  <ScrollAnimation>
+                    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
+                      <img 
+                        src={productionImage}
+                        alt="Cannabis processing facility" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </ScrollAnimation>
+                  <ScrollAnimation delay={0.2}>
+                    <div className="space-y-8">
+                      <div>
+                        <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-4 tracking-tight">Extraction & refinement</h3>
+                        <p className="text-muted-foreground/80 leading-relaxed text-base md:text-lg">
+                          Our GMP-certified extraction facilities employ supercritical CO2 and ethanol-based methods, producing full-spectrum, broad-spectrum, and isolate products with verified cannabinoid profiles.
+                        </p>
+                      </div>
+                      <div>
+                        <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-4 tracking-tight">Quality assurance</h3>
+                        <p className="text-muted-foreground/80 leading-relaxed text-base md:text-lg">
+                          Every batch undergoes rigorous third-party testing for potency, terpene content, residual solvents, pesticides, and microbial contamination. Full certificates of analysis accompany all products.
+                        </p>
+                      </div>
+                      <div>
+                        <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-4 tracking-tight">Formulation development</h3>
+                        <p className="text-muted-foreground/80 leading-relaxed text-base md:text-lg">
+                          Our R&D team develops innovative delivery methods including oils, capsules, topicals, and novel formulations, optimizing bioavailability and therapeutic efficacy.
+                        </p>
+                      </div>
+                    </div>
+                  </ScrollAnimation>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* CTA Section */}
+          <section className="py-20 md:py-32 bg-background">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
               <ScrollAnimation>
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 md:mb-6">Post-harvest excellence</h2>
-                <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mb-12 md:mb-16 leading-relaxed">
-                  Every stage of our processing workflow is designed to preserve cannabinoid integrity and enhance therapeutic value. Our controlled-environment facilities ensure optimal conditions from harvest through final packaging.
+                <h2 className="text-4xl md:text-5xl font-semibold text-foreground mb-6 tracking-tight">
+                  Partner with a global leader
+                </h2>
+                <p className="text-base md:text-lg text-muted-foreground/80 max-w-3xl mx-auto mb-10">
+                  Whether you're a distributor, healthcare provider, or research institution, we offer reliable supply partnerships backed by pharmaceutical-grade quality and regulatory expertise.
                 </p>
+                <a 
+                  href="/contact"
+                  className="inline-flex items-center gap-2 btn-primary px-8 py-3 text-base"
+                >
+                  Start a conversation →
+                </a>
               </ScrollAnimation>
-
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
-                <ScrollAnimation delay={0.1}>
-                  <div className="group bg-background rounded-2xl overflow-hidden shadow-elegant hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-border/50 hover:border-border">
-                    <div className="h-48 md:h-56 overflow-hidden bg-muted">
-                      <img 
-                        src={indoorCultivation} 
-                        alt="Harvesting cannabis" 
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                      />
-                    </div>
-                    <div className="p-6 md:p-8">
-                      <h3 className="text-xl md:text-2xl font-bold text-foreground mb-3 md:mb-4 tracking-tight">Selective Harvesting</h3>
-                      <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                        Our cultivation specialists monitor trichome development and cannabinoid ratios to determine optimal harvest timing for each cultivar. Hand-trimming techniques preserve delicate trichome structures while removing excess plant material.
-                      </p>
-                    </div>
-                  </div>
-                </ScrollAnimation>
-
-                <ScrollAnimation delay={0.2}>
-                  <div className="group bg-background rounded-2xl overflow-hidden shadow-elegant hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-border/50 hover:border-border">
-                    <div className="h-48 md:h-56 overflow-hidden bg-muted">
-                      <img 
-                        src={productionFacility} 
-                        alt="Purification and refinement process" 
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                      />
-                    </div>
-                    <div className="p-6 md:p-8">
-                      <h3 className="text-xl md:text-2xl font-bold text-foreground mb-3 md:mb-4 tracking-tight">Controlled Curing & Drying</h3>
-                      <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                        Temperature and humidity-controlled drying rooms ensure gradual moisture reduction while preserving terpene profiles. Multi-week curing cycles in precision climate chambers enhance flavor complexity and product stability.
-                      </p>
-                    </div>
-                  </div>
-                </ScrollAnimation>
-
-                <ScrollAnimation delay={0.3}>
-                  <div className="group bg-background rounded-2xl overflow-hidden shadow-elegant hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-border/50 hover:border-border sm:col-span-2 lg:col-span-1">
-                    <div className="h-48 md:h-56 overflow-hidden bg-muted">
-                      <img 
-                        src={researchLab} 
-                        alt="Quality control testing" 
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                      />
-                    </div>
-                    <div className="p-6 md:p-8">
-                      <h3 className="text-xl md:text-2xl font-bold text-foreground mb-3 md:mb-4 tracking-tight">Laboratory Testing</h3>
-                      <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                        Comprehensive testing protocols analyze potency, terpene profiles, moisture content, and screen for contaminants. Third-party laboratory verification provides independent quality assurance for every production batch.
-                      </p>
-                    </div>
-                  </div>
-                </ScrollAnimation>
-              </div>
-            </div>
-          </section>
-
-          {/* Newsletter Section */}
-          <section className="py-16 md:py-24 relative overflow-hidden" style={{ backgroundColor: 'hsl(var(--section-color))' }}>
-            {/* Subtle line art decoration */}
-            <motion.img 
-              src={cannabisLineart1} 
-              alt="" 
-              className="absolute top-8 right-8 w-32 md:w-44 h-auto opacity-[0.05] pointer-events-none rotate-12"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 0.05, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1 }}
-            />
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="max-w-4xl mx-auto">
-                <ScrollAnimation>
-                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">Stay informed</h2>
-                  <p className="text-white/80 text-lg md:text-xl mb-10 md:mb-12 leading-relaxed">
-                    Subscribe to receive updates on our expansion, product launches, and industry insights.
-                  </p>
-                </ScrollAnimation>
-                
-                <ScrollAnimation delay={0.2}>
-                  <form className="grid sm:grid-cols-2 gap-4 md:gap-6">
-                    <input
-                      type="text"
-                      placeholder="First Name"
-                      className="px-5 py-3.5 rounded-lg bg-white/10 border border-white/30 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/50 transition-all duration-300"
-                    />
-                    <input
-                      type="email"
-                      placeholder="Email address"
-                      className="px-5 py-3.5 rounded-lg bg-white/10 border border-white/30 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/50 transition-all duration-300"
-                    />
-                    <button
-                      type="submit"
-                      className="sm:col-span-2 px-6 py-3.5 bg-white/10 hover:bg-white/20 border border-white/40 hover:border-white/60 text-white rounded-lg transition-all duration-300 font-semibold hover:shadow-lg hover:-translate-y-0.5"
-                    >
-                      Sign up
-                    </button>
-                  </form>
-                </ScrollAnimation>
-              </div>
             </div>
           </section>
         </main>

@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
+import PageHero from "@/components/PageHero";
 import ScrollAnimation from "@/components/ScrollAnimation";
 import BackToTop from "@/components/BackToTop";
 import MobileBottomActions from "@/components/MobileBottomActions";
@@ -9,24 +10,12 @@ import AnimatedStatistics from "@/components/AnimatedStatistics";
 import { Target, Heart, Globe, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import researchLabImage from "@/assets/research-lab-hq.jpg";
-import { useState, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useState } from "react";
+import { motion } from "framer-motion";
 
 const AboutUs = () => {
   const { t } = useTranslation('aboutUs');
   const [menuOpen, setMenuOpen] = useState(false);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
-  
-  // Parallax effect for hero image
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start end", "end start"]
-  });
-  
-  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
-  const imageScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.1, 1.05, 1]);
-  const overlayOpacity = useTransform(scrollYProgress, [0, 0.5], [0, 0.3]);
 
   // Animation variants
   const fadeInUp = {
@@ -61,109 +50,20 @@ const AboutUs = () => {
       <div className="min-h-screen bg-background pb-24 lg:pb-0">
         <Header onMenuStateChange={setMenuOpen} />
         <main className="pt-28 md:pt-32 relative z-0">
-          {/* Hero Section with animated text */}
-          <section className="bg-background py-16 md:py-20 relative z-10">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-              <motion.div 
-                className="max-w-5xl"
-                initial="hidden"
-                animate="visible"
-                variants={staggerContainer}
-              >
-                <motion.h1 
-                  className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 tracking-tight leading-[1.1]"
-                  variants={fadeInUp}
-                >
-                  {t('hero.title')}
-                </motion.h1>
-                <motion.p 
-                  className="text-xl md:text-2xl text-muted-foreground max-w-3xl font-light"
-                  variants={fadeInUp}
-                >
-                  {t('hero.subtitle')}
-                </motion.p>
-              </motion.div>
-            </div>
-          </section>
-
-          {/* Hero Image with edge fade vignette and parallax */}
-          <section 
-            ref={heroRef}
-            className="container mx-auto px-4 sm:px-6 lg:px-8 pb-16 md:pb-20 relative z-10"
-          >
-            <motion.div 
-              ref={imageRef}
-              className="relative h-[350px] md:h-[450px] lg:h-[550px] overflow-hidden rounded-2xl shadow-2xl"
-              initial={{ opacity: 0, scale: 0.95, y: 40 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-            >
-              {/* Animated image with parallax */}
-              <motion.div 
-                className="absolute inset-0"
-                style={{ y: imageY, scale: imageScale }}
-              >
-                <img 
-                  src={researchLabImage} 
-                  alt="Healing Buds research laboratory" 
-                  className="w-full h-full object-cover"
-                  loading="eager"
-                />
-              </motion.div>
-              
-              {/* Animated vignette edge fade effect */}
-              <div className="absolute inset-0 pointer-events-none">
-                {/* Top edge fade */}
-                <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-background via-background/50 to-transparent" />
-                {/* Bottom edge fade */}
-                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background via-background/60 to-transparent" />
-                {/* Left edge fade */}
-                <div className="absolute top-0 bottom-0 left-0 w-16 md:w-24 bg-gradient-to-r from-background/80 to-transparent" />
-                {/* Right edge fade */}
-                <div className="absolute top-0 bottom-0 right-0 w-16 md:w-24 bg-gradient-to-l from-background/80 to-transparent" />
-                {/* Corner gradients for smooth blend */}
-                <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-background/60 to-transparent" />
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-background/60 to-transparent" />
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-background/60 to-transparent" />
-                <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl from-background/60 to-transparent" />
-              </div>
-              
-              {/* Scroll-based overlay */}
-              <motion.div 
-                className="absolute inset-0 bg-primary/20"
-                style={{ opacity: overlayOpacity }}
-              />
-              
-              {/* Subtle animated grain texture */}
-              <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIvPjwvc3ZnPg==')]" />
-              
-              {/* Glassmorphism ethos card */}
-              <motion.div 
-                className="absolute bottom-6 left-6 right-6 md:bottom-8 md:left-8 md:right-auto md:max-w-md"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <div className="backdrop-blur-xl bg-white/10 dark:bg-black/20 rounded-xl p-4 md:p-5 border border-white/20 dark:border-white/10 shadow-lg">
-                  <p className="text-white text-sm md:text-base font-medium tracking-wide">
-                    Excellence in cultivation • Patient-centered care • Global standards
-                  </p>
-                </div>
-              </motion.div>
-              
-              {/* Animated corner accent */}
-              <motion.div 
-                className="absolute top-4 right-4 w-12 h-12 md:w-16 md:h-16"
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 1, ease: "backOut" }}
-              >
-                <div className="w-full h-full rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 backdrop-blur-sm border border-white/20 flex items-center justify-center">
-                  <div className="w-2 h-2 rounded-full bg-white/80 animate-pulse" />
-                </div>
-              </motion.div>
-            </motion.div>
-          </section>
+          {/* Hero Section using PageHero component */}
+          <PageHero
+            title={t('hero.title')}
+            subtitle={t('hero.subtitle')}
+            image={researchLabImage}
+            imageAlt="Healing Buds research laboratory"
+            variant="split"
+            showGlassmorphismCard
+            glassmorphismText="Excellence in cultivation • Patient-centered care • Global standards"
+            showGrainTexture
+            showCornerAccent
+            imageHeight="lg"
+            parallaxIntensity="subtle"
+          />
 
           {/* Our Story with reveal animation */}
           <section className="py-20 md:py-32 bg-background overflow-hidden">

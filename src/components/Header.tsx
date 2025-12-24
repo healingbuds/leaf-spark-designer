@@ -353,60 +353,60 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
             <ThemeToggle />
 
             {/* Desktop Action Buttons */}
-            <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+            <div className="flex items-center gap-1.5 xl:gap-2 ml-1 xl:ml-2 flex-shrink-0">
               <button
                 onClick={() => setEligibilityDialogOpen(true)}
                 className={cn(
-                  "font-body font-bold px-4 py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl relative z-10 whitespace-nowrap",
+                  "font-body font-bold px-3 xl:px-4 py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl relative z-10 whitespace-nowrap",
                   "bg-white/95 text-[#2A3D3A] hover:bg-white",
                   "border-2 border-white shadow-lg",
-                  "text-xs 2xl:text-sm"
+                  "text-[11px] lg:text-xs 2xl:text-sm"
                 )}
               >
-                <span className="hidden 2xl:inline">{t('nav.checkEligibility')}</span>
-                <span className="2xl:hidden">Eligibility</span>
+                <span className="hidden xl:inline">{t('nav.checkEligibility')}</span>
+                <span className="xl:hidden">Eligibility</span>
               </button>
               {user ? (
                 <>
                   <Link
                     to="/dashboard"
                     className={cn(
-                      "font-body font-bold px-4 py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl relative z-10 whitespace-nowrap",
+                      "font-body font-bold px-3 xl:px-4 py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl relative z-10 whitespace-nowrap",
                       "bg-primary text-white hover:bg-primary/90",
-                      "border-2 border-primary shadow-lg flex items-center gap-1.5",
-                      "text-xs 2xl:text-sm"
+                      "border-2 border-primary shadow-lg flex items-center gap-1",
+                      "text-[11px] lg:text-xs 2xl:text-sm"
                     )}
                   >
-                    <LayoutDashboard className="w-4 h-4" />
-                    <span className="hidden 2xl:inline">Patient Portal</span>
-                    <span className="2xl:hidden">Portal</span>
+                    <LayoutDashboard className="w-3.5 h-3.5 xl:w-4 xl:h-4" />
+                    <span className="hidden xl:inline">Patient Portal</span>
+                    <span className="xl:hidden">Portal</span>
                   </Link>
                   <button
                     onClick={handleLogout}
                     className={cn(
-                      "font-body font-bold px-4 py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl relative z-10 whitespace-nowrap",
+                      "font-body font-bold px-3 xl:px-4 py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl relative z-10 whitespace-nowrap",
                       "bg-transparent text-white hover:bg-white/20",
-                      "border-2 border-white/60 shadow-lg flex items-center gap-1.5",
-                      "text-xs 2xl:text-sm"
+                      "border-2 border-white/60 shadow-lg flex items-center gap-1",
+                      "text-[11px] lg:text-xs 2xl:text-sm"
                     )}
                   >
-                    <LogOut className="w-4 h-4" />
-                    <span className="hidden 2xl:inline">{t('nav.signOut')}</span>
-                    <span className="2xl:hidden">Out</span>
+                    <LogOut className="w-3.5 h-3.5 xl:w-4 xl:h-4" />
+                    <span className="hidden xl:inline">{t('nav.signOut')}</span>
+                    <span className="xl:hidden">Out</span>
                   </button>
                 </>
               ) : (
                 <Link
                   to="/auth"
                   className={cn(
-                    "font-body font-bold px-4 py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl relative z-10 whitespace-nowrap",
+                    "font-body font-bold px-3 xl:px-4 py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl relative z-10 whitespace-nowrap",
                     "bg-transparent text-white hover:bg-white/20",
                     "border-2 border-white/60 shadow-lg",
-                    "text-xs 2xl:text-sm"
+                    "text-[11px] lg:text-xs 2xl:text-sm"
                   )}
                 >
-                  <span className="hidden 2xl:inline">{t('nav.patientLogin')}</span>
-                  <span className="2xl:hidden">Login</span>
+                  <span className="hidden xl:inline">{t('nav.patientLogin')}</span>
+                  <span className="xl:hidden">Login</span>
                 </Link>
               )}
             </div>

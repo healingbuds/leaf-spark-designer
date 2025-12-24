@@ -7,6 +7,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { useShop } from '@/context/ShopContext';
 import { Product } from '@/hooks/useProducts';
+import { formatPrice } from '@/lib/currency';
 
 interface ProductDetailProps {
   product: Product | null;
@@ -15,7 +16,7 @@ interface ProductDetailProps {
 
 export function ProductDetail({ product, onClose }: ProductDetailProps) {
   const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useShop();
+  const { addToCart, countryCode } = useShop();
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -86,7 +87,7 @@ export function ProductDetail({ product, onClose }: ProductDetailProps) {
                 </div>
 
                 <p className="text-2xl font-bold text-primary mb-4">
-                  €{product.retailPrice.toFixed(2)}
+                  {formatPrice(product.retailPrice, countryCode)}
                   <span className="text-sm font-normal text-muted-foreground ml-1">
                     / gram
                   </span>
@@ -188,7 +189,7 @@ export function ProductDetail({ product, onClose }: ProductDetailProps) {
                   {/* Total and add to cart */}
                   <div className="flex items-center justify-between">
                     <span className="text-lg font-semibold">
-                      Total: €{(product.retailPrice * quantity).toFixed(2)}
+                      Total: {formatPrice(product.retailPrice * quantity, countryCode)}
                     </span>
                   </div>
 

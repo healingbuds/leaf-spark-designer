@@ -16,7 +16,7 @@ import { useOrderTracking } from '@/hooks/useOrderTracking';
 import { formatPrice, getCurrencyForCountry } from '@/lib/currency';
 
 const Checkout = () => {
-  const { cart, cartTotal, clearCart, drGreenClient } = useShop();
+  const { cart, cartTotal, clearCart, drGreenClient, countryCode } = useShop();
   const navigate = useNavigate();
   const { t } = useTranslation('shop');
   const { toast } = useToast();
@@ -241,11 +241,11 @@ const Checkout = () => {
                               {item.strain_name}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                              Qty: {item.quantity} × {formatPrice(item.unit_price, drGreenClient?.country_code || 'PT')}
+                              Qty: {item.quantity} × {formatPrice(item.unit_price, countryCode)}
                             </p>
                           </div>
                           <p className="font-semibold text-foreground">
-                            {formatPrice(item.quantity * item.unit_price, drGreenClient?.country_code || 'PT')}
+                            {formatPrice(item.quantity * item.unit_price, countryCode)}
                           </p>
                         </div>
                       ))}
@@ -254,7 +254,7 @@ const Checkout = () => {
 
                       <div className="flex items-center justify-between text-lg font-bold">
                         <span>Total</span>
-                        <span className="text-primary">{formatPrice(cartTotal, drGreenClient?.country_code || 'PT')}</span>
+                        <span className="text-primary">{formatPrice(cartTotal, countryCode)}</span>
                       </div>
                     </CardContent>
                   </Card>
@@ -302,7 +302,7 @@ const Checkout = () => {
                         ) : (
                           <>
                             <CreditCard className="mr-2 h-4 w-4" />
-                            Place Order - {formatPrice(cartTotal, drGreenClient?.country_code || 'PT')}
+                            Place Order - {formatPrice(cartTotal, countryCode)}
                           </>
                         )}
                       </Button>

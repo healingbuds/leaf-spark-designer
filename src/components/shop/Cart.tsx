@@ -12,6 +12,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useShop } from '@/context/ShopContext';
 import { Link } from 'react-router-dom';
+import { formatPrice } from '@/lib/currency';
 
 export function Cart() {
   const {
@@ -24,6 +25,7 @@ export function Cart() {
     isEligible,
     drGreenClient,
     isLoading,
+    countryCode,
   } = useShop();
 
   const getEligibilityStatus = () => {
@@ -96,7 +98,7 @@ export function Cart() {
                         {item.strain_name}
                       </h4>
                       <p className="text-sm text-muted-foreground">
-                        €{item.unit_price.toFixed(2)} / gram
+                        {formatPrice(item.unit_price, countryCode)} / gram
                       </p>
                       
                       {/* Quantity controls */}
@@ -138,7 +140,7 @@ export function Cart() {
                         <Trash2 className="h-4 w-4" />
                       </Button>
                       <span className="font-semibold text-foreground">
-                        €{(item.unit_price * item.quantity).toFixed(2)}
+                        {formatPrice(item.unit_price * item.quantity, countryCode)}
                       </span>
                     </div>
                   </motion.div>
@@ -172,7 +174,7 @@ export function Cart() {
             <div className="flex items-center justify-between w-full">
               <span className="text-muted-foreground">Subtotal</span>
               <span className="text-xl font-bold text-foreground">
-                €{cartTotal.toFixed(2)}
+                {formatPrice(cartTotal, countryCode)}
               </span>
             </div>
 

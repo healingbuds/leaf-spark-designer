@@ -3,15 +3,21 @@
  * 
  * Brand icon for Healing Buds - cannabis leaf with heart and medical cross.
  * Use this instead of generic Lucide icons for brand-specific contexts.
+ * 
+ * Variants:
+ * - "green" (default): Full color brand green icon
+ * - "white": White version for dark backgrounds
  */
 
-import hbIcon from "@/assets/hb-icon.png";
+import hbIconGreen from "@/assets/hb-icon-green.png";
+import hbIconWhite from "@/assets/hb-icon.png";
 import { cn } from "@/lib/utils";
 
 interface HBIconProps {
   size?: number | "sm" | "md" | "lg" | "xl";
   className?: string;
   alt?: string;
+  variant?: "green" | "white";
 }
 
 const sizeMap = {
@@ -21,12 +27,13 @@ const sizeMap = {
   xl: 48,
 };
 
-const HBIcon = ({ size = "md", className, alt = "Healing Buds" }: HBIconProps) => {
+const HBIcon = ({ size = "md", className, alt = "Healing Buds", variant = "green" }: HBIconProps) => {
   const pixelSize = typeof size === "number" ? size : sizeMap[size];
+  const iconSrc = variant === "white" ? hbIconWhite : hbIconGreen;
   
   return (
     <img
-      src={hbIcon}
+      src={iconSrc}
       alt={alt}
       width={pixelSize}
       height={pixelSize}

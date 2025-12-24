@@ -14,7 +14,7 @@ import BackToTop from "@/components/BackToTop";
 import MobileBottomActions from "@/components/MobileBottomActions";
 import SEOHead from "@/components/SEOHead";
 import HBIcon from "@/components/HBIcon";
-import TrustMotifs, { LeafCertifiedMotif, LabTestedMotif, SecureShieldMotif, DeliveryMotif } from "@/components/TrustMotifs";
+import TrustMotifs, { CertifiedMotif, LabTestedMotif, SecureShieldMotif, DeliveryMotif } from "@/components/TrustMotifs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useShop } from "@/context/ShopContext";
@@ -68,7 +68,7 @@ const Index = () => {
             
             {/* Floating motif decorations */}
             <div className="absolute top-32 left-8 opacity-20 hidden lg:block">
-              <LeafCertifiedMotif size={80} className="text-white" />
+              <CertifiedMotif size={80} className="text-white" />
             </div>
             <div className="absolute top-48 right-12 opacity-15 hidden lg:block">
               <LabTestedMotif size={64} className="text-highlight" />
@@ -142,7 +142,7 @@ const Index = () => {
                     className="flex flex-wrap justify-center gap-6 md:gap-10"
                   >
                     {[
-                      { Icon: LeafCertifiedMotif, label: "EU GMP Certified" },
+                      { Icon: CertifiedMotif, label: "EU GMP Certified" },
                       { Icon: LabTestedMotif, label: "Lab Tested" },
                       { Icon: SecureShieldMotif, label: "Secure & Compliant" },
                       { Icon: DeliveryMotif, label: "Discreet Delivery" },

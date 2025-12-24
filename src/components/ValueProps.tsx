@@ -67,31 +67,31 @@ const ValueProps = () => {
         viewport={{ once: true, margin: "-80px" }}
         variants={containerVariants}
       >
-        {/* Large cannabis plant motif - stitched into bottom right, ~25% coverage */}
+        {/* Large cannabis plant motif - constrained to prevent bleeding */}
         <motion.div 
-          className="absolute -bottom-8 -right-8 sm:-bottom-12 sm:-right-12 pointer-events-none select-none"
+          className="absolute bottom-4 right-4 sm:bottom-8 sm:right-8 pointer-events-none select-none"
           style={{
-            width: '45%',
-            maxWidth: '420px',
-            minWidth: '280px',
+            width: '35%',
+            maxWidth: '320px',
+            minWidth: '200px',
           }}
           initial={{ opacity: 0, scale: 0.85, x: 20 }}
           whileInView={{ opacity: 1, scale: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
         >
-          {/* Multi-layer fade mask for seamless blending */}
+          {/* Aggressive fade mask to contain within section */}
           <div 
             className="relative w-full h-full"
             style={{
-              maskImage: 'linear-gradient(135deg, transparent 0%, transparent 15%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.85) 70%, black 100%)',
-              WebkitMaskImage: 'linear-gradient(135deg, transparent 0%, transparent 15%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.85) 70%, black 100%)',
+              maskImage: 'radial-gradient(ellipse 80% 80% at 70% 70%, black 20%, transparent 70%)',
+              WebkitMaskImage: 'radial-gradient(ellipse 80% 80% at 70% 70%, black 20%, transparent 70%)',
             }}
           >
             <img 
               src={plantLineArt} 
               alt="" 
-              className="w-full h-auto opacity-[0.18]"
+              className="w-full h-auto opacity-[0.15]"
               style={{
                 filter: 'brightness(1.1) contrast(0.9)',
               }}

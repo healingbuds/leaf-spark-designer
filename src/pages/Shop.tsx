@@ -102,9 +102,9 @@ export default function Shop() {
                   initial={{ opacity: 0, scale: 0.95, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ type: "spring", stiffness: 200, damping: 25 }}
-                  className="inline-flex items-center gap-3 px-5 py-3 rounded-xl text-sm font-medium bg-muted border border-border text-muted-foreground"
+                  className="inline-flex items-center gap-3 px-5 py-3 rounded-xl text-sm font-medium bg-highlight/10 border border-highlight/30 text-highlight"
                 >
-                  <div className="p-1.5 rounded-lg bg-muted-foreground/10">
+                  <div className="p-1.5 rounded-lg bg-highlight/20">
                     <ShieldCheck className="h-4 w-4" />
                   </div>
                   <span className="tracking-wide text-xs font-semibold">Verification Pending</span>

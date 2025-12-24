@@ -120,19 +120,21 @@ const Index = () => {
 
           {/* Eligibility Status Banner (for logged in users) */}
           {drGreenClient && !isEligible && (
-            <section className="py-6 bg-amber-500/10 border-y border-amber-500/20">
+            <section className="py-6 bg-highlight/10 border-y border-highlight/30">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left">
-                  <Stethoscope className="w-6 h-6 text-amber-500" />
+                  <div className="w-10 h-10 rounded-full bg-highlight/20 flex items-center justify-center flex-shrink-0">
+                    <Stethoscope className="w-5 h-5 text-highlight" />
+                  </div>
                   <p className="text-foreground">
-                    <span className="font-semibold">Verification in progress</span>
+                    <span className="font-semibold text-highlight">Verification in progress</span>
                     <span className="text-muted-foreground ml-2">
                       {drGreenClient.is_kyc_verified 
                         ? 'Awaiting medical review approval' 
                         : 'Please complete identity verification to continue'}
                     </span>
                   </p>
-                  <Button asChild size="sm" variant="outline">
+                  <Button asChild size="sm" variant="outline" className="border-highlight/40 text-highlight hover:bg-highlight/10">
                     <Link to="/eligibility">View Status</Link>
                   </Button>
                 </div>
@@ -167,10 +169,10 @@ const Index = () => {
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.1 }}
                     >
-                      <Card className="h-full bg-card/50 border-border/50 hover:border-primary/30 transition-colors">
+                      <Card className="h-full bg-card/50 border-border/50 hover:border-highlight/40 transition-colors group">
                         <CardContent className="p-6 text-center">
-                          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                            <span className="text-xl font-bold text-primary">{item.step}</span>
+                          <div className="w-12 h-12 rounded-full bg-highlight/10 group-hover:bg-highlight/20 flex items-center justify-center mx-auto mb-4 transition-colors">
+                            <span className="text-xl font-bold text-highlight">{item.step}</span>
                           </div>
                           <h3 className="font-semibold text-lg text-foreground mb-2">{item.title}</h3>
                           <p className="text-sm text-muted-foreground">{item.description}</p>

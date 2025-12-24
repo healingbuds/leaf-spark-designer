@@ -46,7 +46,11 @@ export function VerificationProgress() {
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-primary/80 rounded-full"
+            className={`absolute inset-y-0 left-0 rounded-full ${
+              isEligible 
+                ? 'bg-gradient-to-r from-primary to-primary/80'
+                : 'bg-gradient-to-r from-highlight to-highlight/80'
+            }`}
           />
         </div>
 

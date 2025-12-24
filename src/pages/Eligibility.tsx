@@ -124,10 +124,12 @@ const Eligibility = () => {
                           </Button>
                         </div>
                       ) : (
-                        <div className="inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
-                          <Clock className="w-6 h-6 text-amber-500" />
+                        <div className="inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-highlight/10 border border-highlight/30">
+                          <div className="w-10 h-10 rounded-full bg-highlight/20 flex items-center justify-center">
+                            <Clock className="w-5 h-5 text-highlight" />
+                          </div>
                           <div className="text-left">
-                            <p className="font-semibold text-amber-600 dark:text-amber-400">Verification Pending</p>
+                            <p className="font-semibold text-highlight">Verification Pending</p>
                             <p className="text-sm text-muted-foreground">
                               {drGreenClient.is_kyc_verified 
                                 ? 'Awaiting medical review approval' 
@@ -135,7 +137,7 @@ const Eligibility = () => {
                             </p>
                           </div>
                           {drGreenClient.kyc_link && !drGreenClient.is_kyc_verified && (
-                            <Button asChild variant="outline" className="ml-4">
+                            <Button asChild variant="outline" className="ml-4 border-highlight/40 text-highlight hover:bg-highlight/10">
                               <a href={drGreenClient.kyc_link} target="_blank" rel="noopener noreferrer">
                                 Complete KYC
                               </a>
@@ -266,10 +268,12 @@ const Eligibility = () => {
           <section className="py-12">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="max-w-3xl mx-auto">
-                <Card className="bg-amber-500/5 border-amber-500/20">
+                <Card className="bg-highlight-soft/20 border-highlight/30">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
-                      <AlertCircle className="w-6 h-6 text-amber-500 flex-shrink-0 mt-0.5" />
+                      <div className="w-10 h-10 rounded-full bg-highlight/20 flex items-center justify-center flex-shrink-0">
+                        <AlertCircle className="w-5 h-5 text-highlight" />
+                      </div>
                       <div>
                         <h3 className="font-semibold text-foreground mb-2">Important Medical Notice</h3>
                         <p className="text-sm text-muted-foreground leading-relaxed">

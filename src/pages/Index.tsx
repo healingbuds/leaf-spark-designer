@@ -18,8 +18,6 @@ import TrustMotifs, { CertifiedMotif, LabTestedMotif, SecureShieldMotif, Deliver
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useShop } from "@/context/ShopContext";
-import { useProducts } from "@/hooks/useProducts";
-import { ProductCard } from "@/components/shop/ProductCard";
 import heroVideo from "/hero-video.mp4";
 
 const eligibilitySteps = [
@@ -31,11 +29,7 @@ const eligibilitySteps = [
 const Index = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { drGreenClient, isEligible, countryCode } = useShop();
-  const { products, isLoading: productsLoading } = useProducts(countryCode);
-
-  // Get featured products (first 4 available products)
-  const featuredProducts = products?.slice(0, 4) || [];
+  const { drGreenClient, isEligible } = useShop();
 
   return (
     <PageTransition>
@@ -222,50 +216,6 @@ const Index = () => {
             </div>
           </section>
 
-          {/* Featured Products (only for eligible users) */}
-          {isEligible && featuredProducts.length > 0 && (
-            <section className="py-16 lg:py-24">
-              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="max-w-6xl mx-auto">
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="flex items-center justify-between mb-10"
-                  >
-                    <div>
-                      <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
-                        Featured Products
-                      </h2>
-                      <p className="font-body text-muted-foreground">
-                        Pharmaceutical-grade medical cannabis
-                      </p>
-                    </div>
-                    <Button asChild variant="outline">
-                      <Link to="/shop">
-                        View All
-                        <ArrowRight className="ml-2 w-4 h-4" />
-                      </Link>
-                    </Button>
-                  </motion.div>
-
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {featuredProducts.map((product, index) => (
-                      <motion.div
-                        key={product.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <ProductCard product={product} onViewDetails={() => navigate(`/shop/cultivar/${product.id}`)} />
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </section>
-          )}
 
           {/* Medical Compliance Banner */}
           <section className="py-12 bg-primary/5 border-y border-primary/10">

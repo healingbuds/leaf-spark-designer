@@ -1,0 +1,196 @@
+/**
+ * Theme Design Tokens
+ * 
+ * Global design system tokens for Healing Buds.
+ * Light mode is default, dark mode is fully supported alternative.
+ * All colors use HSL format for consistency.
+ * 
+ * IMPORTANT: This file is imported by index.css and provides
+ * foundational tokens used across the entire application.
+ */
+
+/* ===== LIGHT MODE (DEFAULT) ===== */
+:root {
+  /* Brand Color Palette */
+  --primary-green: 178 48% 21%;       /* #1C4F4D - Primary Green */
+  --secondary-green: 178 48% 33%;     /* #2C7D7A - Secondary Green */
+  --accent-green: 164 48% 53%;        /* #4DBFA1 - Accent Light Green */
+  --lime-green: 84 81% 44%;           /* #84CC16 - Lime Green */
+  --deep-teal: 180 84% 32%;           /* #0D9488 - Deep Teal */
+  --text-light: 0 0% 98%;             /* #F9F9F9 - Text Color */
+  --light-gray: 171 12% 66%;          /* #A0B3B0 - Light Gray */
+  --subtle-dark: 176 39% 17%;         /* #1A3C3A - Subtle Dark */
+
+  /* Application Colors - Soft sage-cream undertones */
+  --background: 150 12% 97%;
+  --foreground: 172 32% 20%;
+  --off-white: 155 18% 98%;
+
+  --card: 155 10% 99%;
+  --card-foreground: 172 32% 20%;
+
+  --popover: 155 10% 99%;
+  --popover-foreground: 172 32% 20%;
+
+  /* Primary & Secondary - sage teal matching nav */
+  --primary: 175 42% 35%;
+  --primary-foreground: 0 0% 98%;
+
+  --secondary: 178 48% 33%;
+  --secondary-foreground: 0 0% 98%;
+
+  --muted: 160 14% 93%;
+  --muted-foreground: 165 12% 42%;
+
+  /* Accent - soft sage-teal for hovers */
+  --accent: 165 35% 92%;
+  --accent-foreground: 176 39% 17%;
+
+  /* Destructive - warmer amber-coral */
+  --destructive: 15 65% 55%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 165 18% 86%;
+  --input: 165 16% 95%;
+  --ring: 172 42% 45%;
+
+  --radius: 0.75rem;
+
+  /* Semantic tokens */
+  --navbar-teal: 178 48% 21%;
+  --section-color: 178 48% 21%;
+  
+  /* Legacy teal tokens (mapped to palette) */
+  --teal-midnight: 178 48% 21%;
+  --teal-deep: 178 48% 33%;
+  --teal-deeper: 176 39% 17%;
+  --teal-primary: 164 48% 53%;
+  --teal-darker: 176 39% 17%;
+  
+  /* Sage tokens */
+  --sage-dark: 171 12% 66%;
+  --sage-deeper: 171 12% 60%;
+  --sage-medium: 171 12% 75%;
+  --sage-forest: 171 12% 50%;
+  
+  /* Pharma colors */
+  --pharma-charcoal: 176 39% 25%;
+  --pharma-grey: 171 12% 60%;
+  --pharma-grey-light: 171 12% 92%;
+  --pharma-green: 164 48% 53%;
+  --pharma-green-dark: 178 48% 33%;
+  --pharma-blue: 178 48% 33%;
+  --pharma-blue-light: 171 12% 94%;
+  
+  /* Map-specific sage colors */
+  --map-sage: 79 51% 52%;
+  --map-sage-light: 79 55% 70%;
+  --map-sage-dark: 79 45% 40%;
+
+  /* Brand Gradients */
+  --gradient-primary: linear-gradient(135deg, hsl(164 48% 53%), hsl(178 48% 33%));
+  --gradient-sage-teal: linear-gradient(135deg, hsl(171 12% 75%), hsl(164 48% 53%));
+  --gradient-teal-midnight: linear-gradient(135deg, hsl(178 48% 33%), hsl(178 48% 21%));
+  --gradient-sage-forest: linear-gradient(135deg, hsl(171 12% 75%), hsl(171 12% 50%));
+  --gradient-hero: linear-gradient(180deg, rgba(77, 191, 161, 0.2), rgba(44, 125, 122, 0.15));
+  --gradient-accent: linear-gradient(135deg, hsl(164 48% 75%), hsl(178 48% 45%));
+  --gradient-warm: linear-gradient(135deg, hsl(164 48% 80%), hsl(171 12% 75%));
+  --gradient-sage-radial: radial-gradient(ellipse at center top, hsl(171 12% 92%) 0%, hsl(171 12% 85%) 25%, hsl(178 48% 40%) 60%, hsl(178 48% 33%) 100%);
+  
+  /* Sage-tinted shadows */
+  --shadow-xs: 0 1px 2px 0 hsla(165, 25%, 45%, 0.04);
+  --shadow-sm: 0 1px 3px 0 hsla(165, 25%, 40%, 0.06), 0 1px 2px -1px hsla(165, 25%, 40%, 0.03);
+  --shadow-md: 0 2px 4px -1px hsla(165, 30%, 35%, 0.08), 0 4px 6px -1px hsla(165, 30%, 35%, 0.05);
+  --shadow-lg: 0 4px 6px -2px hsla(165, 30%, 30%, 0.07), 0 10px 15px -3px hsla(165, 30%, 30%, 0.08);
+  --shadow-xl: 0 10px 25px -5px hsla(165, 28%, 28%, 0.10), 0 8px 10px -6px hsla(165, 28%, 28%, 0.08);
+  --shadow-2xl: 0 20px 40px -12px hsla(165, 25%, 25%, 0.14);
+  --shadow-card: 0 0 0 1px hsla(165, 20%, 45%, 0.05), 0 2px 4px hsla(165, 20%, 40%, 0.06), 0 12px 24px hsla(165, 20%, 35%, 0.07);
+  --shadow-elegant: 0 0 0 1px hsla(165, 20%, 45%, 0.04), 0 8px 24px -4px hsla(165, 25%, 30%, 0.10);
+  
+  /* Transitions */
+  --transition-base: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: all 0.35s cubic-bezier(0.34, 1.15, 0.64, 1);
+  --transition-bounce: all 0.5s cubic-bezier(0.68, -0.3, 0.265, 1.3);
+  
+  /* Typography scale */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+  
+  /* Spacing scale */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+  
+  /* Header height system */
+  --header-height: 6rem;
+  --header-height-md: 7rem;
+  --header-height-scrolled: 5rem;
+  --header-height-md-scrolled: 5.5rem;
+  --header-offset: 0.5rem;
+}
+
+/* ===== DARK MODE ===== */
+.dark {
+  /* Base: warm charcoal with sage undertone */
+  --background: 180 8% 7%;
+  --foreground: 150 8% 95%;
+
+  /* Cards: clear elevation */
+  --card: 175 6% 11%;
+  --card-foreground: 150 8% 94%;
+
+  --popover: 175 6% 12%;
+  --popover-foreground: 150 8% 94%;
+
+  /* Primary - balanced sage-teal */
+  --primary: 168 38% 45%;
+  --primary-foreground: 0 0% 100%;
+
+  /* Secondary - sage-tinted */
+  --secondary: 175 8% 18%;
+  --secondary-foreground: 150 10% 90%;
+
+  /* Muted surfaces */
+  --muted: 175 6% 14%;
+  --muted-foreground: 165 10% 60%;
+
+  /* Accent - visible sage */
+  --accent: 168 20% 18%;
+  --accent-foreground: 165 30% 75%;
+
+  /* Destructive - warm amber */
+  --destructive: 18 60% 50%;
+  --destructive-foreground: 0 0% 100%;
+
+  /* Borders and inputs */
+  --border: 170 8% 20%;
+  --input: 175 6% 14%;
+  --ring: 168 38% 45%;
+  
+  /* Status colors */
+  --success: 158 50% 42%;
+  --warning: 38 70% 50%;
+  --info: 195 55% 48%;
+  
+  /* Dark mode shadows */
+  --shadow-xs: 0 1px 2px 0 hsla(175, 20%, 5%, 0.3);
+  --shadow-sm: 0 1px 3px 0 hsla(175, 20%, 5%, 0.4), 0 1px 2px -1px hsla(175, 20%, 5%, 0.2);
+  --shadow-md: 0 2px 4px -1px hsla(175, 20%, 5%, 0.5), 0 4px 6px -1px hsla(175, 20%, 5%, 0.3);
+  --shadow-lg: 0 4px 6px -2px hsla(175, 20%, 5%, 0.4), 0 10px 15px -3px hsla(175, 20%, 5%, 0.5);
+  --shadow-xl: 0 10px 25px -5px hsla(175, 18%, 5%, 0.6), 0 8px 10px -6px hsla(175, 18%, 5%, 0.4);
+  --shadow-2xl: 0 20px 40px -12px hsla(175, 15%, 5%, 0.7);
+  --shadow-card: 0 0 0 1px hsla(170, 15%, 30%, 0.15), 0 2px 4px hsla(175, 15%, 5%, 0.3), 0 12px 24px hsla(175, 15%, 5%, 0.4);
+  --shadow-elegant: 0 0 0 1px hsla(170, 15%, 30%, 0.12), 0 8px 24px -4px hsla(175, 18%, 5%, 0.5);
+}

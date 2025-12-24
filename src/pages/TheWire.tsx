@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
@@ -11,13 +11,21 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/SEOHead";
-import { newsArticles } from "@/data/newsArticles";
+import { getNewsArticlesByRegion } from "@/data/newsArticles";
+import { useGeoLocation } from "@/hooks/useGeoLocation";
 
 const TheWire = () => {
   const { t } = useTranslation("theWire");
   const [menuOpen, setMenuOpen] = useState(false);
-  const featuredArticle = newsArticles.find((a) => a.featured);
-  const otherArticles = newsArticles.filter((a) => !a.featured);
+  const locationConfig = useGeoLocation();
+  
+  const articles = useMemo(() => 
+    getNewsArticlesByRegion(locationConfig.countryCode), 
+    [locationConfig.countryCode]
+  );
+  
+  const featuredArticle = articles.find((a) => a.featured);
+  const otherArticles = articles.filter((a) => !a.featured);
 
   return (
     <PageTransition>

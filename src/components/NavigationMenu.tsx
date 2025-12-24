@@ -28,7 +28,7 @@ const NavigationMenu = ({ scrolled, onCloseAllDropdowns }: NavigationMenuProps) 
     "whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
   );
   
-  const navItemSize = scrolled ? "text-xs 2xl:text-sm px-3 py-2" : "text-sm 2xl:text-base px-4 py-2.5";
+  const navItemSize = scrolled ? "text-xs xl:text-sm px-3 py-2" : "text-sm xl:text-base px-4 py-2.5";
   
   const getNavItemStyles = (isItemActive: boolean) => cn(
     navItemBase,
@@ -40,7 +40,7 @@ const NavigationMenu = ({ scrolled, onCloseAllDropdowns }: NavigationMenuProps) 
 
   return (
     <nav className={cn(
-      "hidden 2xl:flex items-center justify-center",
+      "hidden xl:flex items-center justify-center",
       "transition-all duration-500 ease-out mx-4",
       scrolled ? "gap-1" : "gap-2"
     )}>

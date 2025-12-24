@@ -167,7 +167,7 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
             <NavigationMenu scrolled={scrolled} />
             
             {/* ZONE 3: Right - Actions (uses 2xl breakpoint to prevent overlap with nav) */}
-            <div className="hidden 2xl:flex items-center gap-2 justify-self-end flex-shrink-0">
+            <div className="hidden xl:flex items-center gap-2 justify-self-end flex-shrink-0">
               <LanguageSwitcher scrolled={scrolled} />
               <ThemeToggle />
 
@@ -235,7 +235,7 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
             </div>
 
             {/* Mobile/Tablet Menu Button & Theme Toggle - shows below 2xl */}
-            <div className="2xl:hidden flex items-center gap-2 justify-self-end">
+            <div className="xl:hidden flex items-center gap-2 justify-self-end">
               <ThemeToggle />
               <button
                 type="button"

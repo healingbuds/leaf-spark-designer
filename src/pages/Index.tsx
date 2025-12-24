@@ -1,14 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   ArrowRight, 
-  Shield, 
-  Award, 
-  Truck,
-  CheckCircle2,
-  Stethoscope,
-  FlaskConical
+  Shield,
+  Stethoscope
 } from "lucide-react";
 import Header from "@/layout/Header";
 import Footer from "@/components/Footer";
@@ -17,18 +13,12 @@ import BackToTop from "@/components/BackToTop";
 import MobileBottomActions from "@/components/MobileBottomActions";
 import SEOHead from "@/components/SEOHead";
 import HBIcon from "@/components/HBIcon";
+import TrustBadges from "@/components/TrustBadges";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useShop } from "@/context/ShopContext";
 import { useProducts } from "@/hooks/useProducts";
 import { ProductCard } from "@/components/shop/ProductCard";
-
-const trustIndicators = [
-  { icon: Award, label: "EU GMP Certified" },
-  { icon: FlaskConical, label: "Lab Tested" },
-  { icon: Shield, label: "Secure & Compliant" },
-  { icon: Truck, label: "Discreet Delivery" }
-];
 
 const eligibilitySteps = [
   { step: 1, title: "Complete Assessment", description: "Fill out our secure medical questionnaire" },
@@ -116,20 +106,13 @@ const Index = () => {
                   </div>
 
                   {/* Trust Indicators */}
-                  <div className="flex flex-wrap justify-center gap-6 md:gap-8">
-                    {trustIndicators.map((item, index) => (
-                      <motion.div
-                        key={item.label}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 + index * 0.1 }}
-                        className="flex items-center gap-2 text-muted-foreground"
-                      >
-                        <item.icon className="w-5 h-5 text-primary" />
-                        <span className="text-sm font-medium">{item.label}</span>
-                      </motion.div>
-                    ))}
-                  </div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    <TrustBadges size="sm" />
+                  </motion.div>
                 </motion.div>
               </div>
             </div>

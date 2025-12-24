@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Leaf, ShieldCheck, Truck, HeartPulse } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import Header from '@/layout/Header';
 import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
@@ -9,39 +9,10 @@ import { Cart } from '@/components/shop/Cart';
 import { CartButton } from '@/components/shop/CartButton';
 import { RestrictedRegionGate } from '@/components/shop/RestrictedRegionGate';
 import { VerificationProgress } from '@/components/shop/VerificationProgress';
+import TrustBadges from '@/components/TrustBadges';
 import { useShop } from '@/context/ShopContext';
 import { useGeoLocation } from '@/hooks/useGeoLocation';
 import { useTranslation } from 'react-i18next';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-
-const benefits = [
-  {
-    icon: ShieldCheck,
-    title: 'Medical Grade',
-    description: 'All products are pharmaceutical-grade quality',
-  },
-  {
-    icon: Leaf,
-    title: 'Lab Tested',
-    description: 'Third-party tested for purity and potency',
-  },
-  {
-    icon: Truck,
-    title: 'Discreet Delivery',
-    description: 'Secure and confidential shipping',
-  },
-  {
-    icon: HeartPulse,
-    title: 'Patient Support',
-    description: 'Dedicated medical support team',
-  },
-];
 
 const countries = [
   { code: 'PT', name: 'Portugal', flag: '🇵🇹' },
@@ -146,32 +117,10 @@ export default function Shop() {
           </div>
         </section>
 
-        {/* Benefits */}
+        {/* Trust Badges */}
         <section className="py-6 sm:py-8 border-y border-border/50 bg-muted/20">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-              {benefits.map((benefit, index) => (
-                <motion.div
-                  key={benefit.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex items-start sm:items-center gap-2 sm:gap-3"
-                >
-                  <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <benefit.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-medium text-foreground text-xs sm:text-sm">
-                      {benefit.title}
-                    </p>
-                    <p className="text-[10px] sm:text-xs text-muted-foreground line-clamp-2">
-                      {benefit.description}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+            <TrustBadges size="sm" />
           </div>
         </section>
 

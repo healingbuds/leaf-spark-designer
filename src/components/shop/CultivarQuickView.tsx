@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { useShop } from '@/context/ShopContext';
 import { Product } from '@/hooks/useProducts';
 import { useToast } from '@/hooks/use-toast';
+import { formatPrice } from '@/lib/currency';
 
 interface CultivarQuickViewProps {
   product: Product | null;
@@ -20,7 +21,7 @@ interface CultivarQuickViewProps {
 
 export function CultivarQuickView({ product, onClose }: CultivarQuickViewProps) {
   const [quantity, setQuantity] = useState(1);
-  const { addToCart, isEligible, drGreenClient } = useShop();
+  const { addToCart, isEligible, drGreenClient, countryCode } = useShop();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -184,7 +185,7 @@ export function CultivarQuickView({ product, onClose }: CultivarQuickViewProps) 
                 {/* Price */}
                 <div className="flex items-baseline gap-2 mb-4">
                   <span className="text-3xl font-bold text-primary">
-                    €{product.retailPrice.toFixed(2)}
+                    {formatPrice(product.retailPrice, countryCode)}
                   </span>
                   <span className="text-sm text-muted-foreground">per gram</span>
                 </div>
@@ -296,7 +297,7 @@ export function CultivarQuickView({ product, onClose }: CultivarQuickViewProps) 
                   <div className="flex items-center justify-between text-lg">
                     <span className="text-muted-foreground">Total:</span>
                     <span className="text-2xl font-bold text-primary">
-                      €{(product.retailPrice * quantity).toFixed(2)}
+                      {formatPrice(product.retailPrice * quantity, countryCode)}
                     </span>
                   </div>
 

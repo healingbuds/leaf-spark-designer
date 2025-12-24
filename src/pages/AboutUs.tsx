@@ -156,58 +156,121 @@ const AboutUs = () => {
             </div>
           </section>
 
-          {/* Our Facilities with hover effects */}
+          {/* Our Facilities with premium visual treatment */}
           <section className="py-20 md:py-32 relative overflow-hidden" style={{ backgroundColor: 'hsl(var(--section-color))' }}>
-            {/* Subtle animated background pattern */}
-            <div className="absolute inset-0 opacity-5">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1)_0%,transparent_50%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.1)_0%,transparent_50%)]" />
+            {/* Animated background orbs */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <motion.div 
+                className="absolute -top-32 -left-32 w-96 h-96 bg-gradient-to-br from-primary/20 to-secondary/10 rounded-full blur-3xl"
+                animate={{ 
+                  x: [0, 30, 0],
+                  y: [0, -20, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div 
+                className="absolute -bottom-32 -right-32 w-80 h-80 bg-gradient-to-tl from-secondary/20 to-primary/10 rounded-full blur-3xl"
+                animate={{ 
+                  x: [0, -25, 0],
+                  y: [0, 25, 0],
+                  scale: [1, 1.15, 1]
+                }}
+                transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+              />
+              <motion.div 
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-white/5 to-transparent rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
+              />
             </div>
+            
+            {/* Subtle grid pattern */}
+            <div className="absolute inset-0 opacity-[0.03]" style={{
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+              backgroundSize: '60px 60px'
+            }} />
             
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
               <motion.div 
-                className="max-w-4xl mx-auto text-center"
+                className="max-w-5xl mx-auto text-center"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={staggerContainer}
               >
+                {/* Enhanced title with gradient */}
+                <motion.div className="mb-4" variants={fadeInUp}>
+                  <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-white/80 border border-white/10">
+                    Global Network
+                  </span>
+                </motion.div>
                 <motion.h2 
-                  className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white mb-8 tracking-tight"
+                  className="text-3xl md:text-4xl lg:text-5xl font-semibold mb-8 tracking-tight bg-gradient-to-r from-white via-white to-white/70 bg-clip-text text-transparent"
                   variants={fadeInUp}
                 >
                   {t('facilities.title')}
                 </motion.h2>
                 <motion.p 
-                  className="text-base md:text-lg text-white/80 leading-relaxed mb-16"
+                  className="text-base md:text-lg text-white/70 leading-relaxed mb-16 max-w-3xl mx-auto"
                   variants={fadeInUp}
                 >
                   {t('facilities.description')}
                 </motion.p>
+                
+                {/* Premium facility cards */}
                 <motion.div 
                   className="grid md:grid-cols-2 gap-6 text-left"
                   variants={staggerContainer}
                 >
                   {[
-                    { title: t('facilities.southAfrica.title'), desc: t('facilities.southAfrica.description') },
-                    { title: t('facilities.uk.title'), desc: t('facilities.uk.description') },
-                    { title: t('facilities.thailand.title'), desc: t('facilities.thailand.description') },
-                    { title: t('facilities.portugal.title'), desc: t('facilities.portugal.description') }
+                    { title: t('facilities.southAfrica.title'), desc: t('facilities.southAfrica.description'), flag: '🇿🇦' },
+                    { title: t('facilities.uk.title'), desc: t('facilities.uk.description'), flag: '🇬🇧' },
+                    { title: t('facilities.thailand.title'), desc: t('facilities.thailand.description'), flag: '🇹🇭' },
+                    { title: t('facilities.portugal.title'), desc: t('facilities.portugal.description'), flag: '🇵🇹' }
                   ].map((facility, index) => (
                     <motion.div 
                       key={index}
-                      className="bg-white/[0.03] backdrop-blur-sm rounded-xl p-7 border border-white/10 transition-all duration-300 hover:bg-white/[0.08] hover:border-white/25 hover:shadow-xl group"
+                      className="relative group"
                       variants={valueCardVariants}
-                      whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
                     >
-                      <h3 className="text-xl md:text-2xl font-medium text-white mb-4 tracking-tight group-hover:text-white/90 transition-colors">
-                        {facility.title}
-                      </h3>
-                      <p className="text-white/70 leading-relaxed text-sm md:text-base group-hover:text-white/80 transition-colors">
-                        {facility.desc}
-                      </p>
+                      {/* Gradient border effect */}
+                      <div className="absolute -inset-[1px] bg-gradient-to-br from-primary/40 via-white/20 to-secondary/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-[1px]" />
+                      
+                      {/* Card content */}
+                      <div className="relative bg-white/[0.05] backdrop-blur-md rounded-2xl p-8 border border-white/10 transition-all duration-500 group-hover:bg-white/[0.08] group-hover:border-white/20 h-full">
+                        {/* Glow effect on hover */}
+                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        
+                        <div className="relative z-10">
+                          {/* Flag and location indicator */}
+                          <div className="flex items-center gap-3 mb-4">
+                            <span className="text-3xl">{facility.flag}</span>
+                            <div className="h-px flex-1 bg-gradient-to-r from-white/30 to-transparent" />
+                          </div>
+                          
+                          <h3 className="text-xl md:text-2xl font-medium text-white mb-4 tracking-tight group-hover:text-white transition-colors">
+                            {facility.title}
+                          </h3>
+                          <p className="text-white/60 leading-relaxed text-sm md:text-base group-hover:text-white/75 transition-colors">
+                            {facility.desc}
+                          </p>
+                        </div>
+                      </div>
                     </motion.div>
                   ))}
+                </motion.div>
+                
+                {/* Connecting line decoration */}
+                <motion.div 
+                  className="mt-12 flex justify-center"
+                  variants={fadeInUp}
+                >
+                  <div className="flex items-center gap-2 text-white/40 text-sm">
+                    <div className="w-12 h-px bg-gradient-to-r from-transparent to-white/30" />
+                    <span>Connecting patients worldwide</span>
+                    <div className="w-12 h-px bg-gradient-to-l from-transparent to-white/30" />
+                  </div>
                 </motion.div>
               </motion.div>
             </div>

@@ -247,7 +247,7 @@ const PageHero = ({
             <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIvPjwvc3ZnPg==')]" />
           )}
           
-          {/* Glassmorphism card */}
+          {/* Glassmorphism card - improved light mode visibility */}
           {showGlassmorphismCard && glassmorphismText && (
             <motion.div 
               className="absolute bottom-6 left-6 right-6 md:bottom-8 md:left-8 md:right-auto md:max-w-md"
@@ -255,8 +255,8 @@ const PageHero = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="backdrop-blur-xl bg-white/10 dark:bg-black/20 rounded-xl p-4 md:p-5 border border-white/20 dark:border-white/10 shadow-lg">
-                <p className="text-white text-sm md:text-base font-medium tracking-wide">
+              <div className="backdrop-blur-xl bg-gradient-to-br from-black/60 via-black/50 to-black/40 dark:from-black/40 dark:via-black/30 dark:to-black/20 rounded-xl p-4 md:p-5 border border-white/20 shadow-lg">
+                <p className="text-white text-sm md:text-base font-medium tracking-wide drop-shadow-md">
                   {glassmorphismText}
                 </p>
               </div>

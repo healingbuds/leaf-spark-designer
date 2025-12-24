@@ -1,11 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion, useSpring, useMotionValue } from 'framer-motion';
+import { useCursor } from '@/context/CursorContext';
 
 interface CursorFollowerProps {
   children?: React.ReactNode;
 }
 
 const CursorFollower = ({ children }: CursorFollowerProps) => {
+  const { cursorEnabled } = useCursor();
   const [isVisible, setIsVisible] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [isMagnetic, setIsMagnetic] = useState(false);
@@ -55,7 +57,7 @@ const CursorFollower = ({ children }: CursorFollowerProps) => {
     };
   }, [handleMouseMove]);
 
-  if (!isVisible) return <>{children}</>;
+  if (!isVisible || !cursorEnabled) return <>{children}</>;
 
   return (
     <>

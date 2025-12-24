@@ -15,6 +15,7 @@ import SkipLinks from "@/components/SkipLinks";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 import { ShopProvider } from "@/context/ShopContext";
+import { CursorProvider } from "@/context/CursorContext";
 
 // Lazy load pages for better performance
 const Index = lazy(() => import("./pages/Index"));
@@ -106,24 +107,26 @@ const AnimatedRoutes = () => {
 const App = () => (
   <ErrorBoundary>
     <ThemeProvider defaultTheme="dark" storageKey="healing-buds-theme">
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <ShopProvider>
-            <CursorFollower>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <SkipLinks />
-                <ScrollToTop />
-                <RouteProgress />
-                <main id="main-content" tabIndex={-1}>
-                  <AnimatedRoutes />
-                </main>
-              </BrowserRouter>
-            </CursorFollower>
-          </ShopProvider>
-        </TooltipProvider>
-      </QueryClientProvider>
+      <CursorProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <ShopProvider>
+              <CursorFollower>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <SkipLinks />
+                  <ScrollToTop />
+                  <RouteProgress />
+                  <main id="main-content" tabIndex={-1}>
+                    <AnimatedRoutes />
+                  </main>
+                </BrowserRouter>
+              </CursorFollower>
+            </ShopProvider>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </CursorProvider>
     </ThemeProvider>
   </ErrorBoundary>
 );

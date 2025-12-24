@@ -10,6 +10,9 @@ import ScrollToTop from "@/components/ScrollToTop";
 import RouteProgress from "@/components/RouteProgress";
 import CursorFollower from "@/components/CursorFollower";
 import PageLoadingSkeleton from "@/components/PageLoadingSkeleton";
+import ErrorBoundary from "@/components/ErrorBoundary";
+import SkipLinks from "@/components/SkipLinks";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 import { ShopProvider } from "@/context/ShopContext";
 
@@ -54,9 +57,24 @@ const AnimatedRoutes = () => {
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<PatientDashboard />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/prescriptions" element={<AdminPrescriptions />} />
-          <Route path="/admin/strains" element={<AdminStrains />} />
+          
+          {/* Protected Admin Routes */}
+          <Route path="/admin" element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/prescriptions" element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminPrescriptions />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/strains" element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminStrains />
+            </ProtectedRoute>
+          } />
+          
           <Route path="/shop" element={<Shop />} />
           <Route path="/shop/register" element={<ShopRegister />} />
           <Route path="/shop/cultivar/:cultivarId" element={<CultivarDetail />} />
@@ -86,23 +104,28 @@ const AnimatedRoutes = () => {
 };
 
 const App = () => (
-  <ThemeProvider defaultTheme="dark" storageKey="healing-buds-theme">
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <ShopProvider>
-          <CursorFollower>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <ScrollToTop />
-              <RouteProgress />
-              <AnimatedRoutes />
-            </BrowserRouter>
-          </CursorFollower>
-        </ShopProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
-  </ThemeProvider>
+  <ErrorBoundary>
+    <ThemeProvider defaultTheme="dark" storageKey="healing-buds-theme">
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <ShopProvider>
+            <CursorFollower>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <SkipLinks />
+                <ScrollToTop />
+                <RouteProgress />
+                <main id="main-content" tabIndex={-1}>
+                  <AnimatedRoutes />
+                </main>
+              </BrowserRouter>
+            </CursorFollower>
+          </ShopProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
+  </ErrorBoundary>
 );
 
 export default App;

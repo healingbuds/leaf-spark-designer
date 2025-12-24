@@ -636,3 +636,88 @@ All colors MUST be HSL.
 .hover\:scrollbar-thumb-white\/30:hover::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.3);
 }
+
+/* ===== ACCESSIBILITY: Skip Links ===== */
+.skip-links {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  padding: 1rem 1.5rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 0.5rem 0;
+  transition: left 0.15s ease-in-out;
+}
+
+.skip-link:focus {
+  left: 0;
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* ===== ACCESSIBILITY: Reduced Motion Support ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* Disable Framer Motion animations */
+  [data-framer-component-type],
+  [data-framer-name] {
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  /* Keep essential visual feedback but make it instant */
+  button:hover,
+  a:hover,
+  [role="button"]:hover {
+    transition: none !important;
+  }
+  
+  /* Disable parallax and scroll-based animations */
+  .parallax,
+  [data-scroll],
+  [data-aos] {
+    transform: none !important;
+  }
+  
+  /* Disable NProgress animation but keep visibility */
+  #nprogress .bar {
+    animation: none !important;
+  }
+  
+  #nprogress .peg {
+    display: none !important;
+  }
+}
+
+/* ===== Focus Visible Styles for Accessibility ===== */
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Remove outline for mouse users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Main content focus target for skip links */
+#main-content:focus {
+  outline: none;
+}

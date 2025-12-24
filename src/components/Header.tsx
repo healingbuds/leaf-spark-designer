@@ -190,10 +190,10 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
       : "text-white/90 hover:text-white hover:bg-white/12"
   );
 
-  // Dropdown item styles
+  // Modern dropdown item styles - matching mobile menu design
   const dropdownItemBase = cn(
-    "block px-5 py-4 transition-all duration-150",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-inset"
+    "block px-5 py-4 transition-all duration-300 relative group/item",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-inset"
   );
 
   return (
@@ -286,79 +286,111 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                   )} />
                 </button>
                 
-                {/* Dropdown Menu - High contrast, proper z-index hierarchy */}
+                {/* Dropdown Menu - Modern glass morphism design */}
                 <AnimatePresence>
                   {whatWeDoOpen && (
                     <motion.div 
-                      initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                      initial={{ opacity: 0, y: -12, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -8, scale: 0.98 }}
-                      transition={{ duration: 0.15, ease: "easeOut" }}
-                      className="absolute top-full left-0 mt-3 w-80 rounded-xl overflow-hidden z-[200] shadow-2xl"
+                      exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                      className="absolute top-full left-0 mt-3 w-80 rounded-2xl overflow-hidden z-[200] shadow-2xl backdrop-blur-xl"
                       style={{ 
-                        backgroundColor: 'hsl(var(--nav-dropdown-bg))',
-                        border: '1px solid hsl(var(--nav-dropdown-border))'
+                        background: 'linear-gradient(135deg, hsl(var(--primary) / 0.95) 0%, hsl(var(--primary) / 0.85) 50%, hsl(var(--secondary) / 0.9) 100%)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05) inset'
                       }}
                       role="menu"
                     >
+                      {/* Subtle gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+                      
                       <Link
                         to="/cultivating-processing"
                         className={cn(
                           dropdownItemBase,
+                          "border-b border-white/10",
                           isActive("/cultivating-processing")
-                            ? "bg-white/15 border-l-4 border-white"
-                            : "hover:bg-white/10 border-l-4 border-transparent"
+                            ? "bg-gradient-to-r from-white/20 to-white/10"
+                            : "hover:bg-white/10"
                         )}
-                        style={{ borderBottom: '1px solid hsl(var(--nav-dropdown-border))' }}
                         onClick={() => setWhatWeDoOpen(false)}
                         role="menuitem"
                       >
-                        <div className="font-semibold text-white">{t('dropdown.cultivating')}</div>
-                        <div className="text-sm text-white/70 mt-0.5">{t('dropdown.cultivatingDesc')}</div>
+                        <div className="flex items-center gap-3 relative z-10">
+                          {isActive("/cultivating-processing") && (
+                            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                          )}
+                          <div>
+                            <div className="font-semibold text-white group-hover/item:translate-x-1 transition-transform duration-200">{t('dropdown.cultivating')}</div>
+                            <div className="text-sm text-white/60 mt-0.5">{t('dropdown.cultivatingDesc')}</div>
+                          </div>
+                        </div>
                       </Link>
                       <Link
                         to="/manufacture-distribution"
                         className={cn(
                           dropdownItemBase,
+                          "border-b border-white/10",
                           isActive("/manufacture-distribution")
-                            ? "bg-white/15 border-l-4 border-white"
-                            : "hover:bg-white/10 border-l-4 border-transparent"
+                            ? "bg-gradient-to-r from-white/20 to-white/10"
+                            : "hover:bg-white/10"
                         )}
-                        style={{ borderBottom: '1px solid hsl(var(--nav-dropdown-border))' }}
                         onClick={() => setWhatWeDoOpen(false)}
                         role="menuitem"
                       >
-                        <div className="font-semibold text-white">{t('dropdown.manufacture')}</div>
-                        <div className="text-sm text-white/70 mt-0.5">{t('dropdown.manufactureDesc')}</div>
+                        <div className="flex items-center gap-3 relative z-10">
+                          {isActive("/manufacture-distribution") && (
+                            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                          )}
+                          <div>
+                            <div className="font-semibold text-white group-hover/item:translate-x-1 transition-transform duration-200">{t('dropdown.manufacture')}</div>
+                            <div className="text-sm text-white/60 mt-0.5">{t('dropdown.manufactureDesc')}</div>
+                          </div>
+                        </div>
                       </Link>
                       <Link
                         to="/medical-clinics"
                         className={cn(
                           dropdownItemBase,
+                          "border-b border-white/10",
                           isActive("/medical-clinics")
-                            ? "bg-white/15 border-l-4 border-white"
-                            : "hover:bg-white/10 border-l-4 border-transparent"
+                            ? "bg-gradient-to-r from-white/20 to-white/10"
+                            : "hover:bg-white/10"
                         )}
-                        style={{ borderBottom: '1px solid hsl(var(--nav-dropdown-border))' }}
                         onClick={() => setWhatWeDoOpen(false)}
                         role="menuitem"
                       >
-                        <div className="font-semibold text-white">{t('dropdown.clinics')}</div>
-                        <div className="text-sm text-white/70 mt-0.5">{t('dropdown.clinicsDesc')}</div>
+                        <div className="flex items-center gap-3 relative z-10">
+                          {isActive("/medical-clinics") && (
+                            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                          )}
+                          <div>
+                            <div className="font-semibold text-white group-hover/item:translate-x-1 transition-transform duration-200">{t('dropdown.clinics')}</div>
+                            <div className="text-sm text-white/60 mt-0.5">{t('dropdown.clinicsDesc')}</div>
+                          </div>
+                        </div>
                       </Link>
                       <Link
                         to="/online-pharmacy"
                         className={cn(
                           dropdownItemBase,
                           isActive("/online-pharmacy")
-                            ? "bg-white/15 border-l-4 border-white"
-                            : "hover:bg-white/10 border-l-4 border-transparent"
+                            ? "bg-gradient-to-r from-white/20 to-white/10"
+                            : "hover:bg-white/10"
                         )}
                         onClick={() => setWhatWeDoOpen(false)}
                         role="menuitem"
                       >
-                        <div className="font-semibold text-white">{t('dropdown.pharmacy')}</div>
-                        <div className="text-sm text-white/70 mt-0.5">{t('dropdown.pharmacyDesc')}</div>
+                        <div className="flex items-center gap-3 relative z-10">
+                          {isActive("/online-pharmacy") && (
+                            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                          )}
+                          <div>
+                            <div className="font-semibold text-white group-hover/item:translate-x-1 transition-transform duration-200">{t('dropdown.pharmacy')}</div>
+                            <div className="text-sm text-white/60 mt-0.5">{t('dropdown.pharmacyDesc')}</div>
+                          </div>
+                        </div>
                       </Link>
                     </motion.div>
                   )}
@@ -407,45 +439,63 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
                 <AnimatePresence>
                   {aboutUsOpen && (
                     <motion.div 
-                      initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                      initial={{ opacity: 0, y: -12, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -8, scale: 0.98 }}
-                      transition={{ duration: 0.15, ease: "easeOut" }}
-                      className="absolute top-full left-0 mt-3 w-80 rounded-xl overflow-hidden z-[200] shadow-2xl"
+                      exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                      className="absolute top-full left-0 mt-3 w-80 rounded-2xl overflow-hidden z-[200] shadow-2xl backdrop-blur-xl"
                       style={{ 
-                        backgroundColor: 'hsl(var(--nav-dropdown-bg))',
-                        border: '1px solid hsl(var(--nav-dropdown-border))'
+                        background: 'linear-gradient(135deg, hsl(var(--primary) / 0.95) 0%, hsl(var(--primary) / 0.85) 50%, hsl(var(--secondary) / 0.9) 100%)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05) inset'
                       }}
                       role="menu"
                     >
+                      {/* Subtle gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+                      
                       <Link
                         to="/about-us"
                         className={cn(
                           dropdownItemBase,
+                          "border-b border-white/10",
                           isActive("/about-us")
-                            ? "bg-white/15 border-l-4 border-white"
-                            : "hover:bg-white/10 border-l-4 border-transparent"
+                            ? "bg-gradient-to-r from-white/20 to-white/10"
+                            : "hover:bg-white/10"
                         )}
-                        style={{ borderBottom: '1px solid hsl(var(--nav-dropdown-border))' }}
                         onClick={() => setAboutUsOpen(false)}
                         role="menuitem"
                       >
-                        <div className="font-semibold text-white">{t('dropdown.aboutHealing')}</div>
-                        <div className="text-sm text-white/70 mt-0.5">{t('dropdown.aboutHealingDesc')}</div>
+                        <div className="flex items-center gap-3 relative z-10">
+                          {isActive("/about-us") && (
+                            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                          )}
+                          <div>
+                            <div className="font-semibold text-white group-hover/item:translate-x-1 transition-transform duration-200">{t('dropdown.aboutHealing')}</div>
+                            <div className="text-sm text-white/60 mt-0.5">{t('dropdown.aboutHealingDesc')}</div>
+                          </div>
+                        </div>
                       </Link>
                       <Link
                         to="/blockchain-technology"
                         className={cn(
                           dropdownItemBase,
                           isActive("/blockchain-technology")
-                            ? "bg-white/15 border-l-4 border-white"
-                            : "hover:bg-white/10 border-l-4 border-transparent"
+                            ? "bg-gradient-to-r from-white/20 to-white/10"
+                            : "hover:bg-white/10"
                         )}
                         onClick={() => setAboutUsOpen(false)}
                         role="menuitem"
                       >
-                        <div className="font-semibold text-white">{t('dropdown.blockchain')}</div>
-                        <div className="text-sm text-white/70 mt-0.5">{t('dropdown.blockchainDesc')}</div>
+                        <div className="flex items-center gap-3 relative z-10">
+                          {isActive("/blockchain-technology") && (
+                            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                          )}
+                          <div>
+                            <div className="font-semibold text-white group-hover/item:translate-x-1 transition-transform duration-200">{t('dropdown.blockchain')}</div>
+                            <div className="text-sm text-white/60 mt-0.5">{t('dropdown.blockchainDesc')}</div>
+                          </div>
+                        </div>
                       </Link>
                     </motion.div>
                   )}

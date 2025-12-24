@@ -91,7 +91,8 @@ const CursorFollower = ({ children }: CursorFollowerProps) => {
         }}
       >
         <motion.div
-          className="relative -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary/30"
+          className="relative -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
+          style={{ borderColor: 'hsl(178 35% 40% / 0.5)' }}
           animate={{
             width: isHovering ? 64 : 32,
             height: isHovering ? 64 : 32,

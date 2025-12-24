@@ -108,8 +108,11 @@ const AboutUs = () => {
           {/* Animated Statistics Section */}
           <AnimatedStatistics />
 
+          {/* Visual Transition Divider */}
+          <div className="relative h-16 md:h-24 bg-gradient-to-b from-[hsl(178_48%_21%)] via-[hsl(178_48%_21%/50%)] to-transparent" />
+
           {/* Our Values with staggered cards */}
-          <section className="py-20 md:py-32 mt-0 bg-muted/30 overflow-hidden">
+          <section className="py-20 md:py-32 -mt-16 md:-mt-24 bg-muted/30 overflow-hidden">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <motion.h2 
                 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground text-center mb-16 md:mb-20 tracking-tight"

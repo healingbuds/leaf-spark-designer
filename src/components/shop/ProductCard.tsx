@@ -152,9 +152,9 @@ export function ProductCard({ product, onViewDetails, showDataSource = false }: 
             />
           </div>
           
-          {/* Out of stock overlay */}
+          {/* Out of stock overlay - faded with image still visible */}
           {!product.availability && (
-            <div className="absolute inset-0 bg-background/90 backdrop-blur-md flex items-center justify-center">
+            <div className="absolute inset-0 bg-background/70 backdrop-blur-[2px] flex items-center justify-center">
               <Badge variant="destructive" className="text-sm px-4 py-1.5 font-medium">
                 {t('outOfStock')}
               </Badge>

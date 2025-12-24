@@ -141,14 +141,16 @@ export function ProductCard({ product, onViewDetails, showDataSource = false }: 
         {/* Gradient overlay for premium depth */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/20 pointer-events-none" />
         
-        {/* Image container - clean, professional display */}
-        <div className="relative aspect-square overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900/40 dark:to-slate-900/60 flex items-center justify-center p-4">
-          <img
-            src={product.imageUrl}
-            alt={product.name}
-            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
+        {/* Image container - clean, professional display with consistent sizing */}
+        <div className="relative aspect-square overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900/40 dark:to-slate-900/60 flex items-center justify-center p-6">
+          <div className="relative w-[75%] h-[75%] flex items-center justify-center">
+            <img
+              src={product.imageUrl}
+              alt={product.name}
+              className="max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_8px_16px_rgba(0,0,0,0.25)]"
+              loading="lazy"
+            />
+          </div>
           
           {/* Out of stock overlay */}
           {!product.availability && (

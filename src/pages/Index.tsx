@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { 
   ArrowRight, 
   Shield, 
-  Leaf, 
   Award, 
   Truck,
   CheckCircle2,
@@ -17,6 +16,7 @@ import PageTransition from "@/components/PageTransition";
 import BackToTop from "@/components/BackToTop";
 import MobileBottomActions from "@/components/MobileBottomActions";
 import SEOHead from "@/components/SEOHead";
+import HBIcon from "@/components/HBIcon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useShop } from "@/context/ShopContext";
@@ -69,7 +69,7 @@ const Index = () => {
                   transition={{ duration: 0.6 }}
                 >
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8">
-                    <Leaf className="w-4 h-4" />
+                    <HBIcon size="sm" />
                     Medical Cannabis Dispensary
                   </span>
                   
@@ -289,7 +289,7 @@ const Index = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                 >
-                  <Leaf className="w-12 h-12 text-primary mx-auto mb-6" />
+                  <HBIcon size="xl" className="mx-auto mb-6" />
                   <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
                     Ready to Get Started?
                   </h2>

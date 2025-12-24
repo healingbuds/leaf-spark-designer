@@ -66,19 +66,6 @@ const Index = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-transparent to-secondary/20" />
             </div>
             
-            {/* Floating motif decorations */}
-            <div className="absolute top-32 left-8 opacity-20 hidden lg:block">
-              <CertifiedMotif size={80} className="text-white" />
-            </div>
-            <div className="absolute top-48 right-12 opacity-15 hidden lg:block">
-              <LabTestedMotif size={64} className="text-highlight" />
-            </div>
-            <div className="absolute bottom-32 left-16 opacity-20 hidden lg:block">
-              <SecureShieldMotif size={56} className="text-white" />
-            </div>
-            <div className="absolute bottom-48 right-8 opacity-15 hidden lg:block">
-              <DeliveryMotif size={72} className="text-highlight" />
-            </div>
             
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-20 lg:py-32 pt-32">
               <div className="max-w-4xl mx-auto text-center">

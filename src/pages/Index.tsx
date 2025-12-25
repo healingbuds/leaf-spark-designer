@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { 
   ArrowRight, 
   Shield,
   Stethoscope,
-  Play
+  Play,
+  ChevronDown
 } from "lucide-react";
 import Header from "@/layout/Header";
 import Footer from "@/components/Footer";
@@ -30,6 +31,23 @@ const Index = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { drGreenClient, isEligible } = useShop();
+  const heroRef = useRef<HTMLElement>(null);
+  
+  // Parallax scroll effect for video
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"]
+  });
+  const videoY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const videoScale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
+  const overlayOpacity = useTransform(scrollYProgress, [0, 0.5], [0.4, 0.8]);
+  
+  const scrollToContent = () => {
+    const nextSection = heroRef.current?.nextElementSibling;
+    if (nextSection) {
+      nextSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <PageTransition>
@@ -43,9 +61,12 @@ const Index = () => {
         
         <main>
           {/* Video Hero Section */}
-          <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden mt-24 sm:mt-28 md:mt-32">
-            {/* Video Background */}
-            <div className="absolute inset-0 z-0">
+          <section ref={heroRef} className="relative min-h-[85vh] flex items-center justify-center overflow-hidden mt-24 sm:mt-28 md:mt-32">
+            {/* Video Background with Parallax */}
+            <motion.div 
+              className="absolute inset-0 z-0"
+              style={{ y: videoY, scale: videoScale }}
+            >
               <video
                 autoPlay
                 muted
@@ -55,10 +76,13 @@ const Index = () => {
               >
                 <source src={heroVideo} type="video/mp4" />
               </video>
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
+              {/* Gradient overlay with scroll-based opacity */}
+              <motion.div 
+                className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70"
+                style={{ opacity: overlayOpacity }}
+              />
               <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-transparent to-secondary/20" />
-            </div>
+            </motion.div>
             
             
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-20 lg:py-32 pt-32">
@@ -137,6 +161,30 @@ const Index = () => {
                 </motion.div>
               </div>
             </div>
+            
+            {/* Scroll Indicator Arrow */}
+            <motion.button
+              onClick={scrollToContent}
+              className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 text-white/70 hover:text-white transition-colors cursor-pointer group"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1, duration: 0.6 }}
+              aria-label="Scroll to content"
+            >
+              <span className="text-xs font-medium tracking-widest uppercase opacity-60 group-hover:opacity-100 transition-opacity">
+                Scroll
+              </span>
+              <motion.div
+                animate={{ y: [0, 8, 0] }}
+                transition={{ 
+                  duration: 1.5, 
+                  repeat: Infinity, 
+                  ease: "easeInOut" 
+                }}
+              >
+                <ChevronDown className="w-6 h-6" />
+              </motion.div>
+            </motion.button>
           </section>
 
           {/* Eligibility Status Banner (for logged in users) */}

@@ -322,7 +322,23 @@ const Index = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                 >
-                  <img src={hbLogoTeal} alt="Healing Buds" className="mx-auto mb-6 h-24 w-auto object-contain" />
+                  <motion.img 
+                    src={hbLogoTeal} 
+                    alt="Healing Buds" 
+                    className="mx-auto mb-6 h-24 w-auto object-contain drop-shadow-[0_0_20px_hsl(var(--primary)/0.4)]"
+                    animate={{ 
+                      filter: [
+                        "drop-shadow(0 0 15px hsl(var(--primary)/0.3))",
+                        "drop-shadow(0 0 25px hsl(var(--primary)/0.5))",
+                        "drop-shadow(0 0 15px hsl(var(--primary)/0.3))"
+                      ]
+                    }}
+                    transition={{ 
+                      duration: 3, 
+                      repeat: Infinity, 
+                      ease: "easeInOut" 
+                    }}
+                  />
                   <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
                     Ready to Get Started?
                   </h2>

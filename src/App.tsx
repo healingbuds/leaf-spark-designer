@@ -39,6 +39,7 @@ const AdminPrescriptions = lazy(() => import("./pages/AdminPrescriptions"));
 const AdminStrains = lazy(() => import("./pages/AdminStrains"));
 const AdminStrainSync = lazy(() => import("./pages/AdminStrainSync"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const Debug = lazy(() => import("./pages/Debug"));
 
 const queryClient = new QueryClient();
 
@@ -91,7 +92,12 @@ const AnimatedRoutes = () => {
             </ProtectedRoute>
           } />
           
+          {/* Debug/Diagnosis */}
+          <Route path="/debug" element={<Debug />} />
+          
           {/* Legal */}
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           

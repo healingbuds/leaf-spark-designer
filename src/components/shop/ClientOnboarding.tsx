@@ -16,7 +16,11 @@ import {
   RefreshCw,
   Mail,
   Clock,
+  Camera,
+  ShieldCheck,
+  FileWarning,
 } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -169,6 +173,9 @@ export function ClientOnboarding() {
   const [postalError, setPostalError] = useState<string | null>(null);
   const [kycLinkReceived, setKycLinkReceived] = useState<boolean | null>(null);
   const [storedClientId, setStoredClientId] = useState<string | null>(null);
+  const [kycStatus, setKycStatus] = useState<'idle' | 'verifying' | 'success' | 'error'>('idle');
+  const [kycProgress, setKycProgress] = useState(0);
+  const [documentError, setDocumentError] = useState<string | null>(null);
   const [formData, setFormData] = useState<{
     personal?: PersonalDetails;
     address?: Address;
@@ -256,10 +263,20 @@ export function ClientOnboarding() {
   const handleMedicalSubmit = async (data: Medical) => {
     setFormData((prev) => ({ ...prev, medical: data }));
     setIsSubmitting(true);
+    setDocumentError(null);
+    setKycStatus('verifying');
+    setKycProgress(0);
+
+    // Simulate progress while waiting for API
+    const progressInterval = setInterval(() => {
+      setKycProgress(prev => Math.min(prev + 10, 90));
+    }, 500);
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
+        clearInterval(progressInterval);
+        setKycStatus('idle');
         toast({
           title: 'Authentication required',
           description: 'Please sign in to continue.',
@@ -286,15 +303,38 @@ export function ClientOnboarding() {
           },
         });
 
+        // Handle 422 Unprocessable Entity (e.g., blurry ID)
+        if (error) {
+          const errorData = error as any;
+          if (errorData?.context?.status === 422 || result?.errorCode === 'DOCUMENT_QUALITY') {
+            clearInterval(progressInterval);
+            setKycStatus('error');
+            setDocumentError('document_quality');
+            setIsSubmitting(false);
+            return;
+          }
+        }
+
         if (!error && result?.clientId) {
           clientId = result.clientId;
           kycLink = result.kycLink || null;
           apiSuccess = true;
         }
-      } catch (apiError) {
+      } catch (apiError: any) {
+        // Check for 422 error in catch block
+        if (apiError?.status === 422 || apiError?.message?.includes('Unprocessable')) {
+          clearInterval(progressInterval);
+          setKycStatus('error');
+          setDocumentError('document_quality');
+          setIsSubmitting(false);
+          return;
+        }
         // Edge function failed - continue with local client ID
         console.warn('Dr Green API unavailable, using local client ID:', apiError);
       }
+
+      clearInterval(progressInterval);
+      setKycProgress(100);
 
       // Store client info locally
       const { error: dbError } = await supabase.from('drgreen_clients').insert({
@@ -314,6 +354,7 @@ export function ClientOnboarding() {
       await refreshClient();
       setStoredClientId(clientId);
       setKycLinkReceived(!!kycLink);
+      setKycStatus('success');
       setCurrentStep(3);
 
       // Show appropriate toast based on API success
@@ -334,6 +375,8 @@ export function ClientOnboarding() {
         });
       }
     } catch (error: any) {
+      clearInterval(progressInterval);
+      setKycStatus('idle');
       console.error('Registration error:', error);
       toast({
         title: 'Something went wrong',
@@ -342,6 +385,16 @@ export function ClientOnboarding() {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Retry submission after document quality error
+  const retrySubmission = () => {
+    setDocumentError(null);
+    setKycStatus('idle');
+    // Re-trigger submission with existing form data
+    if (formData.medical) {
+      handleMedicalSubmit(formData.medical);
     }
   };
 
@@ -841,6 +894,115 @@ export function ClientOnboarding() {
                     </div>
                   </form>
                 </Form>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* KYC Verification In Progress Screen */}
+        {currentStep === 2 && kycStatus === 'verifying' && (
+          <motion.div
+            key="verifying"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 flex items-center justify-center"
+          >
+            <Card className="max-w-md w-full mx-4 bg-card/95 border-border/50">
+              <CardContent className="pt-8 pb-8 text-center">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                  className="h-20 w-20 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6"
+                >
+                  <ShieldCheck className="h-10 w-10 text-primary" />
+                </motion.div>
+                <h2 className="text-2xl font-bold mb-2">We're Verifying Your ID</h2>
+                <p className="text-muted-foreground mb-6">
+                  Please wait while we process your information. This usually takes a few moments.
+                </p>
+                <div className="space-y-2">
+                  <Progress value={kycProgress} className="h-2" />
+                  <p className="text-xs text-muted-foreground">
+                    {kycProgress < 30 && 'Validating your information...'}
+                    {kycProgress >= 30 && kycProgress < 60 && 'Checking eligibility...'}
+                    {kycProgress >= 60 && kycProgress < 90 && 'Preparing verification link...'}
+                    {kycProgress >= 90 && 'Almost done...'}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Document Quality Error Screen (422) */}
+        {currentStep === 2 && documentError === 'document_quality' && (
+          <motion.div
+            key="document-error"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <Card className="bg-card/50 backdrop-blur-sm border-destructive/30">
+              <CardContent className="pt-8 pb-8 text-center">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', delay: 0.2 }}
+                  className="h-20 w-20 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-6"
+                >
+                  <FileWarning className="h-10 w-10 text-destructive" />
+                </motion.div>
+                <h2 className="text-2xl font-bold mb-2 text-destructive">Document Issue Detected</h2>
+                <p className="text-muted-foreground mb-6">
+                  We couldn't process your submission. This is usually due to image quality issues.
+                </p>
+                
+                <div className="bg-muted/30 rounded-lg p-4 mb-6 text-left">
+                  <h3 className="font-medium mb-3 flex items-center gap-2">
+                    <Camera className="h-4 w-4" />
+                    Tips for a successful submission:
+                  </h3>
+                  <ul className="text-sm text-muted-foreground space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      Ensure your ID photo is clear and not blurry
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      Use good lighting — avoid glare or shadows
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      Make sure all corners of the document are visible
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      Use a plain background without patterns
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="space-y-3">
+                  <Button
+                    onClick={retrySubmission}
+                    className="w-full"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Retrying...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="mr-2 h-4 w-4" />
+                        Try Again
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    Still having issues? Please <button onClick={() => navigate('/support')} className="text-primary underline">contact support</button> for assistance.
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </motion.div>

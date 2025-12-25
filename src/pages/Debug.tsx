@@ -5,7 +5,7 @@ import SEOHead from '@/components/SEOHead';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, CheckCircle2, XCircle, RefreshCw, Shield, FileText, Building2, Wifi, Database } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, XCircle, RefreshCw, Shield, FileText, Building2, Wifi, Database, User } from 'lucide-react';
 import { buildLegacyClientPayload } from '@/lib/drgreenApi';
 import { supabase } from '@/integrations/supabase/client';
 interface TestResult {
@@ -70,6 +70,11 @@ export default function Debug() {
     {
       name: 'Database Connectivity',
       description: 'Verify Supabase tables are accessible and return row counts',
+      status: 'pending',
+    },
+    {
+      name: 'Authentication State',
+      description: 'Verify current user session and display user ID/email if logged in',
       status: 'pending',
     },
   ]);
@@ -429,6 +434,63 @@ export default function Debug() {
       });
     }
     
+    // ===========================================
+    // TEST 6: Authentication State
+    // ===========================================
+    updateTest(5, { status: 'running' });
+    
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        anyFailed = true;
+        updateTest(5, {
+          status: 'fail',
+          details: `Auth error: ${sessionError.message}`,
+          expected: 'Valid session or no session',
+          actual: `Error: ${sessionError.message}`,
+        });
+      } else if (session?.user) {
+        // User is logged in
+        const user = session.user;
+        const email = user.email || 'No email';
+        const userId = user.id;
+        const createdAt = user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown';
+        const provider = user.app_metadata?.provider || 'email';
+        
+        // Check for user roles
+        const { data: roles } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId);
+        
+        const userRoles = roles?.map(r => r.role).join(', ') || 'none';
+        
+        updateTest(5, {
+          status: 'pass',
+          details: `Authenticated as ${email}`,
+          expected: 'Session state verified',
+          actual: `ID: ${userId.slice(0, 8)}... | Provider: ${provider} | Roles: ${userRoles} | Created: ${createdAt}`,
+        });
+      } else {
+        // No session - this is still a valid state, just informational
+        updateTest(5, {
+          status: 'pass',
+          details: 'No active session (user not logged in)',
+          expected: 'Session state verified',
+          actual: 'Anonymous user - login required for protected features',
+        });
+      }
+    } catch (error) {
+      anyFailed = true;
+      updateTest(5, {
+        status: 'fail',
+        details: `Auth check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        expected: 'Auth state accessible',
+        actual: 'Failed to check authentication',
+      });
+    }
+    
     setHasFailures(anyFailed);
     setIsRunning(false);
   }, []);
@@ -463,6 +525,8 @@ export default function Debug() {
         return <Wifi className="h-5 w-5" />;
       case 4:
         return <Database className="h-5 w-5" />;
+      case 5:
+        return <User className="h-5 w-5" />;
       default:
         return null;
     }
@@ -624,6 +688,7 @@ export default function Debug() {
                 <p><strong>Test 3:</strong> Validates the <code className="bg-muted px-1 rounded">clientBusiness</code> object is conditionally included based on the <code className="bg-muted px-1 rounded">isBusiness</code> flag</p>
                 <p><strong>Test 4:</strong> Pings the <code className="bg-muted px-1 rounded">drgreen-proxy</code> edge function to verify backend connectivity and response time</p>
                 <p><strong>Test 5:</strong> Queries Supabase tables (<code className="bg-muted px-1 rounded">strains</code>, <code className="bg-muted px-1 rounded">profiles</code>, <code className="bg-muted px-1 rounded">user_roles</code>, <code className="bg-muted px-1 rounded">drgreen_clients</code>) and returns row counts</p>
+                <p><strong>Test 6:</strong> Checks <code className="bg-muted px-1 rounded">supabase.auth.getSession()</code> and displays user ID, email, provider, and assigned roles if authenticated</p>
               </CardContent>
             </Card>
           </div>

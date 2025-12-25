@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { SmokeParticles } from "@/components/SmokeParticles";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { 
@@ -31,6 +32,7 @@ const eligibilitySteps = [
 
 const Index = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [ctaIconHovered, setCtaIconHovered] = useState(false);
   const navigate = useNavigate();
   const { drGreenClient, isEligible } = useShop();
   const heroRef = useRef<HTMLElement>(null);
@@ -323,28 +325,37 @@ const Index = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                 >
-                  <motion.img 
-                    src={hbIconCta} 
-                    alt="Healing Buds" 
-                    className="mx-auto mb-6 h-28 w-auto object-contain cursor-pointer"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5 }}
-                    whileHover={{ 
-                      filter: "blur(8px) brightness(1.5)",
-                      opacity: 0.3,
-                      scale: 1.2,
-                      y: -10,
-                      transition: { 
-                        duration: 0.6, 
-                        ease: "easeOut" 
-                      }
-                    }}
-                    style={{ 
-                      willChange: "filter, opacity, transform"
-                    }}
-                  />
+                  <div 
+                    className="relative mx-auto mb-6 flex items-center justify-center"
+                    onMouseEnter={() => setCtaIconHovered(true)}
+                    onMouseLeave={() => setCtaIconHovered(false)}
+                  >
+                    <SmokeParticles isActive={ctaIconHovered} particleCount={16} />
+                    <motion.img 
+                      src={hbIconCta} 
+                      alt="Healing Buds" 
+                      className="h-28 w-auto object-contain cursor-pointer"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5 }}
+                      animate={ctaIconHovered ? { 
+                        filter: "blur(12px) brightness(1.8)",
+                        opacity: 0.15,
+                        scale: 1.3,
+                        y: -15,
+                      } : {
+                        filter: "blur(0px) brightness(1)",
+                        opacity: 1,
+                        scale: 1,
+                        y: 0,
+                      }}
+                      style={{ 
+                        willChange: "filter, opacity, transform",
+                        transition: "all 0.6s ease-out"
+                      }}
+                    />
+                  </div>
                   <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
                     Ready to Get Started?
                   </h2>

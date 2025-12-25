@@ -415,6 +415,13 @@ const AdminDashboard = () => {
       icon: RefreshCw,
       link: "/admin/strain-sync",
       badge: null
+    },
+    {
+      title: "Strain Knowledge Base",
+      description: "AI-powered strain data from dispensary sources",
+      icon: Package,
+      link: "/admin/strain-knowledge",
+      badge: null
     }
   ];
 

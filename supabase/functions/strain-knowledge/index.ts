@@ -111,14 +111,8 @@ serve(async (req) => {
   }
 
   try {
-    const { strainName, countryCode, forceRefresh } = await req.json();
-
-    if (!strainName) {
-      return new Response(
-        JSON.stringify({ error: 'Strain name is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    const body = await req.json().catch(() => ({}));
+    const { action, strainName, countryCode, forceRefresh, sourceName, sourceUrl } = body;
 
     const FIRECRAWL_API_KEY = Deno.env.get('FIRECRAWL_API_KEY');
     if (!FIRECRAWL_API_KEY) {
@@ -132,6 +126,139 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Handle scrape_all action - scrape all sources for general knowledge
+    if (action === 'scrape_all') {
+      console.log('Starting full scrape of all dispensary sources');
+      
+      const allSources = [
+        ...DISPENSARY_SOURCES.PT.map(s => ({ ...s, country: 'PT', category: 'dispensary' })),
+        ...DISPENSARY_SOURCES.UK.map(s => ({ ...s, country: 'GB', category: 'dispensary' })),
+        ...DISPENSARY_SOURCES.ZA.map(s => ({ ...s, country: 'ZA', category: 'dispensary' })),
+        ...DISPENSARY_SOURCES.DRGREEN_NETWORK.map(s => ({ ...s, country: 'Network', category: 'drgreen' })),
+      ];
+
+      let scraped = 0;
+      const errors: string[] = [];
+
+      for (const source of allSources) {
+        try {
+          console.log(`Scraping ${source.name} (${source.url})`);
+          const result = await scrapeUrl(source.url, FIRECRAWL_API_KEY);
+          
+          if (result.success && result.markdown && result.markdown.length > 100) {
+            // Extract strain names from content (simplified extraction)
+            const strainMatches = result.markdown.match(/(?:strain|cultivar|product)[:\s]+([A-Za-z\s]+?)(?:\n|,|\.)/gi) || [];
+            const strainName = strainMatches.length > 0 && strainMatches[0]
+              ? strainMatches[0].replace(/(?:strain|cultivar|product)[:\s]+/i, '').trim()
+              : source.name;
+
+            const { error: upsertError } = await supabase
+              .from('strain_knowledge')
+              .upsert({
+                strain_name: strainName.toLowerCase().substring(0, 100),
+                source_url: source.url,
+                source_name: source.name,
+                country_code: source.country,
+                category: source.category,
+                scraped_content: result.markdown.substring(0, 50000),
+                last_scraped_at: new Date().toISOString(),
+              }, {
+                onConflict: 'strain_name,source_url',
+              });
+
+            if (upsertError) {
+              console.error(`Error upserting from ${source.name}:`, upsertError);
+              errors.push(`${source.name}: ${upsertError.message}`);
+            } else {
+              scraped++;
+            }
+          } else {
+            errors.push(`${source.name}: ${result.error || 'No content'}`);
+          }
+
+          // Rate limit delay
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        } catch (err) {
+          console.error(`Error scraping ${source.name}:`, err);
+          errors.push(`${source.name}: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        }
+      }
+
+      console.log(`Scrape complete: ${scraped}/${allSources.length} sources`);
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          scraped,
+          total: allSources.length,
+          errors: errors.length > 0 ? errors : undefined,
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Handle scrape_single action - scrape a specific source
+    if (action === 'scrape_single' && sourceName && sourceUrl) {
+      console.log(`Scraping single source: ${sourceName} (${sourceUrl})`);
+      
+      const result = await scrapeUrl(sourceUrl, FIRECRAWL_API_KEY);
+      
+      if (!result.success || !result.markdown || result.markdown.length < 100) {
+        return new Response(
+          JSON.stringify({ error: result.error || 'No content found' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Determine category and country
+      const isDrGreen = DISPENSARY_SOURCES.DRGREEN_NETWORK.some(s => s.url === sourceUrl || s.name === sourceName);
+      const category = isDrGreen ? 'drgreen' : 'dispensary';
+      let countryCodeVal = 'Network';
+      
+      if (DISPENSARY_SOURCES.PT.some(s => s.url === sourceUrl || s.name === sourceName)) countryCodeVal = 'PT';
+      else if (DISPENSARY_SOURCES.UK.some(s => s.url === sourceUrl || s.name === sourceName)) countryCodeVal = 'GB';
+      else if (DISPENSARY_SOURCES.ZA.some(s => s.url === sourceUrl || s.name === sourceName)) countryCodeVal = 'ZA';
+
+      const { error: upsertError } = await supabase
+        .from('strain_knowledge')
+        .upsert({
+          strain_name: sourceName.toLowerCase(),
+          source_url: sourceUrl,
+          source_name: sourceName,
+          country_code: countryCodeVal,
+          category,
+          scraped_content: result.markdown.substring(0, 50000),
+          last_scraped_at: new Date().toISOString(),
+        }, {
+          onConflict: 'strain_name,source_url',
+        });
+
+      if (upsertError) {
+        console.error('Error upserting:', upsertError);
+        return new Response(
+          JSON.stringify({ error: upsertError.message }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          sourceName,
+          contentLength: result.markdown.length,
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Original strain-specific scraping logic
+    if (!strainName) {
+      return new Response(
+        JSON.stringify({ error: 'Strain name or action is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Check cache first (unless force refresh)
     if (!forceRefresh) {

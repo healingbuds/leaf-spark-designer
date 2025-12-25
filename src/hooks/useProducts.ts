@@ -148,79 +148,27 @@ export function useProducts(countryCode: string = 'PT') {
     setIsLoading(true);
     setError(null);
 
+    const alpha3Code = countryCodeMap[countryCode] || 'PRT';
+    
     try {
-      // STEP 1: Try local database first (fastest)
-      console.log('Fetching strains from local database...');
-      const { data: localStrains, error: dbError } = await supabase
-        .from('strains')
-        .select('*')
-        .eq('is_archived', false)
-        .order('name');
-
-      if (!dbError && localStrains && localStrains.length > 0) {
-        console.log(`Found ${localStrains.length} strains in local database`);
-        const transformedProducts: Product[] = localStrains.map((strain) => ({
-          id: strain.id,
-          name: strain.name,
-          description: strain.description || '',
-          thcContent: strain.thc_content || 0,
-          cbdContent: strain.cbd_content || 0,
-          retailPrice: strain.retail_price || 0,
-          availability: strain.availability,
-          stock: strain.stock || 0,
-          imageUrl: strain.image_url || '/placeholder.svg',
-          effects: strain.feelings || [],
-          terpenes: strain.flavors || [],
-          category: strain.type || 'Hybrid',
-          dataSource: 'local' as DataSource,
-        }));
-        setProducts(transformedProducts);
-        setDataSource('local');
-        setIsLoading(false);
-        return;
-      }
-
-      // STEP 2: If local DB empty, try Dr Green API
-      const alpha3Code = countryCodeMap[countryCode] || 'PRT';
-      console.log(`Local DB empty, fetching from Dr Green API for country: ${alpha3Code}`);
-
-      // First try country-specific strains
-      let { data, error: fnError } = await supabase.functions.invoke('drgreen-proxy', {
+      // STEP 1: Try Dr Green API first (primary source)
+      console.log(`Fetching strains from Dr Green API for country: ${alpha3Code}`);
+      
+      const { data, error: fnError } = await supabase.functions.invoke('drgreen-proxy', {
         body: {
-          action: 'get-strains',
+          action: 'get-strains-legacy',
           countryCode: alpha3Code,
+          orderBy: 'desc',
+          take: 100,
+          page: 1,
         },
       });
 
-      // If country-specific returns empty, try global catalog
-      if (!fnError && (!data?.data?.strains?.length)) {
-        console.log('No country-specific strains, trying global catalog...');
-        const fallbackResult = await supabase.functions.invoke('drgreen-proxy', {
-          body: { action: 'get-all-strains' },
-        });
-        if (!fallbackResult.error) {
-          data = fallbackResult.data;
-        }
-      }
-
-      if (fnError) {
-        console.warn('Dr Green API unavailable, using fallback data:', fnError);
-        setProducts(mockProducts);
-        setDataSource('fallback');
-      } else if (data?.success && data?.data?.strains?.length > 0) {
+      if (!fnError && data?.success && data?.data?.strains?.length > 0) {
+        console.log(`Received ${data.data.strains.length} strains from Dr Green API`);
+        
         // Transform API response to our Product interface
         const transformedProducts: Product[] = data.data.strains.map((strain: any) => {
-          // Debug log to check raw API data
-          console.log('Raw strain data:', strain.name, {
-            thc: strain.thc,
-            thcContent: strain.thcContent,
-            cbd: strain.cbd,
-            cbdContent: strain.cbdContent,
-            retailPrice: strain.retailPrice,
-            price: strain.price,
-            pricePerGram: strain.pricePerGram,
-          });
-
           // Build full image URL - API returns just filename, prepend S3 base
           let imageUrl = '/placeholder.svg';
           if (strain.imageUrl) {
@@ -251,6 +199,8 @@ export function useProducts(countryCode: string = 'PT') {
             terpenes = strain.flavour.split(',').map((s: string) => s.trim());
           } else if (Array.isArray(strain.terpenes)) {
             terpenes = strain.terpenes;
+          } else if (Array.isArray(strain.flavors)) {
+            terpenes = strain.flavors;
           }
 
           // Check availability from strainLocations
@@ -294,14 +244,58 @@ export function useProducts(countryCode: string = 'PT') {
             dataSource: 'api' as DataSource,
           };
         });
+        
         setProducts(transformedProducts);
         setDataSource('api');
-      } else {
-        // Use fallback data if no strains returned from API
-        console.log('No strains from API, using fallback data');
-        setProducts(mockProducts);
-        setDataSource('fallback');
+        setIsLoading(false);
+        return;
       }
+      
+      // Log API error if any
+      if (fnError) {
+        console.warn('Dr Green API error:', fnError);
+      } else if (!data?.success) {
+        console.warn('Dr Green API returned unsuccessful response:', data);
+      } else {
+        console.warn('Dr Green API returned no strains');
+      }
+
+      // STEP 2: Fallback to local database
+      console.log('Falling back to local database...');
+      const { data: localStrains, error: dbError } = await supabase
+        .from('strains')
+        .select('*')
+        .eq('is_archived', false)
+        .order('name');
+
+      if (!dbError && localStrains && localStrains.length > 0) {
+        console.log(`Found ${localStrains.length} strains in local database`);
+        const transformedProducts: Product[] = localStrains.map((strain) => ({
+          id: strain.id,
+          name: strain.name,
+          description: strain.description || '',
+          thcContent: strain.thc_content || 0,
+          cbdContent: strain.cbd_content || 0,
+          retailPrice: strain.retail_price || 0,
+          availability: strain.availability,
+          stock: strain.stock || 0,
+          imageUrl: strain.image_url || '/placeholder.svg',
+          effects: strain.feelings || [],
+          terpenes: strain.flavors || [],
+          category: strain.type || 'Hybrid',
+          dataSource: 'local' as DataSource,
+        }));
+        setProducts(transformedProducts);
+        setDataSource('local');
+        setIsLoading(false);
+        return;
+      }
+
+      // STEP 3: Use fallback mock data
+      console.log('No data from API or local DB, using fallback data');
+      setProducts(mockProducts);
+      setDataSource('fallback');
+      
     } catch (err) {
       console.error('Error fetching products:', err);
       setProducts(mockProducts);
@@ -315,7 +309,14 @@ export function useProducts(countryCode: string = 'PT') {
   const syncFromApi = useCallback(async () => {
     console.log('Triggering strain sync from Dr Green API...');
     try {
-      const { data, error } = await supabase.functions.invoke('sync-strains');
+      const alpha3Code = countryCodeMap[countryCode] || 'PRT';
+      const { data, error } = await supabase.functions.invoke('sync-strains', {
+        body: {
+          countryCode: alpha3Code,
+          take: 100,
+          page: 1,
+        },
+      });
       if (error) {
         console.error('Sync error:', error);
         return { success: false, error: error.message };
@@ -328,7 +329,7 @@ export function useProducts(countryCode: string = 'PT') {
       console.error('Sync exception:', err);
       return { success: false, error: 'Sync failed' };
     }
-  }, [fetchProducts]);
+  }, [fetchProducts, countryCode]);
 
   useEffect(() => {
     fetchProducts();

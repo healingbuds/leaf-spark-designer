@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,6 +14,14 @@ interface StrainData {
   effects: string[];
   terpenes: string[];
   description?: string;
+  countryCode?: string;
+}
+
+interface StrainKnowledge {
+  source_name: string;
+  source_url: string;
+  scraped_content: string;
+  category: string;
 }
 
 serve(async (req) => {
@@ -39,13 +48,57 @@ serve(async (req) => {
       );
     }
 
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    let strainKnowledge: StrainKnowledge[] = [];
+    let sources: { name: string; url: string; isDrGreenNetwork: boolean }[] = [];
+
+    // Fetch real dispensary data from strain_knowledge table
+    if (supabaseUrl && supabaseKey) {
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      
+      const { data: knowledgeData, error: knowledgeError } = await supabase
+        .from('strain_knowledge')
+        .select('source_name, source_url, scraped_content, category')
+        .or(`strain_name.ilike.%${strain.name.toLowerCase()}%,strain_name.ilike.%${strain.name.split(' ')[0].toLowerCase()}%`)
+        .gte('last_scraped_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+        .limit(10);
+
+      if (!knowledgeError && knowledgeData && knowledgeData.length > 0) {
+        strainKnowledge = knowledgeData;
+        sources = knowledgeData.map(k => ({
+          name: k.source_name,
+          url: k.source_url,
+          isDrGreenNetwork: k.category === 'drgreen_network',
+        }));
+        console.log(`Found ${knowledgeData.length} real-world sources for ${strain.name}`);
+      }
+    }
+
     console.log(`Fetching medical info for strain: ${strain.name}`);
 
-    const systemPrompt = `You are a medical cannabis expert providing accurate, evidence-based information about cannabis strains for a licensed medical cannabis platform. Your responses must be:
+    // Build context from real dispensary data
+    let realWorldContext = '';
+    if (strainKnowledge.length > 0) {
+      realWorldContext = `\n\nREAL-WORLD DISPENSARY DATA (use this to ground your response):\n`;
+      for (const knowledge of strainKnowledge) {
+        // Extract relevant snippets (limit each source to ~1000 chars)
+        const snippet = knowledge.scraped_content.substring(0, 1000);
+        realWorldContext += `\n--- From ${knowledge.source_name} (${knowledge.category === 'drgreen_network' ? 'Dr. Green Network Partner' : 'Licensed Dispensary'}) ---\n${snippet}\n`;
+      }
+    }
+
+    const systemPrompt = `You are a medical cannabis expert providing accurate, evidence-based information about cannabis strains for a licensed medical cannabis platform (Healing Buds / Dr. Green Network).
+
+Your responses must be:
 - Clinically accurate and based on current medical research
 - Professional in tone, suitable for healthcare contexts
-- Clear about the therapeutic applications and potential side effects
+- Clear about therapeutic applications and potential side effects
 - Compliant with medical regulations
+- GROUNDED IN REAL-WORLD DATA when provided from dispensary sources
+
+${strainKnowledge.length > 0 ? 'IMPORTANT: You have been provided with real-world data from licensed dispensaries and Dr. Green Network partners. Use this information to enhance your response accuracy and include relevant insights from these sources.' : ''}
 
 Always include proper medical disclaimers and emphasize that patients should consult with their healthcare provider.`;
 
@@ -56,8 +109,9 @@ Always include proper medical disclaimers and emphasize that patients should con
 - Known effects: ${strain.effects?.join(', ') || 'Not specified'}
 - Terpene profile: ${strain.terpenes?.join(', ') || 'Not specified'}
 ${strain.description ? `- Description: ${strain.description}` : ''}
+${realWorldContext}
 
-Provide comprehensive medical guidance for this strain using the get_medical_info function.`;
+Provide comprehensive medical guidance for this strain using the get_medical_info function. ${strainKnowledge.length > 0 ? 'Incorporate insights from the real-world dispensary data provided above.' : ''}`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -168,7 +222,7 @@ Provide comprehensive medical guidance for this strain using the get_medical_inf
     if (!toolCall?.function?.arguments) {
       console.error('No tool call in response');
       return new Response(
-        JSON.stringify({ success: true, data: getDefaultMedicalInfo(strain) }),
+        JSON.stringify({ success: true, data: getDefaultMedicalInfo(strain), sources: [] }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -179,15 +233,20 @@ Provide comprehensive medical guidance for this strain using the get_medical_inf
     } catch (parseError) {
       console.error('Failed to parse tool call arguments:', parseError);
       return new Response(
-        JSON.stringify({ success: true, data: getDefaultMedicalInfo(strain) }),
+        JSON.stringify({ success: true, data: getDefaultMedicalInfo(strain), sources: [] }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`Successfully fetched medical info for ${strain.name}`);
+    console.log(`Successfully fetched medical info for ${strain.name} with ${sources.length} real-world sources`);
 
     return new Response(
-      JSON.stringify({ success: true, data: medicalInfo }),
+      JSON.stringify({ 
+        success: true, 
+        data: medicalInfo,
+        sources: sources,
+        groundedInRealData: sources.length > 0,
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {

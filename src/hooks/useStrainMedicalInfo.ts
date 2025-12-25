@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Product } from './useProducts';
 
+export interface MedicalSource {
+  name: string;
+  url: string;
+  isDrGreenNetwork: boolean;
+}
+
 export interface MedicalInfo {
   medicalConditions: string[];
   therapeuticEffects: string[];
@@ -13,10 +19,11 @@ export interface MedicalInfo {
   interactionWarnings: string[];
   researchNotes: string;
   patientTestimonialSummary: string;
+  sources?: MedicalSource[];
+  groundedInRealData?: boolean;
 }
 
 // Cache medical info in memory to avoid repeated API calls
-// Use session storage to persist across page navigations but clear on reload
 const medicalInfoCache: Record<string, MedicalInfo> = {};
 
 export function useStrainMedicalInfo(product: Product | null) {
@@ -72,8 +79,14 @@ export function useStrainMedicalInfo(product: Product | null) {
             console.warn('Received malformed medical info, using defaults');
             setMedicalInfo(getDefaultMedicalInfo(product));
           } else {
-            medicalInfoCache[product.id] = fetchedData;
-            setMedicalInfo(fetchedData);
+            // Include sources from the response
+            const enrichedData: MedicalInfo = {
+              ...fetchedData,
+              sources: data.sources || [],
+              groundedInRealData: data.groundedInRealData || false,
+            };
+            medicalInfoCache[product.id] = enrichedData;
+            setMedicalInfo(enrichedData);
           }
         } else if (data?.error) {
           console.error('API error:', data.error);
@@ -93,6 +106,30 @@ export function useStrainMedicalInfo(product: Product | null) {
   }, [product?.id]);
 
   return { medicalInfo, isLoading, error };
+}
+
+// Trigger background scraping for a strain to populate knowledge base
+export async function triggerStrainKnowledgeScrape(strainName: string, countryCode?: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabase.functions.invoke('strain-knowledge', {
+      body: {
+        strainName,
+        countryCode: countryCode || 'PT',
+        forceRefresh: false,
+      },
+    });
+
+    if (error) {
+      console.error('Failed to trigger strain knowledge scrape:', error);
+      return false;
+    }
+
+    console.log('Strain knowledge scrape result:', data);
+    return data?.success || false;
+  } catch (err) {
+    console.error('Error triggering strain knowledge scrape:', err);
+    return false;
+  }
 }
 
 // Provide sensible defaults based on strain category
@@ -135,5 +172,7 @@ function getDefaultMedicalInfo(product: Product): MedicalInfo {
     ],
     researchNotes: `${product.category} strains with ${product.thcContent}% THC and ${product.cbdContent}% CBD have been studied for various therapeutic applications. Research is ongoing.`,
     patientTestimonialSummary: 'Individual experiences vary. Many patients report positive outcomes when used as directed under medical supervision.',
+    sources: [],
+    groundedInRealData: false,
   };
 }

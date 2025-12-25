@@ -8,3 +8,9 @@ verify_jwt = false
 
 [functions.sync-strains]
 verify_jwt = false
+
+[functions.strain-knowledge]
+verify_jwt = false
+
+[functions.strain-medical-info]
+verify_jwt = false

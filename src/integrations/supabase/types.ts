@@ -254,6 +254,57 @@ export type Database = {
         }
         Relationships: []
       }
+      strain_knowledge: {
+        Row: {
+          category: string
+          country_code: string
+          created_at: string
+          effects: string[] | null
+          id: string
+          last_scraped_at: string
+          medical_conditions: string[] | null
+          patient_reviews: string | null
+          product_info: Json | null
+          scraped_content: string | null
+          source_name: string
+          source_url: string
+          strain_name: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          country_code?: string
+          created_at?: string
+          effects?: string[] | null
+          id?: string
+          last_scraped_at?: string
+          medical_conditions?: string[] | null
+          patient_reviews?: string | null
+          product_info?: Json | null
+          scraped_content?: string | null
+          source_name: string
+          source_url: string
+          strain_name: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          country_code?: string
+          created_at?: string
+          effects?: string[] | null
+          id?: string
+          last_scraped_at?: string
+          medical_conditions?: string[] | null
+          patient_reviews?: string | null
+          product_info?: Json | null
+          scraped_content?: string | null
+          source_name?: string
+          source_url?: string
+          strain_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       strains: {
         Row: {
           availability: boolean

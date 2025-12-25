@@ -5,7 +5,7 @@ import { useEffect, useRef, useCallback } from 'react';
  * Traps focus within a container when active
  */
 export function useFocusTrap(isActive: boolean) {
-  const containerRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
   const getFocusableElements = useCallback(() => {
@@ -22,7 +22,7 @@ export function useFocusTrap(isActive: boolean) {
 
     return Array.from(
       containerRef.current.querySelectorAll<HTMLElement>(focusableSelectors)
-    ).filter(el => el.offsetParent !== null); // Filter out hidden elements
+    ).filter(el => el.offsetParent !== null);
   }, []);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -35,13 +35,11 @@ export function useFocusTrap(isActive: boolean) {
     const lastElement = focusableElements[focusableElements.length - 1];
 
     if (e.shiftKey) {
-      // Shift + Tab
       if (document.activeElement === firstElement) {
         e.preventDefault();
         lastElement.focus();
       }
     } else {
-      // Tab
       if (document.activeElement === lastElement) {
         e.preventDefault();
         firstElement.focus();
@@ -51,51 +49,25 @@ export function useFocusTrap(isActive: boolean) {
 
   useEffect(() => {
     if (isActive) {
-      // Store current active element
       previousActiveElement.current = document.activeElement as HTMLElement;
       
-      // Focus first focusable element
       const focusableElements = getFocusableElements();
       if (focusableElements.length > 0) {
-        // Small delay to ensure DOM is ready
         requestAnimationFrame(() => {
-          focusableElements[0].focus();
+          focusableElements[0]?.focus();
         });
       }
 
-      // Add keyboard listener
       document.addEventListener('keydown', handleKeyDown);
-
-      // Hide background from screen readers
-      const mainContent = document.querySelector('main');
-      if (mainContent) {
-        mainContent.setAttribute('aria-hidden', 'true');
-        mainContent.setAttribute('inert', '');
-      }
     } else {
-      // Restore focus
       if (previousActiveElement.current) {
         previousActiveElement.current.focus();
       }
-
-      // Remove keyboard listener
       document.removeEventListener('keydown', handleKeyDown);
-
-      // Restore background accessibility
-      const mainContent = document.querySelector('main');
-      if (mainContent) {
-        mainContent.removeAttribute('aria-hidden');
-        mainContent.removeAttribute('inert');
-      }
     }
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      const mainContent = document.querySelector('main');
-      if (mainContent) {
-        mainContent.removeAttribute('aria-hidden');
-        mainContent.removeAttribute('inert');
-      }
     };
   }, [isActive, getFocusableElements, handleKeyDown]);
 

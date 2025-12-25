@@ -91,12 +91,8 @@ const NavigationOverlay = ({
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
-  // Close on route change (only if open)
-  useEffect(() => {
-    if (isOpen) {
-      onClose();
-    }
-  }, [location.pathname]);
+  // Note: Route change closing is handled by Header component
+  // to avoid dependency issues with onClose callback
 
   const handleEligibility = () => {
     onEligibilityClick();
@@ -133,8 +129,8 @@ const NavigationOverlay = ({
           />
           
           {/* Menu Surface - smooth slide-in with spring physics */}
-          <motion.nav 
-            ref={focusTrapRef as React.RefObject<HTMLElement>}
+          <motion.div 
+            ref={focusTrapRef}
             initial={{ opacity: 0, x: '100%', scale: 0.98 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: '100%', scale: 0.98 }}
@@ -314,7 +310,7 @@ const NavigationOverlay = ({
                 <ThemeToggle />
               </div>
             </div>
-          </motion.nav>
+          </motion.div>
         </>
       )}
     </AnimatePresence>

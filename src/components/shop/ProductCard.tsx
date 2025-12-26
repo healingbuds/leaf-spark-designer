@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { formatPrice } from '@/lib/currency';
+import { PriceBreakdownTooltip } from './PriceBreakdownTooltip';
 
 interface ProductCardProps {
   product: Product;
@@ -201,10 +202,12 @@ export function ProductCard({ product, onViewDetails, showDataSource = false }: 
               {product.name}
             </h3>
             <div className="flex flex-col items-end shrink-0">
-              <span className="text-xl font-bold text-primary">
-                {/* Convert from EUR (API base) to user's currency */}
-                {formatPrice(convertFromEUR(product.retailPrice), countryCode)}
-              </span>
+              <PriceBreakdownTooltip>
+                <span className="text-xl font-bold text-primary">
+                  {/* Convert from EUR (API base) to user's currency */}
+                  {formatPrice(convertFromEUR(product.retailPrice), countryCode)}
+                </span>
+              </PriceBreakdownTooltip>
               <span className="text-[10px] text-muted-foreground uppercase tracking-wide">per gram</span>
             </div>
           </div>

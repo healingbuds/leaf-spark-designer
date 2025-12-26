@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Product } from '@/hooks/useProducts';
 import { formatPrice } from '@/lib/currency';
 import { useShop } from '@/context/ShopContext';
+import { PriceBreakdownTooltip } from './PriceBreakdownTooltip';
 
 interface RelatedProductsProps {
   products: Product[];
@@ -134,9 +135,11 @@ export function RelatedProducts({ products, currentProductId, countryCode }: Rel
                 <h4 className="text-xs sm:text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
                   {product.name}
                 </h4>
-                <p className="text-xs sm:text-sm font-semibold text-primary">
-                  {formatPrice(convertFromEUR(product.retailPrice), countryCode)}
-                </p>
+                <PriceBreakdownTooltip>
+                  <p className="text-xs sm:text-sm font-semibold text-primary">
+                    {formatPrice(convertFromEUR(product.retailPrice), countryCode)}
+                  </p>
+                </PriceBreakdownTooltip>
               </button>
             </motion.div>
           ))}

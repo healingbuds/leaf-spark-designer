@@ -1,5 +1,14 @@
 {
   "title": "Dispensário de Cannabis Medicinal",
+  "priceBreakdown": {
+    "title": "O Que Está Incluído Neste Preço",
+    "product": "Produto de Grau Farmacêutico",
+    "testing": "Testes Laboratoriais e Garantia de Qualidade",
+    "compliance": "Conformidade Regulamentar",
+    "traceability": "Rastreabilidade da Semente à Venda",
+    "logistics": "Logística Médica Segura",
+    "note": "Todos os produtos cumprem os padrões farmacêuticos EU-GMP"
+  },
   "subtitle": "Explore a nossa seleção de cultivares de cannabis de grau farmacêutico",
   "searchPlaceholder": "Pesquisar cultivares...",
   "showingProducts": "A mostrar {{count}} de {{total}} produtos",

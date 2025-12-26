@@ -1,5 +1,14 @@
 {
   "title": "Medical Cannabis Dispensary",
+  "priceBreakdown": {
+    "title": "What's Included in This Price",
+    "product": "Pharmaceutical-Grade Product",
+    "testing": "Lab Testing & Quality Assurance",
+    "compliance": "Regulatory Compliance",
+    "traceability": "Seed-to-Sale Traceability",
+    "logistics": "Secure Medical Logistics",
+    "note": "All products meet EU-GMP pharmaceutical standards"
+  },
   "subtitle": "Explore our curated selection of pharmaceutical-grade cannabis cultivars",
   "searchPlaceholder": "Search cultivars...",
   "showingProducts": "Showing {{count}} of {{total}} products",

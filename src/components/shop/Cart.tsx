@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { useShop } from '@/context/ShopContext';
 import { Link } from 'react-router-dom';
 import { formatPrice } from '@/lib/currency';
+import { PriceBreakdownTooltip } from './PriceBreakdownTooltip';
 
 export function Cart() {
   const {
@@ -98,9 +99,11 @@ export function Cart() {
                       <h4 className="font-medium text-foreground truncate">
                         {item.strain_name}
                       </h4>
-                      <p className="text-sm text-muted-foreground">
-                        {formatPrice(convertFromEUR(item.unit_price), countryCode)} / gram
-                      </p>
+                      <PriceBreakdownTooltip>
+                        <p className="text-sm text-muted-foreground">
+                          {formatPrice(convertFromEUR(item.unit_price), countryCode)} / gram
+                        </p>
+                      </PriceBreakdownTooltip>
                       
                       {/* Quantity controls */}
                       <div className="flex items-center gap-2 mt-2">

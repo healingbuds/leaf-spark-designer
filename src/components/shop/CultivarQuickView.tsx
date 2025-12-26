@@ -13,6 +13,7 @@ import { useShop } from '@/context/ShopContext';
 import { Product } from '@/hooks/useProducts';
 import { useToast } from '@/hooks/use-toast';
 import { formatPrice } from '@/lib/currency';
+import { PriceBreakdownTooltip } from './PriceBreakdownTooltip';
 
 interface CultivarQuickViewProps {
   product: Product | null;
@@ -184,9 +185,11 @@ export function CultivarQuickView({ product, onClose }: CultivarQuickViewProps) 
 
                 {/* Price - converted from EUR to user's currency */}
                 <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-3xl font-bold text-primary">
-                    {formatPrice(convertFromEUR(product.retailPrice), countryCode)}
-                  </span>
+                  <PriceBreakdownTooltip>
+                    <span className="text-3xl font-bold text-primary">
+                      {formatPrice(convertFromEUR(product.retailPrice), countryCode)}
+                    </span>
+                  </PriceBreakdownTooltip>
                   <span className="text-sm text-muted-foreground">per gram</span>
                 </div>
 

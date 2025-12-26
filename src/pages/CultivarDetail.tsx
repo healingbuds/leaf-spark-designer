@@ -22,6 +22,7 @@ import { useStrainMedicalInfo } from '@/hooks/useStrainMedicalInfo';
 import { useToast } from '@/hooks/use-toast';
 import { formatPrice } from '@/lib/currency';
 import { RelatedProducts } from '@/components/shop/RelatedProducts';
+import { PriceBreakdownTooltip } from '@/components/shop/PriceBreakdownTooltip';
 
 export default function CultivarDetail() {
   const { cultivarId } = useParams<{ cultivarId: string }>();
@@ -263,9 +264,11 @@ export default function CultivarDetail() {
 
                 {/* Price - converted from EUR to user's currency */}
                 <div className="flex items-baseline gap-3">
-                  <span className="text-4xl font-bold text-primary">
-                    {formatPrice(convertFromEUR(product.retailPrice), countryCode)}
-                  </span>
+                  <PriceBreakdownTooltip>
+                    <span className="text-4xl font-bold text-primary">
+                      {formatPrice(convertFromEUR(product.retailPrice), countryCode)}
+                    </span>
+                  </PriceBreakdownTooltip>
                   <span className="text-lg text-muted-foreground">per gram</span>
                 </div>
 

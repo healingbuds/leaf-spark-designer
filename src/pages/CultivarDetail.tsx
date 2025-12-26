@@ -210,36 +210,22 @@ export default function CultivarDetail() {
                 transition={{ duration: 0.5 }}
                 className="relative"
               >
-                <div className={`relative aspect-square rounded-3xl bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-slate-900/60 dark:to-slate-900/90 border border-border/20 dark:border-white/10 overflow-hidden ${styles.ring} ring-2`}>
-                  {/* Light mode: clean white background for crystal clear images */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white via-slate-50/50 to-slate-100/30 dark:from-transparent dark:via-transparent dark:to-transparent" />
-                  
-                  {/* Ambient glow for dark mode only */}
-                  <div className="absolute inset-[15%] rounded-full bg-gradient-radial from-transparent dark:from-white/10 via-transparent dark:via-white/3 to-transparent blur-3xl" />
-                  
-                  {/* Centered image container */}
-                  <div className="absolute inset-0 flex items-center justify-center p-8">
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      className="w-full h-full object-contain"
-                      style={{ 
-                        filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.25)) drop-shadow(0 8px 16px rgba(0,0,0,0.15))',
-                        maxWidth: '85%',
-                        maxHeight: '85%',
-                      }}
-                    />
-                  </div>
+                <div className="relative aspect-square">
+                  <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                    className="w-full h-full object-contain"
+                  />
                   
                   {/* Badges */}
                   <Badge 
-                    className={`absolute top-6 left-6 px-4 py-1.5 text-sm font-semibold uppercase tracking-wider border ${styles.badge}`}
+                    className={`absolute top-4 left-4 px-4 py-1.5 text-sm font-semibold uppercase tracking-wider border ${styles.badge}`}
                   >
                     {product.category}
                   </Badge>
 
                   {product.thcContent >= 25 && product.availability && (
-                    <div className="absolute bottom-6 left-6 flex items-center gap-2 px-3 py-2 rounded-full bg-amber-500/20 backdrop-blur-sm border border-amber-400/30">
+                    <div className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-2 rounded-full bg-amber-500/20 backdrop-blur-sm border border-amber-400/30">
                       <Sparkles className="h-4 w-4 text-amber-500 dark:text-amber-400" />
                       <span className="text-sm font-semibold text-amber-600 dark:text-amber-300">High Potency</span>
                     </div>

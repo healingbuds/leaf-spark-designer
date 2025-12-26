@@ -1,5 +1,5 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 interface Particle {
   id: number;
@@ -29,9 +29,11 @@ interface Wisp {
 interface SmokeParticlesProps {
   isActive: boolean;
   particleCount?: number;
-  spawnRate?: number; // ms between wisp spawns
+  spawnRate?: number;
   density?: 'light' | 'medium' | 'heavy';
   color?: string;
+  opacity?: 'soft' | 'medium' | 'visible';
+  interactive?: boolean;
 }
 
 const densityConfig = {
@@ -40,20 +42,54 @@ const densityConfig = {
   heavy: { particleMultiplier: 1.5, maxWisps: 12, spawnRate: 250 },
 };
 
+const opacityConfig = {
+  soft: { wispOpacity: [0, 0.35, 0.28, 0], burstOpacity: [0.5, 0.4, 0.3, 0.15, 0] },
+  medium: { wispOpacity: [0, 0.55, 0.45, 0], burstOpacity: [0.7, 0.6, 0.45, 0.22, 0] },
+  visible: { wispOpacity: [0, 0.75, 0.6, 0], burstOpacity: [0.9, 0.8, 0.6, 0.35, 0] },
+};
+
 export const SmokeParticles = ({ 
   isActive, 
   particleCount = 18,
   spawnRate,
   density = 'medium',
-  color = "hsl(var(--primary))"
+  color = "hsl(var(--primary))",
+  opacity = 'medium',
+  interactive = true,
 }: SmokeParticlesProps) => {
   const [particles, setParticles] = useState<Particle[]>([]);
   const [wisps, setWisps] = useState<Wisp[]>([]);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const wispIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const wispIdRef = useRef(0);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  
+  // Mouse interaction
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const springX = useSpring(mouseX, { stiffness: 50, damping: 20 });
+  const springY = useSpring(mouseY, { stiffness: 50, damping: 20 });
+  
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!interactive || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const offsetX = (e.clientX - centerX) * 0.15;
+    const offsetY = (e.clientY - centerY) * 0.08;
+    mouseX.set(offsetX);
+    mouseY.set(offsetY);
+  }, [interactive, mouseX, mouseY]);
+
+  useEffect(() => {
+    if (interactive && isActive) {
+      window.addEventListener('mousemove', handleMouseMove);
+      return () => window.removeEventListener('mousemove', handleMouseMove);
+    }
+  }, [interactive, isActive, handleMouseMove]);
 
   const config = densityConfig[density];
+  const opacitySettings = opacityConfig[opacity];
   const effectiveSpawnRate = spawnRate ?? config.spawnRate;
   const effectiveParticleCount = Math.round(particleCount * config.particleMultiplier);
 
@@ -198,7 +234,14 @@ export const SmokeParticles = ({
   );
 
   return (
-    <>
+    <motion.div
+      ref={containerRef}
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        x: interactive ? springX : 0,
+        y: interactive ? springY : 0,
+      }}
+    >
       {/* Subtle shadow layer beneath smoke */}
       <AnimatePresence>
         {(isActive || isFadingOut) && wisps.slice(0, 3).map((wisp) => (
@@ -208,9 +251,12 @@ export const SmokeParticles = ({
             style={{
               width: wisp.size * 0.8,
               height: wisp.size * 0.3,
+              left: '50%',
+              top: '50%',
+              marginLeft: -(wisp.size * 0.4),
               background: `radial-gradient(ellipse at 50% 50%, 
-                rgba(0,0,0,0.08) 0%, 
-                rgba(0,0,0,0.04) 40%,
+                rgba(0,0,0,0.06) 0%, 
+                rgba(0,0,0,0.03) 40%,
                 transparent 70%)`,
               filter: "blur(4px)",
               borderRadius: "50%",
@@ -224,7 +270,7 @@ export const SmokeParticles = ({
             animate={{ 
               x: wisp.xPath.map(x => x * 0.3),
               y: 8,
-              opacity: isFadingOut ? [0.3, 0] : [0, 0.35, 0.3, 0],
+              opacity: isFadingOut ? [0.25, 0] : [0, 0.28, 0.22, 0],
               scale: [0.5, 0.8, 1, 1.2],
             }}
             exit={{ opacity: 0 }}
@@ -246,6 +292,10 @@ export const SmokeParticles = ({
             style={{
               width: wisp.size,
               height: wisp.size,
+              left: '50%',
+              top: '50%',
+              marginLeft: -(wisp.size / 2),
+              marginTop: -(wisp.size / 2),
             }}
             initial={{ 
               x: 0, 
@@ -257,7 +307,7 @@ export const SmokeParticles = ({
             animate={{ 
               x: wisp.xPath,
               y: wisp.yPath,
-              opacity: isFadingOut ? [0.5, 0] : [0, 0.6, 0.5, 0],
+              opacity: isFadingOut ? [opacitySettings.wispOpacity[1] * 0.7, 0] : opacitySettings.wispOpacity,
               scale: [0.5, 0.9, 1.2, 1.5],
               rotate: wisp.rotationEnd,
             }}
@@ -285,19 +335,23 @@ export const SmokeParticles = ({
             style={{
               width: particle.size,
               height: particle.size,
+              left: '50%',
+              top: '50%',
+              marginLeft: -(particle.size / 2),
+              marginTop: -(particle.size / 2),
               filter: `blur(${particle.blur}px)`,
             }}
             initial={{ 
               x: 0, 
               y: 0, 
-              opacity: 0.8, 
+              opacity: opacitySettings.burstOpacity[0], 
               scale: 0.35,
               rotate: particle.rotation,
             }}
             animate={{ 
               x: particle.xPath,
               y: particle.yPath,
-              opacity: [0.8, 0.7, 0.5, 0.25, 0], 
+              opacity: opacitySettings.burstOpacity, 
               scale: [0.35, 0.7, 1.0, 1.4, 1.8],
               rotate: particle.rotationEnd,
             }}
@@ -313,6 +367,6 @@ export const SmokeParticles = ({
           </motion.div>
         ))}
       </AnimatePresence>
-    </>
+    </motion.div>
   );
 };

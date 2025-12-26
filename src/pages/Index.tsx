@@ -65,7 +65,7 @@ const Index = () => {
         
         <main>
           {/* Video Hero Section - with margin for floating navbar */}
-          <section ref={heroRef} className="relative min-h-[70vh] flex items-center justify-center overflow-hidden mt-[4.5rem] md:mt-[5.5rem] rounded-2xl mx-4 sm:mx-5 md:mx-6">
+          <section ref={heroRef} className="relative min-h-[70vh] flex items-center justify-center overflow-hidden mt-[6.5rem] md:mt-[8rem] rounded-2xl mx-4 sm:mx-5 md:mx-6">
             {/* Video Background with Parallax */}
             <motion.div 
               className="absolute inset-0 z-0"

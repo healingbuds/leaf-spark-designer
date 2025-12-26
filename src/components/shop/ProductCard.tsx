@@ -152,12 +152,7 @@ export function ProductCard({ product, onViewDetails, showDataSource = false }: 
             loading="lazy"
           />
           
-          {/* Category badge - top left */}
-          <Badge 
-            className={`absolute top-4 left-4 px-3 py-1 text-xs font-semibold uppercase tracking-wider border ${categoryStyles.badge}`}
-          >
-            {product.category}
-          </Badge>
+          {/* Category badge removed - now part of jar image */}
           
           {/* Quick view button - top right */}
           <motion.button

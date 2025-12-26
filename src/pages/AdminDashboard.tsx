@@ -21,7 +21,8 @@ import {
   ToggleRight,
   Loader2,
   DollarSign,
-  RefreshCw
+  RefreshCw,
+  Sparkles
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/layout/Header";
@@ -33,6 +34,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useDrGreenApi } from "@/hooks/useDrGreenApi";
+import { BatchImageGenerator } from "@/components/admin/BatchImageGenerator";
 
 interface DashboardStats {
   pendingPrescriptions: number;
@@ -583,6 +585,11 @@ const AdminDashboard = () => {
                   </Card>
                 </motion.div>
               ))}
+            </div>
+
+            {/* AI Image Generator */}
+            <div className="mb-12">
+              <BatchImageGenerator />
             </div>
 
             {/* Admin Tools */}

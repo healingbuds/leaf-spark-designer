@@ -47,20 +47,20 @@ export const SmokeParticles = ({
       setIsFadingOut(false);
       const newParticles: Particle[] = Array.from({ length: particleCount }, (_, i) => {
         const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.5;
-        const distance = Math.random() * 120 + 60;
-        const swirl = (Math.random() - 0.5) * 80;
+        const distance = Math.random() * 80 + 40;
+        const swirl = (Math.random() - 0.5) * 60;
         
         return {
           id: i,
           x: Math.cos(angle) * distance,
-          y: Math.sin(angle) * distance - 40,
+          y: Math.sin(angle) * distance - 30,
           midX: Math.cos(angle + 0.5) * (distance * 0.5) + swirl,
-          midY: Math.sin(angle + 0.5) * (distance * 0.5) - 20,
-          size: Math.random() * 28 + 12,
-          duration: Math.random() * 1.2 + 1.0,
-          delay: Math.random() * 0.3,
-          rotation: (Math.random() - 0.5) * 360,
-          blur: Math.random() * 2 + 1,
+          midY: Math.sin(angle + 0.5) * (distance * 0.5) - 15,
+          size: Math.random() * 40 + 24,
+          duration: Math.random() * 1.8 + 1.4,
+          delay: Math.random() * 0.2,
+          rotation: (Math.random() - 0.5) * 180,
+          blur: Math.random() * 1.5 + 0.5,
         };
       });
       setParticles(newParticles);
@@ -109,15 +109,15 @@ export const SmokeParticles = ({
   const createWisp = (): Wisp => {
     wispIdRef.current += 1;
     const angle = Math.random() * Math.PI * 2;
-    const distance = Math.random() * 50 + 30;
+    const distance = Math.random() * 40 + 20;
     return {
       id: wispIdRef.current,
       x: Math.cos(angle) * distance,
-      y: Math.sin(angle) * distance - 30,
-      size: Math.random() * 18 + 10,
-      duration: Math.random() * 1.5 + 1.5,
+      y: Math.sin(angle) * distance - 25,
+      size: Math.random() * 30 + 18,
+      duration: Math.random() * 2.0 + 1.8,
       delay: 0,
-      rotation: (Math.random() - 0.5) * 180,
+      rotation: (Math.random() - 0.5) * 120,
     };
   };
 
@@ -132,21 +132,21 @@ export const SmokeParticles = ({
             style={{
               width: wisp.size,
               height: wisp.size,
-              background: `radial-gradient(ellipse at 40% 40%, ${color}40 0%, ${color}20 40%, transparent 70%)`,
-              filter: "blur(2px)",
+              background: `radial-gradient(ellipse at 50% 50%, ${color}70 0%, ${color}40 35%, ${color}15 60%, transparent 80%)`,
+              filter: "blur(1px)",
             }}
             initial={{ 
               x: 0, 
               y: 0, 
               opacity: 0, 
-              scale: 0.5,
+              scale: 0.6,
               rotate: 0,
             }}
             animate={{ 
               x: wisp.x,
               y: wisp.y,
-              opacity: isFadingOut ? [0.3, 0] : [0, 0.4, 0.3, 0],
-              scale: [0.5, 1.2, 1.8],
+              opacity: isFadingOut ? [0.5, 0] : [0, 0.6, 0.5, 0],
+              scale: [0.6, 1.0, 1.4],
               rotate: wisp.rotation,
             }}
             exit={{ 
@@ -171,21 +171,21 @@ export const SmokeParticles = ({
             style={{
               width: particle.size,
               height: particle.size,
-              background: `radial-gradient(ellipse at 30% 30%, ${color} 0%, ${color}66 30%, transparent 70%)`,
+              background: `radial-gradient(ellipse at 45% 45%, ${color}90 0%, ${color}60 25%, ${color}30 50%, transparent 75%)`,
               filter: `blur(${particle.blur}px)`,
             }}
             initial={{ 
               x: 0, 
               y: 0, 
-              opacity: 0.7, 
-              scale: 0.3,
+              opacity: 0.85, 
+              scale: 0.4,
               rotate: 0,
             }}
             animate={{ 
               x: [0, particle.midX, particle.x],
               y: [0, particle.midY, particle.y],
-              opacity: [0.7, 0.5, 0], 
-              scale: [0.3, 1.5, 2.5],
+              opacity: [0.85, 0.7, 0], 
+              scale: [0.4, 1.0, 1.6],
               rotate: particle.rotation,
             }}
             exit={{ opacity: 0 }}

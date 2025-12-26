@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { formatPrice } from '@/lib/currency';
-import { GeneratedProductImage } from './GeneratedProductImage';
 
 interface ProductCardProps {
   product: Product;
@@ -143,17 +142,15 @@ export function ProductCard({ product, onViewDetails, showDataSource = false }: 
         {/* Gradient overlay for premium depth */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/20 pointer-events-none" />
         
-        {/* Image container with consistent sizing */}
+        {/* Image container with full-bleed display */}
         <div className="relative aspect-square overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900/40 dark:to-slate-900/60">
-          {/* Generated product image with 4K support */}
-          <div className="absolute inset-0 flex items-center justify-center p-4">
-            <GeneratedProductImage
-              productId={product.id}
-              productName={product.name}
-              originalImageUrl={product.imageUrl}
-              className="drop-shadow-[0_10px_20px_rgba(0,0,0,0.3)] transition-transform duration-500 group-hover:scale-110"
-            />
-          </div>
+          {/* Direct product image - full bleed */}
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            loading="lazy"
+          />
           
           {/* Category badge - top left */}
           <Badge 

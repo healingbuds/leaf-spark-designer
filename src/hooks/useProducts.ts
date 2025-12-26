@@ -31,11 +31,35 @@ export interface Product {
 // S3 base URL for strain images
 const S3_BASE = 'https://prod-profiles-backend.s3.amazonaws.com/';
 
-// All branded jar images for products
+// Strain name to branded jar image mapping
+const STRAIN_IMAGE_MAP: Record<string, string> = {
+  'BlockBerry': strainJar1,
+  'Blockberry': strainJar1,
+  'Blue Zushi': strainJar2,
+  'Candy Pave': strainJar3,
+  'Caribbean Breeze': strainJar4,
+  'Femme Fatale': strainJar5,
+  'NFS 12': strainJar6,
+  'Peanut Butter Breath': strainJar7,
+};
+
+// All branded jar images for fallback
 const BRANDED_JAR_IMAGES = [strainJar1, strainJar2, strainJar3, strainJar4, strainJar5, strainJar6, strainJar7];
 
-// Get branded jar image for a strain (consistent per product index)
-const getBrandedImage = (index: number): string => {
+// Get branded jar image for a strain - first by name, then by index fallback
+const getBrandedImage = (name: string, index: number): string => {
+  // Try exact match first
+  if (STRAIN_IMAGE_MAP[name]) {
+    return STRAIN_IMAGE_MAP[name];
+  }
+  // Try case-insensitive match
+  const lowerName = name.toLowerCase();
+  for (const [key, value] of Object.entries(STRAIN_IMAGE_MAP)) {
+    if (key.toLowerCase() === lowerName) {
+      return value;
+    }
+  }
+  // Fallback to index-based cycling
   return BRANDED_JAR_IMAGES[index % BRANDED_JAR_IMAGES.length];
 };
 
@@ -91,8 +115,8 @@ export function useProducts(countryCode: string = 'PT') {
         
         // Transform API response to our Product interface
         const transformedProducts: Product[] = data.data.strains.map((strain: any, index: number) => {
-          // Use branded jar image based on index
-          const imageUrl = getBrandedImage(index);
+          // Use branded jar image based on strain name, fallback to index
+          const imageUrl = getBrandedImage(strain.name, index);
 
           let effects: string[] = [];
           if (Array.isArray(strain.effects)) {
@@ -186,8 +210,8 @@ export function useProducts(countryCode: string = 'PT') {
         console.log(`Loaded ${localStrains.length} strains from local database`);
         
         const transformedProducts: Product[] = localStrains.map((strain, index) => {
-          // Use branded jar image based on index
-          const imageUrl = getBrandedImage(index);
+          // Use branded jar image based on strain name, fallback to index
+          const imageUrl = getBrandedImage(strain.name, index);
 
           return {
             id: strain.id,

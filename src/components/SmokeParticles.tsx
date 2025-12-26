@@ -26,6 +26,8 @@ interface Wisp {
   swirlIntensity: number;
 }
 
+type WindDirection = 'none' | 'left' | 'right' | 'up' | 'up-left' | 'up-right';
+
 interface SmokeParticlesProps {
   isActive: boolean;
   particleCount?: number;
@@ -34,6 +36,8 @@ interface SmokeParticlesProps {
   color?: string;
   opacity?: 'soft' | 'medium' | 'visible';
   interactive?: boolean;
+  wind?: WindDirection;
+  windStrength?: 'gentle' | 'moderate' | 'strong';
 }
 
 const densityConfig = {
@@ -48,6 +52,23 @@ const opacityConfig = {
   visible: { wispOpacity: [0, 0.75, 0.6, 0], burstOpacity: [0.9, 0.8, 0.6, 0.35, 0] },
 };
 
+const windStrengthConfig = {
+  gentle: 0.4,
+  moderate: 0.7,
+  strong: 1.0,
+};
+
+const getWindVector = (direction: WindDirection): { x: number; y: number } => {
+  switch (direction) {
+    case 'left': return { x: -1, y: 0 };
+    case 'right': return { x: 1, y: 0 };
+    case 'up': return { x: 0, y: -1 };
+    case 'up-left': return { x: -0.7, y: -0.7 };
+    case 'up-right': return { x: 0.7, y: -0.7 };
+    default: return { x: 0, y: 0 };
+  }
+};
+
 export const SmokeParticles = ({ 
   isActive, 
   particleCount = 18,
@@ -56,6 +77,8 @@ export const SmokeParticles = ({
   color = "hsl(var(--primary))",
   opacity = 'medium',
   interactive = true,
+  wind = 'none',
+  windStrength = 'moderate',
 }: SmokeParticlesProps) => {
   const [particles, setParticles] = useState<Particle[]>([]);
   const [wisps, setWisps] = useState<Wisp[]>([]);
@@ -92,6 +115,12 @@ export const SmokeParticles = ({
   const opacitySettings = opacityConfig[opacity];
   const effectiveSpawnRate = spawnRate ?? config.spawnRate;
   const effectiveParticleCount = Math.round(particleCount * config.particleMultiplier);
+  
+  // Wind calculations
+  const windVector = getWindVector(wind);
+  const windMultiplier = windStrengthConfig[windStrength];
+  const windDriftX = windVector.x * 60 * windMultiplier;
+  const windDriftY = windVector.y * 40 * windMultiplier;
 
   // Generate burst particles on activation
   useEffect(() => {
@@ -101,20 +130,32 @@ export const SmokeParticles = ({
         const baseX = (Math.random() - 0.5) * 35;
         const riseHeight = -(Math.random() * 100 + 70);
         
-        // Create wavy turbulence path with 5 keyframes
+        // Create wavy turbulence path with 5 keyframes + wind drift
         const turbulence1 = (Math.random() - 0.5) * 30;
         const turbulence2 = (Math.random() - 0.5) * 40;
         const turbulence3 = (Math.random() - 0.5) * 25;
         
         return {
           id: i,
-          xPath: [0, baseX + turbulence1, baseX - turbulence2, baseX + turbulence3, baseX + (Math.random() - 0.5) * 45],
-          yPath: [0, riseHeight * 0.25, riseHeight * 0.5, riseHeight * 0.75, riseHeight],
+          xPath: [
+            0, 
+            baseX + turbulence1 + windDriftX * 0.2, 
+            baseX - turbulence2 + windDriftX * 0.45, 
+            baseX + turbulence3 + windDriftX * 0.7, 
+            baseX + (Math.random() - 0.5) * 45 + windDriftX
+          ],
+          yPath: [
+            0, 
+            riseHeight * 0.25 + windDriftY * 0.2, 
+            riseHeight * 0.5 + windDriftY * 0.45, 
+            riseHeight * 0.75 + windDriftY * 0.7, 
+            riseHeight + windDriftY
+          ],
           size: Math.random() * 32 + 21,
           duration: Math.random() * 2.5 + 2,
           delay: Math.random() * 0.35,
           rotation: (Math.random() - 0.5) * 60,
-          rotationEnd: (Math.random() - 0.5) * 180 + (Math.random() > 0.5 ? 120 : -120),
+          rotationEnd: (Math.random() - 0.5) * 180 + (Math.random() > 0.5 ? 120 : -120) + (windVector.x * 30 * windMultiplier),
           blur: Math.random() * 2 + 0.5,
           swirlIntensity: Math.random() * 0.4 + 0.3,
         };
@@ -123,7 +164,38 @@ export const SmokeParticles = ({
     } else {
       setParticles([]);
     }
-  }, [isActive, effectiveParticleCount]);
+  }, [isActive, effectiveParticleCount, windDriftX, windDriftY, windVector.x, windMultiplier]);
+
+  const createWisp = useCallback((): Wisp => {
+    wispIdRef.current += 1;
+    const baseX = (Math.random() - 0.5) * 25;
+    const riseHeight = -(Math.random() * 80 + 40);
+    
+    const sway1 = (Math.random() - 0.5) * 22;
+    const sway2 = (Math.random() - 0.5) * 28;
+    
+    return {
+      id: wispIdRef.current,
+      xPath: [
+        0, 
+        baseX + sway1 + windDriftX * 0.3, 
+        baseX - sway2 + windDriftX * 0.65, 
+        baseX + sway1 * 0.5 + windDriftX
+      ],
+      yPath: [
+        0, 
+        riseHeight * 0.35 + windDriftY * 0.3, 
+        riseHeight * 0.7 + windDriftY * 0.65, 
+        riseHeight + windDriftY
+      ],
+      size: Math.random() * 25 + 16,
+      duration: Math.random() * 2.6 + 2.4,
+      delay: 0,
+      rotation: (Math.random() - 0.5) * 40,
+      rotationEnd: (Math.random() - 0.5) * 160 + (Math.random() > 0.5 ? 100 : -100) + (windVector.x * 25 * windMultiplier),
+      swirlIntensity: Math.random() * 0.3 + 0.2,
+    };
+  }, [windDriftX, windDriftY, windVector.x, windMultiplier]);
 
   // Continuous wisps while active
   useEffect(() => {
@@ -155,28 +227,7 @@ export const SmokeParticles = ({
         clearInterval(wispIntervalRef.current);
       }
     };
-  }, [isActive, effectiveSpawnRate, config.maxWisps]);
-
-  const createWisp = (): Wisp => {
-    wispIdRef.current += 1;
-    const baseX = (Math.random() - 0.5) * 25;
-    const riseHeight = -(Math.random() * 80 + 40);
-    
-    const sway1 = (Math.random() - 0.5) * 22;
-    const sway2 = (Math.random() - 0.5) * 28;
-    
-    return {
-      id: wispIdRef.current,
-      xPath: [0, baseX + sway1, baseX - sway2, baseX + sway1 * 0.5],
-      yPath: [0, riseHeight * 0.35, riseHeight * 0.7, riseHeight],
-      size: Math.random() * 25 + 16,
-      duration: Math.random() * 2.6 + 2.4,
-      delay: 0,
-      rotation: (Math.random() - 0.5) * 40,
-      rotationEnd: (Math.random() - 0.5) * 160 + (Math.random() > 0.5 ? 100 : -100),
-      swirlIntensity: Math.random() * 0.3 + 0.2,
-    };
-  };
+  }, [isActive, effectiveSpawnRate, config.maxWisps, createWisp]);
 
   // Wispy swirl SVG shape matching reference images
   const SwirlShape = ({ size, intensity, id }: { size: number; intensity: number; id: number }) => (

@@ -99,22 +99,12 @@ export function RelatedProducts({ products, currentProductId, countryCode }: Rel
               >
                 {/* Image Container */}
                 <div className="relative aspect-square rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/60 dark:to-slate-900/80 border border-border/30 overflow-hidden mb-2 group-hover:border-primary/40 group-hover:shadow-lg transition-all duration-300">
-                  {/* Light mode: crisp white background */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white via-slate-50/80 to-slate-100/60 dark:from-transparent dark:via-transparent dark:to-transparent" />
-                  
-                  <div className="absolute inset-0 flex items-center justify-center p-2 sm:p-3">
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                      style={{
-                        filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.12))',
-                        maxWidth: '88%',
-                        maxHeight: '88%',
-                      }}
-                      loading="lazy"
-                    />
-                  </div>
+                  <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
+                  />
 
                   {/* Category badge */}
                   <Badge

@@ -46,20 +46,21 @@ export const SmokeParticles = ({
     if (isActive) {
       setIsFadingOut(false);
       const newParticles: Particle[] = Array.from({ length: particleCount }, (_, i) => {
-        const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.5;
-        const distance = Math.random() * 80 + 40;
-        const swirl = (Math.random() - 0.5) * 60;
+        // Smoke rises upward with gentle horizontal drift
+        const horizontalDrift = (Math.random() - 0.5) * 50;
+        const riseHeight = -(Math.random() * 80 + 50); // Negative = upward
+        const midDrift = (Math.random() - 0.5) * 30;
         
         return {
           id: i,
-          x: Math.cos(angle) * distance,
-          y: Math.sin(angle) * distance - 30,
-          midX: Math.cos(angle + 0.5) * (distance * 0.5) + swirl,
-          midY: Math.sin(angle + 0.5) * (distance * 0.5) - 15,
+          x: horizontalDrift + (Math.random() - 0.5) * 20,
+          y: riseHeight,
+          midX: midDrift,
+          midY: riseHeight * 0.4,
           size: Math.random() * 40 + 24,
-          duration: Math.random() * 1.8 + 1.4,
-          delay: Math.random() * 0.2,
-          rotation: (Math.random() - 0.5) * 180,
+          duration: Math.random() * 2.0 + 1.6,
+          delay: Math.random() * 0.3,
+          rotation: (Math.random() - 0.5) * 90,
           blur: Math.random() * 1.5 + 0.5,
         };
       });
@@ -108,16 +109,17 @@ export const SmokeParticles = ({
 
   const createWisp = (): Wisp => {
     wispIdRef.current += 1;
-    const angle = Math.random() * Math.PI * 2;
-    const distance = Math.random() * 40 + 20;
+    // Wisps rise upward with gentle swaying
+    const horizontalSway = (Math.random() - 0.5) * 35;
+    const riseHeight = -(Math.random() * 60 + 30); // Negative = upward
     return {
       id: wispIdRef.current,
-      x: Math.cos(angle) * distance,
-      y: Math.sin(angle) * distance - 25,
+      x: horizontalSway,
+      y: riseHeight,
       size: Math.random() * 30 + 18,
-      duration: Math.random() * 2.0 + 1.8,
+      duration: Math.random() * 2.2 + 2.0,
       delay: 0,
-      rotation: (Math.random() - 0.5) * 120,
+      rotation: (Math.random() - 0.5) * 60,
     };
   };
 
@@ -155,7 +157,7 @@ export const SmokeParticles = ({
             }}
             transition={{ 
               duration: wisp.duration,
-              ease: "easeOut",
+              ease: [0.4, 0, 0.2, 1], // Smooth deceleration like rising smoke
               times: [0, 0.3, 0.7, 1],
             }}
           />
@@ -192,8 +194,8 @@ export const SmokeParticles = ({
             transition={{ 
               duration: particle.duration, 
               delay: particle.delay,
-              ease: [0.25, 0.1, 0.25, 1],
-              times: [0, 0.4, 1],
+              ease: [0.4, 0, 0.15, 1], // Starts fast, slows as it rises (like smoke losing momentum)
+              times: [0, 0.35, 1],
             }}
           />
         ))}

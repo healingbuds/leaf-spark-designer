@@ -241,7 +241,7 @@ const NavigationOverlay = ({
               <div className="my-6 h-[2px] bg-white/20" />
 
               {/* User Section */}
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {user ? (
                   <>
                     <Link
@@ -250,52 +250,53 @@ const NavigationOverlay = ({
                       className={cn(
                         "flex items-center gap-4 py-4 px-5 rounded-xl transition-all duration-200",
                         "touch-manipulation min-h-[56px] active:scale-[0.98]",
-                        "text-white/90 hover:text-white hover:bg-white/10",
+                        "bg-white/10 text-white hover:bg-white/15 border border-white/20",
                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EAB308]/50"
                       )}
                     >
                       <LayoutDashboard className="w-5 h-5 text-[#EAB308]" />
-                      <span>Patient Portal</span>
+                      <span className="font-medium">Patient Portal</span>
                     </Link>
                     <button
                       onClick={handleLogout}
                       className={cn(
                         "w-full flex items-center gap-4 py-4 px-5 rounded-xl transition-all duration-200",
                         "touch-manipulation min-h-[56px] active:scale-[0.98]",
-                        "text-white/90 hover:text-white hover:bg-white/10",
+                        "bg-white/10 text-white hover:bg-white/15 border border-white/20",
                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EAB308]/50"
                       )}
                     >
-                      <LogOut className="w-5 h-5 text-white/60" />
-                      <span>Sign Out</span>
+                      <LogOut className="w-5 h-5 text-white/70" />
+                      <span className="font-medium">Sign Out</span>
                     </button>
                   </>
                 ) : (
                   <>
-                    {/* Check Eligibility - Primary CTA */}
+                    {/* Check Eligibility - Primary CTA - HIGH VISIBILITY */}
                     <button
                       onClick={handleEligibility}
                       className={cn(
-                        "w-full flex items-center justify-center gap-2 py-4 px-5 rounded-xl transition-all duration-200",
-                        "touch-manipulation min-h-[56px] active:scale-[0.98]",
-                        "bg-emerald-500 text-white font-semibold",
-                        "shadow-lg shadow-emerald-500/30",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50"
+                        "w-full flex items-center justify-center gap-3 py-5 px-6 rounded-xl transition-all duration-200",
+                        "touch-manipulation min-h-[60px] active:scale-[0.97]",
+                        "bg-white text-[hsl(178,48%,16%)] font-bold text-lg",
+                        "shadow-xl shadow-white/20 border-2 border-white",
+                        "hover:bg-white/95",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#1A2E2A]"
                       )}
                     >
                       Check Eligibility
                     </button>
                     
-                    {/* Patient Login */}
+                    {/* Patient Login - Secondary CTA - Clear but distinct */}
                     <Link
                       to="/auth"
                       onClick={onClose}
                       className={cn(
-                        "flex items-center justify-center gap-3 py-4 px-5 rounded-xl transition-all duration-200",
-                        "touch-manipulation min-h-[56px] active:scale-[0.98]",
-                        "bg-white/10 text-white font-medium border border-white/20",
-                        "hover:border-[#EAB308]/50 hover:text-[#EAB308]",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EAB308]/50"
+                        "flex items-center justify-center gap-3 py-5 px-6 rounded-xl transition-all duration-200",
+                        "touch-manipulation min-h-[60px] active:scale-[0.97]",
+                        "bg-[#EAB308]/20 text-[#EAB308] font-semibold text-lg border-2 border-[#EAB308]/60",
+                        "hover:bg-[#EAB308]/30 hover:border-[#EAB308]",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EAB308]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#1A2E2A]"
                       )}
                     >
                       <User className="w-5 h-5" />

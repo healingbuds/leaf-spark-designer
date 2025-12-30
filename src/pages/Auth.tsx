@@ -148,9 +148,8 @@ const Auth = () => {
       },
     });
 
-    setLoading(false);
-
     if (error) {
+      setLoading(false);
       let message = t('signupError');
       if (error.message.includes("User already registered")) {
         message = t('emailRegistered');
@@ -164,6 +163,22 @@ const Auth = () => {
       });
       return;
     }
+
+    // Send onboarding email (non-blocking - errors won't affect signup)
+    try {
+      await supabase.functions.invoke('send-onboarding-email', {
+        body: {
+          email: email.trim(),
+          fullName: fullName.trim(),
+        },
+      });
+      console.log('Onboarding email triggered successfully');
+    } catch (emailError) {
+      // Log but don't block registration
+      console.error('Failed to send onboarding email:', emailError);
+    }
+
+    setLoading(false);
 
     toast({
       title: t('accountCreated'),

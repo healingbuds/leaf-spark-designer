@@ -1,5 +1,5 @@
 import { useAccount, useReadContract } from 'wagmi';
-import { polygon, mainnet } from 'wagmi/chains';
+import { mainnet } from 'wagmi/chains';
 import { Address } from 'viem';
 
 // Standard ERC-721 ABI for balanceOf and ownerOf
@@ -24,36 +24,34 @@ const ERC721_ABI = [
  * Dr. Green Digital Key NFT Contract Configuration
  * 
  * The Dr. Green ecosystem uses NFTs as "Digital Keys" for access control.
- * These are deployed on Polygon for lower gas fees.
+ * Deployed on Ethereum Mainnet.
  * 
  * Key Types:
  * - Standard Key: Access to 1 planet, basic functionality
  * - Gold Key: Access to multiple planets, enhanced benefits
  * - Platinum Key: Access to all 20 planets, custom strain creation
  * 
- * IMPORTANT: Replace placeholder addresses with actual contract addresses
- * from the Dr. Green team before production deployment.
+ * Contract: 0x217ddEad61a42369A266F1Fb754EB5d3EBadc88a
  */
 export const NFT_CONTRACTS = {
-  // Dr. Green Digital Key - Main access NFT on Polygon
-  // This is the primary NFT that grants access to the platform
+  // Dr. Green Digital Key - Main access NFT on Ethereum Mainnet
   drGreenDigitalKey: {
-    address: '0x0000000000000000000000000000000000000000' as Address, // TODO: Get from Dr. Green team
-    chainId: polygon.id,
+    address: '0x217ddEad61a42369A266F1Fb754EB5d3EBadc88a' as Address,
+    chainId: mainnet.id,
     name: 'Dr. Green Digital Key',
   },
   
-  // Dr. Green Platinum Key - Premium tier NFT
+  // Dr. Green Platinum Key - Premium tier (same contract, different token metadata)
   drGreenPlatinumKey: {
-    address: '0x0000000000000000000000000000000000000000' as Address, // TODO: Get from Dr. Green team
-    chainId: polygon.id,
+    address: '0x217ddEad61a42369A266F1Fb754EB5d3EBadc88a' as Address,
+    chainId: mainnet.id,
     name: 'Dr. Green Platinum Key',
   },
   
   // Healing Buds Partner Access (if applicable)
   healingBudsAccess: {
-    address: '0x0000000000000000000000000000000000000000' as Address, // TODO: Configure if needed
-    chainId: polygon.id,
+    address: '0x0000000000000000000000000000000000000000' as Address,
+    chainId: mainnet.id,
     name: 'Healing Buds Access',
   },
 } as const;
@@ -83,7 +81,7 @@ interface NFTOwnershipResult {
  */
 export function useNFTOwnership({
   contractAddress,
-  chainId = polygon.id, // Default to Polygon where Dr. Green NFTs are deployed
+  chainId = mainnet.id, // Default to Ethereum Mainnet where Dr. Green NFTs are deployed
   enabled = true,
 }: UseNFTOwnershipOptions): NFTOwnershipResult {
   const { address, isConnected } = useAccount();

@@ -6,9 +6,10 @@ import { useCursor } from "@/context/CursorContext";
 interface ThemeToggleProps {
   className?: string;
   variant?: "icon" | "button";
+  isDark?: boolean;
 }
 
-const ThemeToggle = ({ className, variant = "icon" }: ThemeToggleProps) => {
+const ThemeToggle = ({ className, variant = "icon", isDark = true }: ThemeToggleProps) => {
   const { theme, setTheme } = useTheme();
   const { cursorEnabled, toggleCursor } = useCursor();
 
@@ -63,7 +64,9 @@ const ThemeToggle = ({ className, variant = "icon" }: ThemeToggleProps) => {
         onClick={toggleTheme}
         className={cn(
           "p-2.5 rounded-full transition-all duration-300 hover:scale-110 flex-shrink-0 touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center",
-          "text-white/70 hover:text-white hover:bg-white/10 active:bg-white/20",
+          isDark 
+            ? "text-white/70 hover:text-white hover:bg-white/10 active:bg-white/20"
+            : "text-teal-600 hover:text-teal-800 hover:bg-teal-50 active:bg-teal-100",
           className
         )}
         aria-label="Toggle theme"
@@ -79,7 +82,9 @@ const ThemeToggle = ({ className, variant = "icon" }: ThemeToggleProps) => {
         onClick={toggleCursor}
         className={cn(
           "p-2.5 rounded-full transition-all duration-300 hover:scale-110 flex-shrink-0 touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center",
-          "text-white/70 hover:text-white hover:bg-white/10 active:bg-white/20",
+          isDark 
+            ? "text-white/70 hover:text-white hover:bg-white/10 active:bg-white/20"
+            : "text-teal-600 hover:text-teal-800 hover:bg-teal-50 active:bg-teal-100",
           !cursorEnabled && "opacity-50",
           className
         )}

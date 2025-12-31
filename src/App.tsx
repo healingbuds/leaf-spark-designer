@@ -17,6 +17,10 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { ShopProvider } from "@/context/ShopContext";
 import { CursorProvider } from "@/context/CursorContext";
 
+// TEMPORARY: Environment debugger for migration validation - REMOVE BEFORE PRODUCTION
+// See docs/ENV-DEBUGGER-CLEANUP.md for removal checklist
+import EnvDebugger from "@/components/EnvDebugger";
+
 // Lazy load pages for better performance
 const Index = lazy(() => import("./pages/Index"));
 const Eligibility = lazy(() => import("./pages/Eligibility"));
@@ -132,6 +136,8 @@ const App = () => (
                   <main id="main-content" tabIndex={-1}>
                     <AnimatedRoutes />
                   </main>
+                  {/* TEMPORARY: Remove before production - see docs/ENV-DEBUGGER-CLEANUP.md */}
+                  <EnvDebugger />
                 </BrowserRouter>
               </CursorFollower>
             </ShopProvider>

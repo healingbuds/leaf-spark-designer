@@ -12,7 +12,7 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({ 
   children, 
-  defaultTheme = "dark",
+  defaultTheme = "light",
   storageKey = "healing-buds-theme",
   attribute = "class",
   enableSystem = true,

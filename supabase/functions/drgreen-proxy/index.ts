@@ -516,7 +516,7 @@ serve(async (req) => {
           countryCode: payload.countryCode,
         });
         
-        response = await drGreenRequestBody("/clients/", "POST", payload);
+        response = await drGreenRequestBody("/clients", "POST", payload);
         
         // Log response details for debugging
         const clonedResp = response.clone();

@@ -245,9 +245,12 @@ async function drGreenRequestBody(
   const payload = body ? JSON.stringify(body) : "";
   const signature = await signPayload(payload, secretKey);
   
+  // API key must be Base64 encoded per Dr Green API spec
+  const encodedApiKey = btoa(apiKey);
+  
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    "x-auth-apikey": apiKey,
+    "x-auth-apikey": encodedApiKey,
     "x-auth-signature": signature,
   };
   
@@ -301,9 +304,12 @@ async function drGreenRequestQuery(
   // Sign the query string (not the body)
   const signature = await signQueryString(queryString, secretKey);
   
+  // API key must be Base64 encoded per Dr Green API spec
+  const encodedApiKey = btoa(apiKey);
+  
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    "x-auth-apikey": apiKey,
+    "x-auth-apikey": encodedApiKey,
     "x-auth-signature": signature,
   };
   

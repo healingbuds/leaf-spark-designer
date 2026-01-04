@@ -45,8 +45,8 @@ const Header = ({ onMenuStateChange }: HeaderProps) => {
   
   const isDark = resolvedTheme === 'dark';
   
-  // Always use white logo since navbar is always teal green
-  const logoSrc = tenant.logo.dark;
+  // Logo switches based on scroll: white when solid teal BG, teal when scrolled/faded
+  const logoSrc = scrolled ? tenant.logo.light : tenant.logo.dark;
   
   // Scroll progress tracking
   const { scrollYProgress } = useScroll();

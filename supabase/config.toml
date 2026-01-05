@@ -14,3 +14,12 @@ verify_jwt = false
 
 [functions.drgreen-health]
 verify_jwt = false
+
+[functions.send-onboarding-email]
+verify_jwt = false
+
+[functions.drgreen-webhook]
+verify_jwt = false
+
+[functions.send-contact-email]
+verify_jwt = false

@@ -7,8 +7,6 @@ import {
   Pencil,
   Trash2,
   Loader2,
-  Shield,
-  AlertTriangle,
   Search,
   RefreshCw,
   Database,
@@ -59,9 +57,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import Header from '@/layout/Header';
-import Footer from '@/components/Footer';
-import { useNavigate } from 'react-router-dom';
+import AdminLayout from '@/layout/AdminLayout';
 
 interface Strain {
   id: string;
@@ -107,7 +103,6 @@ const emptyStrain: Partial<Strain> = {
 const AdminStrains = () => {
   const [strains, setStrains] = useState<Strain[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingStrain, setEditingStrain] = useState<Partial<Strain> | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -115,41 +110,10 @@ const AdminStrains = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    checkAdminStatus();
+    fetchStrains();
   }, []);
-
-  const checkAdminStatus = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate('/auth');
-        return;
-      }
-
-      const { data: roles, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin');
-
-      if (error) throw error;
-
-      if (!roles || roles.length === 0) {
-        setIsAdmin(false);
-        setIsLoading(false);
-        return;
-      }
-
-      setIsAdmin(true);
-      fetchStrains();
-    } catch (error) {
-      console.error('Error checking admin status:', error);
-      setIsLoading(false);
-    }
-  };
 
   const fetchStrains = async () => {
     try {
@@ -311,224 +275,176 @@ const AdminStrains = () => {
     s.sku.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="pt-32 pb-20">
-          <div className="container mx-auto px-4 flex justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="pt-32 pb-20">
-          <div className="container mx-auto px-4 text-center">
-            <Card className="max-w-md mx-auto bg-card/50 backdrop-blur-sm border-border/50">
-              <CardContent className="pt-12 pb-8">
-                <AlertTriangle className="w-16 h-16 mx-auto mb-6 text-yellow-500" />
-                <h2 className="text-2xl font-bold text-foreground mb-4">Access Denied</h2>
-                <p className="text-muted-foreground mb-6">
-                  You don't have permission to access this page. Admin privileges are required.
-                </p>
-                <Button onClick={() => navigate('/dashboard')}>
-                  Return to Dashboard
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="pt-32 pb-20">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-7xl mx-auto"
+    <AdminLayout 
+      title="Cultivar Management" 
+      description={`Manage locally cached cultivar data • ${strains.length} cultivars`}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        {/* Action Buttons */}
+        <div className="flex items-center justify-end gap-3 mb-6">
+          <Button
+            variant="outline"
+            onClick={handleSync}
+            disabled={isSyncing}
           >
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <Shield className="h-8 w-8 text-primary" />
-                  <h1 className="text-3xl font-bold text-foreground">Admin: Cultivar Management</h1>
-                </div>
-                <p className="text-muted-foreground">
-                  Manage locally cached cultivar data • {strains.length} cultivars
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="outline"
-                  onClick={handleSync}
-                  disabled={isSyncing}
-                >
-                  {isSyncing ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Cloud className="mr-2 h-4 w-4" />
-                  )}
-                  Sync from API
-                </Button>
-                <Button onClick={() => {
-                  setEditingStrain({ ...emptyStrain });
-                  setIsDialogOpen(true);
-                }}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Cultivar
-                </Button>
-              </div>
+            {isSyncing ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Cloud className="mr-2 h-4 w-4" />
+            )}
+            Sync from API
+          </Button>
+          <Button onClick={() => {
+            setEditingStrain({ ...emptyStrain });
+            setIsDialogOpen(true);
+          }}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Cultivar
+          </Button>
+        </div>
+
+        {/* Search */}
+        <Card className="mb-6 bg-card/50 backdrop-blur-sm border-border/50">
+          <CardContent className="pt-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search cultivars by name or SKU..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
             </div>
+          </CardContent>
+        </Card>
 
-            {/* Search */}
-            <Card className="mb-6 bg-card/50 backdrop-blur-sm border-border/50">
-              <CardContent className="pt-6">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search cultivars by name or SKU..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Strains Table */}
-            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Database className="h-5 w-5" />
-                  Cultivar Catalog
-                </CardTitle>
-                <CardDescription>
-                  {filteredStrains.length} cultivar{filteredStrains.length !== 1 ? 's' : ''} found
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
+        {/* Strains Table */}
+        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Database className="h-5 w-5" />
+              Cultivar Catalog
+            </CardTitle>
+            <CardDescription>
+              {filteredStrains.length} cultivar{filteredStrains.length !== 1 ? 's' : ''} found
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Image</TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>THC</TableHead>
+                      <TableHead>CBD</TableHead>
+                      <TableHead>Price</TableHead>
+                      <TableHead>Stock</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredStrains.length === 0 ? (
                       <TableRow>
-                        <TableHead>Image</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>THC</TableHead>
-                        <TableHead>CBD</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Stock</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableCell colSpan={9} className="text-center py-12">
+                          <Leaf className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
+                          <p className="text-muted-foreground">No cultivars found</p>
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredStrains.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={9} className="text-center py-12">
-                            <Leaf className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
-                            <p className="text-muted-foreground">No cultivars found</p>
+                    ) : (
+                      filteredStrains.map((strain) => (
+                        <TableRow key={strain.id} className={strain.is_archived ? 'opacity-50' : ''}>
+                          <TableCell>
+                            {strain.image_url ? (
+                              <img
+                                src={strain.image_url}
+                                alt={strain.name}
+                                className="w-12 h-12 object-cover rounded-lg"
+                              />
+                            ) : (
+                              <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
+                                <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{strain.name}</p>
+                              <p className="text-xs text-muted-foreground">{strain.sku}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{strain.type}</Badge>
+                          </TableCell>
+                          <TableCell>{strain.thc_content}%</TableCell>
+                          <TableCell>{strain.cbd_content}%</TableCell>
+                          <TableCell>{formatPrice(strain.retail_price, 'ZA')}</TableCell>
+                          <TableCell>{strain.stock}</TableCell>
+                          <TableCell>
+                            <div className="flex flex-col gap-1">
+                              {strain.is_archived ? (
+                                <Badge variant="secondary">Archived</Badge>
+                              ) : strain.availability ? (
+                                <Badge variant="default" className="bg-green-600">Available</Badge>
+                              ) : (
+                                <Badge variant="destructive">Unavailable</Badge>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setEditingStrain(strain);
+                                  setIsDialogOpen(true);
+                                }}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleArchiveToggle(strain)}
+                              >
+                                {strain.is_archived ? (
+                                  <RefreshCw className="h-4 w-4" />
+                                ) : (
+                                  <X className="h-4 w-4" />
+                                )}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setDeleteConfirm(strain.id)}
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
-                      ) : (
-                        filteredStrains.map((strain) => (
-                          <TableRow key={strain.id} className={strain.is_archived ? 'opacity-50' : ''}>
-                            <TableCell>
-                              {strain.image_url ? (
-                                <img
-                                  src={strain.image_url}
-                                  alt={strain.name}
-                                  className="w-12 h-12 object-cover rounded-lg"
-                                />
-                              ) : (
-                                <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
-                                  <ImageIcon className="h-5 w-5 text-muted-foreground" />
-                                </div>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <div>
-                                <p className="font-medium">{strain.name}</p>
-                                <p className="text-xs text-muted-foreground">{strain.sku}</p>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline">{strain.type}</Badge>
-                            </TableCell>
-                            <TableCell>{strain.thc_content}%</TableCell>
-                            <TableCell>{strain.cbd_content}%</TableCell>
-                            <TableCell>{formatPrice(strain.retail_price, 'ZA')}</TableCell>
-                            <TableCell>{strain.stock}</TableCell>
-                            <TableCell>
-                              <div className="flex flex-col gap-1">
-                                {strain.is_archived ? (
-                                  <Badge variant="secondary">Archived</Badge>
-                                ) : strain.availability ? (
-                                  <Badge variant="default" className="bg-green-600">Available</Badge>
-                                ) : (
-                                  <Badge variant="destructive">Unavailable</Badge>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex items-center justify-end gap-2">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    setEditingStrain(strain);
-                                    setIsDialogOpen(true);
-                                  }}
-                                >
-                                  <Pencil className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleArchiveToggle(strain)}
-                                >
-                                  {strain.is_archived ? (
-                                    <RefreshCw className="h-4 w-4" />
-                                  ) : (
-                                    <X className="h-4 w-4" />
-                                  )}
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => setDeleteConfirm(strain.id)}
-                                  className="text-destructive hover:text-destructive"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-      </main>
-      <Footer />
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Edit/Create Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -730,7 +646,7 @@ const AdminStrains = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </AdminLayout>
   );
 };
 

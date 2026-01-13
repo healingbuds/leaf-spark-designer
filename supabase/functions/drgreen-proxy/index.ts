@@ -199,11 +199,12 @@ const DRGREEN_API_URL = "https://api.drgreennft.com/api/v1";
 const API_TIMEOUT_MS = 20000;
 
 /**
- * Sign payload using HMAC-SHA256 (matching WordPress legacy)
- * Uses native Web Crypto API
- * This is used for POST requests and singular GET requests (Method A)
+ * Generate HMAC-SHA256 signature using Web Crypto API
+ * @param data - The data to sign
+ * @param secretKey - The secret key
+ * @returns Base64-encoded signature
  */
-async function signPayload(payload: string, secretKey: string): Promise<string> {
+async function generateHmacSignature(data: string, secretKey: string): Promise<string> {
   const encoder = new TextEncoder();
   
   // Import the secret key for HMAC - use key directly as UTF-8 bytes
@@ -216,26 +217,38 @@ async function signPayload(payload: string, secretKey: string): Promise<string> 
     ["sign"]
   );
   
-  // Sign the payload
-  const payloadData = encoder.encode(payload);
-  const signatureBuffer = await crypto.subtle.sign("HMAC", cryptoKey, payloadData);
+  // Sign the data
+  const dataBytes = encoder.encode(data);
+  const signatureBuffer = await crypto.subtle.sign("HMAC", cryptoKey, dataBytes);
   
-  // Convert ArrayBuffer to Base64 string (as per API specification)
+  // Convert ArrayBuffer to Base64 string
   const signatureBytes = new Uint8Array(signatureBuffer);
   let binary = '';
   for (let i = 0; i < signatureBytes.byteLength; i++) {
     binary += String.fromCharCode(signatureBytes[i]);
   }
-  const base64Signature = btoa(binary);
+  return btoa(binary);
+}
+
+/**
+ * Sign payload using HMAC-SHA256 (matching WordPress legacy)
+ * Uses native Web Crypto API
+ * This is used for POST requests and singular GET requests (Method A)
+ * 
+ * IMPORTANT: Based on common API patterns and the Postman collection,
+ * the signature should be computed on just the JSON body payload.
+ */
+async function signPayload(payload: string, secretKey: string): Promise<string> {
+  const signature = await generateHmacSignature(payload, secretKey);
   
-  // Debug logging - temporary
+  // Debug logging
   logInfo("Signature generated", {
-    signatureLength: base64Signature.length,  // Should be 44 chars for Base64 SHA-256
-    signaturePreview: base64Signature.slice(0, 10) + "...",
-    payloadPreview: payload.slice(0, 50),
+    signatureLength: signature.length,  // Should be 44 chars for Base64 SHA-256
+    signaturePreview: signature.slice(0, 3) + "***...",
+    payloadPreview: payload.slice(0, 3) + "***" + payload.slice(-3),
   });
   
-  return base64Signature;
+  return signature;
 }
 
 /**

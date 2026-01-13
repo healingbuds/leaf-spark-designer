@@ -13,6 +13,8 @@ import PageTransition from "@/components/PageTransition";
 import { Mail, Lock, User as UserIcon, ArrowRight, Loader2 } from "lucide-react";
 import hbLogoWhite from "@/assets/hb-logo-white-new.png";
 import { useTranslation } from "react-i18next";
+import { useUserRole } from "@/hooks/useUserRole";
+import { useShop } from "@/context/ShopContext";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -30,6 +32,10 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useTranslation('auth');
+  
+  // Role and eligibility checks for smart redirect
+  const { isAdmin, isLoading: roleLoading } = useUserRole();
+  const { isEligible, isLoading: clientLoading } = useShop();
 
   const loginSchema = z.object({
     email: z.string().trim().email({ message: t('validationErrors.invalidEmail') }),
@@ -62,11 +68,25 @@ const Auth = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Role-based redirect after login
   useEffect(() => {
-    if (user) {
-      navigate("/");
+    if (user && !roleLoading && !clientLoading) {
+      // Priority 1: Admins go to admin portal
+      if (isAdmin) {
+        navigate("/admin", { replace: true });
+        return;
+      }
+      
+      // Priority 2: Verified patients go to patient dashboard
+      if (isEligible) {
+        navigate("/dashboard", { replace: true });
+        return;
+      }
+      
+      // Priority 3: Unverified patients go to status page
+      navigate("/dashboard/status", { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, isAdmin, roleLoading, isEligible, clientLoading, navigate]);
 
   const validateForm = () => {
     setErrors({});
@@ -125,7 +145,7 @@ const Auth = () => {
       title: t('welcomeBackToast'),
       description: t('loginSuccess'),
     });
-    navigate("/");
+    // Navigation handled by useEffect based on role/eligibility
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -226,6 +246,18 @@ const Auth = () => {
       description: t('resetLinkSentToast'),
     });
   };
+
+  // Show loading state while determining redirect destination
+  if (user && (roleLoading || clientLoading)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#1a2e2a] via-[#2a3d3a] to-[#1a2e2a]">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-white/80">Preparing your portal...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <PageTransition variant="premium">

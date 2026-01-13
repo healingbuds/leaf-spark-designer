@@ -820,6 +820,10 @@ serve(async (req) => {
         }
         
         // Transform legacy payload to new /dapp/clients schema
+        // Legacy payload has nested structure: shipping.*, medicalRecord.*
+        const shipping = legacyPayload.shipping || {};
+        const medicalRecord = legacyPayload.medicalRecord || {};
+        
         const dappPayload = {
           transaction_metadata: {
             source: "Healingbuds_Web_Store",
@@ -829,32 +833,36 @@ serve(async (req) => {
           user_identity: {
             first_name: String(legacyPayload.firstName || "").slice(0, 100),
             last_name: String(legacyPayload.lastName || "").slice(0, 100),
-            dob: legacyPayload.dob || legacyPayload.dateOfBirth || "",
+            dob: String(medicalRecord.dob || ""),
             email: String(legacyPayload.email || "").toLowerCase().slice(0, 255),
-            phone_number: String(legacyPayload.contactNumber || legacyPayload.phone || "").slice(0, 20)
+            phone_number: String(legacyPayload.contactNumber || "").slice(0, 20)
           },
           eligibility_results: {
             age_verified: true,
             region_eligible: true,
-            postal_code: String(legacyPayload.postalCode || "").slice(0, 20),
-            country_code: String(legacyPayload.countryCode || "PT").slice(0, 3),
-            declared_medical_patient: legacyPayload.medicalHistory3 === true || legacyPayload.doctorApproval === true
+            postal_code: String(shipping.postalCode || "").slice(0, 20),
+            country_code: String(shipping.countryCode || "PRT").slice(0, 3),
+            declared_medical_patient: medicalRecord.medicalHistory3 === true
           },
           shipping_address: {
-            street: String(legacyPayload.address1 || legacyPayload.street || "").slice(0, 200),
-            city: String(legacyPayload.city || "").slice(0, 100),
-            postal_code: String(legacyPayload.postalCode || "").slice(0, 20),
-            country: String(legacyPayload.countryCode || "PT").slice(0, 3)
+            street: String(shipping.address1 || "").slice(0, 200),
+            city: String(shipping.city || "").slice(0, 100),
+            postal_code: String(shipping.postalCode || "").slice(0, 20),
+            country: String(shipping.countryCode || "PRT").slice(0, 3)
           },
           medical_record: {
-            conditions: String(legacyPayload.medicalConditions || legacyPayload.medicalHistory11 || "").slice(0, 2000),
-            current_medications: String(legacyPayload.currentMedications || legacyPayload.medicalHistory13 || "").slice(0, 1000),
-            allergies: String(legacyPayload.allergies || "").slice(0, 500),
-            previous_cannabis_use: legacyPayload.medicalHistory0 === true || legacyPayload.previousCannabisUse === true
+            conditions: Array.isArray(medicalRecord.medicalConditions) 
+              ? medicalRecord.medicalConditions.join(", ") 
+              : String(medicalRecord.medicalConditions || "").slice(0, 2000),
+            current_medications: Array.isArray(medicalRecord.medicinesTreatments)
+              ? medicalRecord.medicinesTreatments.join(", ")
+              : String(medicalRecord.medicalHistory13 || "").slice(0, 1000),
+            allergies: "",
+            previous_cannabis_use: medicalRecord.medicalHistory0 === true
           },
           kyc_requirements: {
             document_type: "Government_ID",
-            id_country: String(legacyPayload.countryCode || "PT").slice(0, 3),
+            id_country: String(shipping.countryCode || "PRT").slice(0, 3),
             selfie_required: true,
             liveness_check: "active"
           }

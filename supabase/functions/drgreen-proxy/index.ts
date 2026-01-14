@@ -247,100 +247,138 @@ async function generatePrivateKeySignature(
   base64PrivateKey: string
 ): Promise<string> {
   const encoder = new TextEncoder();
-  
-  // Decode the Base64 private key
-  let privateKeyBytes: Uint8Array;
+
+  // WordPress reference:
+  //   $privateKeyPEM = base64_decode($key);
+  //   $privateKey = openssl_pkey_get_private($privateKeyPEM);
+  //   openssl_sign($payload, $signature, $privateKey, OPENSSL_ALGO_SHA256);
+  //
+  // In our backend function, DRGREEN_PRIVATE_KEY is expected to be a Base64-encoded
+  // PEM file. The WebCrypto API can't import PEM directly, so we must:
+  //  1) Base64-decode the secret → PEM text
+  //  2) Strip PEM header/footer and whitespace
+  //  3) Base64-decode the PEM body → DER bytes (PKCS#8)
+
+  const secret = (base64PrivateKey || '').trim();
+
+  // Step 1: Base64 decode the secret
+  let decodedSecretBytes: Uint8Array;
   try {
-    privateKeyBytes = base64ToBytes(base64PrivateKey);
-    logDebug("Private key decoded", { keyLength: privateKeyBytes.length });
+    decodedSecretBytes = base64ToBytes(secret);
   } catch (e) {
     logError("Failed to decode private key from Base64", { error: String(e) });
     throw new Error("Invalid private key format - must be Base64-encoded");
   }
-  
-  // Try to detect key format and import it
+
+  // Step 2: Detect PEM and extract DER bytes
+  let keyDerBytes: Uint8Array;
+  const decodedAsText = new TextDecoder().decode(decodedSecretBytes);
+
+  if (decodedAsText.includes('-----BEGIN')) {
+    // Extract the PEM body (base64 DER)
+    const pemBody = decodedAsText
+      .replace(/-----BEGIN [A-Z0-9 ]+-----/g, '')
+      .replace(/-----END [A-Z0-9 ]+-----/g, '')
+      .replace(/[\r\n\s]/g, '')
+      .trim();
+
+    if (!pemBody || !isBase64(pemBody)) {
+      logError('Private key PEM body is empty or not Base64', {
+        pemDetected: true,
+        decodedLength: decodedAsText.length,
+      });
+      throw new Error('Invalid private key PEM format');
+    }
+
+    keyDerBytes = base64ToBytes(pemBody);
+    logDebug('Private key decoded from Base64 PEM', {
+      derLength: keyDerBytes.length,
+    });
+  } else {
+    // Secret might be Base64(DER) already
+    keyDerBytes = decodedSecretBytes;
+    logDebug('Private key decoded from Base64 DER', {
+      derLength: keyDerBytes.length,
+    });
+  }
+
+  // Step 3: Try to import as PKCS#8 (RSA first, then EC), else fallback to HMAC.
   let cryptoKey: CryptoKey;
-  
-  // First, try to import as PKCS#8 (most common format for private keys)
+
   try {
     cryptoKey = await crypto.subtle.importKey(
-      "pkcs8",
-      privateKeyBytes.buffer as ArrayBuffer,
+      'pkcs8',
+      keyDerBytes.buffer as ArrayBuffer,
       {
-        name: "RSASSA-PKCS1-v1_5",
-        hash: "SHA-256",
+        name: 'RSASSA-PKCS1-v1_5',
+        hash: 'SHA-256',
       },
       false,
-      ["sign"]
+      ['sign']
     );
-    logDebug("Successfully imported RSA private key (PKCS#8)");
+    logDebug('Successfully imported RSA private key (PKCS#8)');
   } catch (rsaError) {
-    logDebug("RSA import failed, trying EC", { error: String(rsaError) });
-    
+    logDebug('RSA import failed, trying EC', { error: String(rsaError) });
+
     // Try EC key (P-256)
     try {
       cryptoKey = await crypto.subtle.importKey(
-        "pkcs8",
-        privateKeyBytes.buffer as ArrayBuffer,
+        'pkcs8',
+        keyDerBytes.buffer as ArrayBuffer,
         {
-          name: "ECDSA",
-          namedCurve: "P-256",
+          name: 'ECDSA',
+          namedCurve: 'P-256',
         },
         false,
-        ["sign"]
+        ['sign']
       );
-      logDebug("Successfully imported EC private key (P-256)");
+      logDebug('Successfully imported EC private key (P-256)');
     } catch (ecError) {
-      logDebug("EC P-256 import failed, trying P-384", { error: String(ecError) });
-      
+      logDebug('EC P-256 import failed, trying P-384', { error: String(ecError) });
+
       // Try EC key (P-384)
       try {
         cryptoKey = await crypto.subtle.importKey(
-          "pkcs8",
-          privateKeyBytes.buffer as ArrayBuffer,
+          'pkcs8',
+          keyDerBytes.buffer as ArrayBuffer,
           {
-            name: "ECDSA",
-            namedCurve: "P-384",
+            name: 'ECDSA',
+            namedCurve: 'P-384',
           },
           false,
-          ["sign"]
+          ['sign']
         );
-        logDebug("Successfully imported EC private key (P-384)");
+        logDebug('Successfully imported EC private key (P-384)');
       } catch (ec384Error) {
         // Last resort: try raw HMAC (legacy fallback)
-        logWarn("Private key import failed, falling back to HMAC", { 
+        logWarn('Private key import failed, falling back to HMAC', {
           rsaError: String(rsaError),
           ecError: String(ecError),
-          ec384Error: String(ec384Error)
+          ec384Error: String(ec384Error),
         });
         return generateHmacSignatureFallback(data, base64PrivateKey);
       }
     }
   }
-  
-  // Sign the data
+
+  // Step 4: Sign the data
   const dataBytes = encoder.encode(data);
-  
+
   let signatureBuffer: ArrayBuffer;
-  if (cryptoKey.algorithm.name === "ECDSA") {
+  if (cryptoKey.algorithm.name === 'ECDSA') {
     signatureBuffer = await crypto.subtle.sign(
-      { name: "ECDSA", hash: "SHA-256" },
+      { name: 'ECDSA', hash: 'SHA-256' },
       cryptoKey,
       dataBytes
     );
   } else {
-    // RSA
-    signatureBuffer = await crypto.subtle.sign(
-      "RSASSA-PKCS1-v1_5",
-      cryptoKey,
-      dataBytes
-    );
+    signatureBuffer = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', cryptoKey, dataBytes);
   }
-  
-  // Convert to Base64
-  const signatureBytes = new Uint8Array(signatureBuffer);
-  return bytesToBase64(signatureBytes);
+
+  // Step 5: Return Base64 signature
+  return bytesToBase64(new Uint8Array(signatureBuffer));
 }
+
 
 /**
  * Fallback HMAC-SHA256 signature for legacy compatibility

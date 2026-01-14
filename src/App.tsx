@@ -47,7 +47,7 @@ const AdminStrains = lazy(() => import("./pages/AdminStrains"));
 const AdminStrainSync = lazy(() => import("./pages/AdminStrainSync"));
 const AdminStrainKnowledge = lazy(() => import("./pages/AdminStrainKnowledge"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
-const Debug = lazy(() => import("./pages/Debug"));
+
 
 const queryClient = new QueryClient();
 
@@ -102,8 +102,6 @@ const AnimatedRoutes = () => {
           <Route path="/admin/strain-sync" element={<AdminStrainSync />} />
           <Route path="/admin/strain-knowledge" element={<AdminStrainKnowledge />} />
           
-          {/* Debug/Diagnosis */}
-          <Route path="/debug" element={<Debug />} />
           
           {/* Legal */}
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />

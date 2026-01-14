@@ -784,7 +784,7 @@ export default function Debug() {
       // Mock order data matching expected API structure
       // The proxy expects: { action: 'create-order', data: { ... } }
       const mockOrderData = {
-        action: 'create-order',
+        action: 'place-order',
         data: {
           clientId: 'test-client-id-123',
           items: [
@@ -815,12 +815,15 @@ export default function Debug() {
       
       const responseTime = Date.now() - startTime;
       
-      // Check for 401 - expected for read-only API credentials
+      // Check for 401 - expected for read-only API credentials or unauthenticated requests
       const is401 = error?.message?.includes('401') || 
                     error?.message?.includes('Unauthorized') ||
                     error?.message?.includes('not authorized') ||
+                    error?.message?.includes('Authentication required') ||
                     data?.statusCode === 401 ||
-                    data?.error?.includes('not authorized');
+                    data?.error?.includes('not authorized') ||
+                    data?.error?.includes('Authentication required') ||
+                    data?.message?.includes('Authentication required');
       
       if (is401) {
         // 401 is expected - API credentials are read-only
@@ -881,39 +884,41 @@ export default function Debug() {
     try {
       const startTime = Date.now();
       
-      // Mock client registration payload matching buildLegacyClientPayload structure
+      // Mock client registration payload - wrapped in 'data' object as expected by proxy
       const mockClientPayload = {
         action: 'create-client',
-        client: {
-          firstName: 'Test',
-          lastName: 'User',
-          email: 'test@healingbuds.test',
-          phone: '+351912345678',
-          dateOfBirth: '1990-01-15',
-          gender: 'male',
-        },
-        address: {
-          address1: '123 Test Street',
-          address2: '',
-          city: 'Lisbon',
-          postalCode: '1000-001',
-          countryCode: 'PT',
-        },
-        medicalRecord: {
-          medicalHistory1: 'chronic_pain',
-          medicalHistory2: 'no',
-          medicalHistory3: 'no',
-          medicalHistory4: 'no',
-          medicalHistory5: ['none'],
-          medicalHistory6: 'no',
-          medicalHistory7: 'no',
-          medicalHistory8: 'no',
-          medicalHistory9: 'no',
-          medicalHistory10: 'no',
-          medicalHistory11: 'no',
-          medicalHistory12: 'no',
-          medicalHistory13: 'no',
-          medicalHistory14: ['never'],
+        data: {
+          personal: {
+            firstName: 'Test',
+            lastName: 'User',
+            email: 'test@healingbuds.test',
+            phone: '+351912345678',
+            dateOfBirth: '1990-01-15',
+            gender: 'male',
+          },
+          address: {
+            address1: '123 Test Street',
+            address2: '',
+            city: 'Lisbon',
+            postalCode: '1000-001',
+            countryCode: 'PT',
+          },
+          medicalRecord: {
+            medicalHistory1: 'chronic_pain',
+            medicalHistory2: 'no',
+            medicalHistory3: 'no',
+            medicalHistory4: 'no',
+            medicalHistory5: ['none'],
+            medicalHistory6: 'no',
+            medicalHistory7: 'no',
+            medicalHistory8: 'no',
+            medicalHistory9: 'no',
+            medicalHistory10: 'no',
+            medicalHistory11: 'no',
+            medicalHistory12: 'no',
+            medicalHistory13: 'no',
+            medicalHistory14: ['never'],
+          },
         },
       };
       
@@ -923,23 +928,26 @@ export default function Debug() {
       
       const responseTime = Date.now() - startTime;
       
-      // Validate payload structure was accepted
+      // Validate payload structure was accepted (using new 'data' wrapped structure)
       const payloadChecks = {
-        hasClient: mockClientPayload.client !== undefined,
-        hasAddress: mockClientPayload.address !== undefined,
-        hasMedicalRecord: mockClientPayload.medicalRecord !== undefined,
-        mh5IsArray: Array.isArray(mockClientPayload.medicalRecord.medicalHistory5),
-        mh14IsArray: Array.isArray(mockClientPayload.medicalRecord.medicalHistory14),
+        hasPersonal: mockClientPayload.data.personal !== undefined,
+        hasAddress: mockClientPayload.data.address !== undefined,
+        hasMedicalRecord: mockClientPayload.data.medicalRecord !== undefined,
+        mh5IsArray: Array.isArray(mockClientPayload.data.medicalRecord.medicalHistory5),
+        mh14IsArray: Array.isArray(mockClientPayload.data.medicalRecord.medicalHistory14),
       };
       
       const structureValid = Object.values(payloadChecks).every(v => v);
       
-      // Check for 401 - expected for read-only API credentials
+      // Check for 401 - expected for read-only API credentials or unauthenticated requests
       const is401 = error?.message?.includes('401') || 
                     error?.message?.includes('Unauthorized') ||
                     error?.message?.includes('not authorized') ||
+                    error?.message?.includes('Authentication required') ||
                     data?.statusCode === 401 ||
                     data?.error?.includes('not authorized') ||
+                    data?.error?.includes('Authentication required') ||
+                    data?.message?.includes('Authentication required') ||
                     data?.message?.includes('not authorized');
       
       if (is401) {

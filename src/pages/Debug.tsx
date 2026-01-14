@@ -6,7 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { AlertTriangle, CheckCircle2, XCircle, RefreshCw, Shield, FileText, Building2, Wifi, Database, User, Download, Leaf, ShoppingCart, Package, UserPlus, Beaker } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AlertTriangle, CheckCircle2, XCircle, RefreshCw, Shield, FileText, Building2, Wifi, Database, User, Download, Leaf, ShoppingCart, Package, UserPlus, Beaker, Info, Lock, Home } from 'lucide-react';
+import useUserRole from '@/hooks/useUserRole';
+import { Link } from 'react-router-dom';
 import { buildLegacyClientPayload } from '@/lib/drgreenApi';
 import { supabase } from '@/integrations/supabase/client';
 import { 
@@ -53,6 +57,7 @@ async function signPayloadHex(payload: string, secretKey: string): Promise<strin
 }
 
 export default function Debug() {
+  const { isAdmin, isLoading: roleLoading, user } = useUserRole();
   const [tests, setTests] = useState<TestResult[]>([
     {
       name: 'HMAC Security Check',
@@ -1081,6 +1086,78 @@ export default function Debug() {
     }
   };
 
+  // Loading state for role check
+  if (roleLoading) {
+    return (
+      <>
+        <SEOHead
+          title="System Diagnosis | Debug"
+          description="Internal testing page for DAPP logic verification"
+          keywords="debug, testing, system diagnosis"
+        />
+        <div className="min-h-screen bg-background">
+          <Header />
+          <main className="pt-24 pb-12">
+            <div className="container max-w-4xl mx-auto px-4">
+              <Skeleton className="h-10 w-64 mb-4" />
+              <Skeleton className="h-6 w-96 mb-8" />
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <Skeleton key={i} className="h-32 w-full" />
+                ))}
+              </div>
+            </div>
+          </main>
+          <Footer />
+        </div>
+      </>
+    );
+  }
+
+  // Access denied for non-admin users
+  if (!isAdmin) {
+    return (
+      <>
+        <SEOHead
+          title="Access Denied | Debug"
+          description="Admin access required"
+          keywords="debug, admin"
+        />
+        <div className="min-h-screen bg-background">
+          <Header />
+          <main className="pt-24 pb-12">
+            <div className="container max-w-lg mx-auto px-4">
+              <Card className="border-destructive/50">
+                <CardContent className="pt-8 text-center">
+                  <Lock className="h-16 w-16 text-destructive mx-auto mb-4" />
+                  <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
+                  <p className="text-muted-foreground mb-6">
+                    This page is restricted to administrators only.
+                    {!user && ' Please sign in with an admin account.'}
+                  </p>
+                  <div className="flex justify-center gap-3">
+                    <Button asChild variant="outline">
+                      <Link to="/">
+                        <Home className="mr-2 h-4 w-4" />
+                        Return Home
+                      </Link>
+                    </Button>
+                    {!user && (
+                      <Button asChild>
+                        <Link to="/auth">Sign In</Link>
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </main>
+          <Footer />
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <SEOHead
@@ -1095,11 +1172,33 @@ export default function Debug() {
         <main className="pt-24 pb-12">
           <div className="container max-w-4xl mx-auto px-4">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold mb-2">System Diagnosis</h1>
+              <div className="flex items-center gap-2 mb-2">
+                <h1 className="text-3xl font-bold">System Diagnosis</h1>
+                <Badge variant="outline" className="text-xs">Admin Only</Badge>
+              </div>
               <p className="text-muted-foreground">
                 Automated tests to verify DAPP logic, HMAC signatures, and registration schema mapping.
               </p>
             </div>
+
+            {/* Dr. Green API Permissions Info Banner */}
+            <Alert className="mb-6 border-blue-500/50 bg-blue-500/5">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertTitle className="text-blue-700 dark:text-blue-400">About API Permission Tests</AlertTitle>
+              <AlertDescription className="text-sm text-muted-foreground">
+                <p className="mb-2">
+                  Tests 8-10 (Cart, Order, Client) call write endpoints on the Dr. Green API. 
+                  If your API credentials are <strong>read-only</strong>, these tests will return 
+                  <code className="mx-1 px-1 bg-muted rounded text-xs">401 Unauthorized</code> — this is expected behavior, not an error.
+                </p>
+                <p>
+                  <strong>To enable write operations:</strong> Contact the Dr. Green API administrator to request 
+                  write permissions for <code className="mx-1 px-1 bg-muted rounded text-xs">/dapp/clients</code>, 
+                  <code className="mx-1 px-1 bg-muted rounded text-xs">/dapp/carts</code>, and 
+                  <code className="mx-1 px-1 bg-muted rounded text-xs">/dapp/orders</code> endpoints.
+                </p>
+              </AlertDescription>
+            </Alert>
 
             {/* DO NOT DEPLOY Warning */}
             {hasFailures && (
@@ -1108,9 +1207,9 @@ export default function Debug() {
                   <div className="flex items-center gap-4">
                     <AlertTriangle className="h-12 w-12 text-destructive" />
                     <div>
-                      <h2 className="text-2xl font-bold text-destructive">DO NOT DEPLOY</h2>
+                      <h2 className="text-2xl font-bold text-destructive">Test Failures Detected</h2>
                       <p className="text-muted-foreground">
-                        One or more critical tests have failed. Fix all issues before deploying to production.
+                        One or more tests have failed. Review the results below for details.
                       </p>
                     </div>
                   </div>

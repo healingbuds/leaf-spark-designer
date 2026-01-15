@@ -15,6 +15,7 @@ import hbLogoWhite from "@/assets/hb-logo-white-new.png";
 import { useTranslation } from "react-i18next";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useShop } from "@/context/ShopContext";
+import { getProductionPath } from "@/lib/urls";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -155,7 +156,8 @@ const Auth = () => {
     
     setLoading(true);
 
-    const redirectUrl = `${window.location.origin}/`;
+    // Use consistent production URL for email confirmation redirects
+    const redirectUrl = getProductionPath('/');
 
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
@@ -223,7 +225,8 @@ const Auth = () => {
 
     setLoading(true);
 
-    const redirectUrl = `${window.location.origin}/auth`;
+    // Use consistent production URL for password reset redirects
+    const redirectUrl = getProductionPath('/auth');
 
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
       redirectTo: redirectUrl,

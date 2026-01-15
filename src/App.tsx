@@ -47,6 +47,9 @@ const AdminStrains = lazy(() => import("./pages/AdminStrains"));
 const AdminStrainSync = lazy(() => import("./pages/AdminStrainSync"));
 const AdminStrainKnowledge = lazy(() => import("./pages/AdminStrainKnowledge"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const Research = lazy(() => import("./pages/Research"));
+const TheWire = lazy(() => import("./pages/TheWire"));
+const ArticleDetail = lazy(() => import("./pages/ArticleDetail"));
 
 
 const queryClient = new QueryClient();
@@ -67,6 +70,9 @@ const AnimatedRoutes = () => {
           <Route path="/traceability" element={<Traceability />} />
           <Route path="/not-eligible" element={<NotEligible />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/research" element={<Research />} />
+          <Route path="/the-wire" element={<TheWire />} />
+          <Route path="/the-wire/:slug" element={<ArticleDetail />} />
           
           {/* Patient Portal */}
           <Route path="/dashboard" element={<PatientDashboard />} />
@@ -104,8 +110,6 @@ const AnimatedRoutes = () => {
           
           
           {/* Legal */}
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           

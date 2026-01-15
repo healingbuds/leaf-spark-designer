@@ -74,8 +74,8 @@ const Footer = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/orders" className="font-body text-sm text-white/60 hover:text-white transition-colors inline-block hover:translate-x-1 transform duration-200">
-                      My Orders
+                    <Link to="/the-wire" className="font-body text-sm text-white/60 hover:text-white transition-colors inline-block hover:translate-x-1 transform duration-200">
+                      The Wire
                     </Link>
                   </li>
                 </ul>

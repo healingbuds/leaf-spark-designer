@@ -6,7 +6,7 @@
 
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { FileText, ClipboardCheck, ShoppingBag, HeadphonesIcon } from "lucide-react";
+import { FileText, ClipboardCheck, ShoppingBag, HeadphonesIcon, Newspaper } from "lucide-react";
 
 interface NavigationMenuProps {
   scrolled: boolean;
@@ -22,6 +22,7 @@ const NavigationMenu = ({ scrolled, isDark = true }: NavigationMenuProps) => {
 
   const navItems = [
     { path: '/research', label: 'Research', icon: FileText },
+    { path: '/the-wire', label: 'The Wire', icon: Newspaper },
     { path: '/eligibility', label: 'Eligibility', icon: ClipboardCheck },
     { path: '/shop', label: 'Products', icon: ShoppingBag, isShop: true },
     { path: '/support', label: 'Support', icon: HeadphonesIcon },

@@ -201,23 +201,65 @@ const DRGREEN_API_URL = "https://api.drgreennft.com/api/v1";
 const API_TIMEOUT_MS = 20000;
 
 /**
- * Check if a string is valid Base64
+ * Clean and normalize Base64 string for decoding
+ * Handles URL-safe Base64, whitespace, and padding issues
  */
-function isBase64(str: string): boolean {
-  if (!str || str.length % 4 !== 0) return false;
-  return /^[A-Za-z0-9+/]+=*$/.test(str);
+function cleanBase64(base64: string): string {
+  // Remove any whitespace, newlines, quotes
+  let cleaned = (base64 || '')
+    .replace(/[\s\r\n"']/g, '')
+    .trim();
+  
+  // Convert URL-safe Base64 to standard Base64
+  cleaned = cleaned.replace(/-/g, '+').replace(/_/g, '/');
+  
+  // Fix padding if needed
+  const paddingNeeded = (4 - (cleaned.length % 4)) % 4;
+  if (paddingNeeded > 0 && paddingNeeded < 4) {
+    cleaned += '='.repeat(paddingNeeded);
+  }
+  
+  return cleaned;
 }
 
 /**
- * Decode Base64 string to Uint8Array
+ * Check if a string is valid Base64 (after cleaning)
+ */
+function isBase64(str: string): boolean {
+  const cleaned = cleanBase64(str);
+  if (!cleaned || cleaned.length === 0) return false;
+  // More permissive regex that allows for various Base64 formats
+  return /^[A-Za-z0-9+/]*=*$/.test(cleaned);
+}
+
+/**
+ * Decode Base64 string to Uint8Array with robust error handling
  */
 function base64ToBytes(base64: string): Uint8Array {
-  const binaryString = atob(base64);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
+  const cleaned = cleanBase64(base64);
+  
+  if (!cleaned) {
+    throw new Error('Empty Base64 string');
   }
-  return bytes;
+  
+  try {
+    const binaryString = atob(cleaned);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes;
+  } catch (e) {
+    // Log more details for debugging
+    logError('Base64 decode failed', {
+      originalLength: base64?.length || 0,
+      cleanedLength: cleaned.length,
+      first20Chars: cleaned.substring(0, 20),
+      last20Chars: cleaned.substring(cleaned.length - 20),
+      error: String(e)
+    });
+    throw e;
+  }
 }
 
 /**

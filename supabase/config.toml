@@ -2,3 +2,6 @@ project_id = "ibzzekpbzdrxaxtjxjhe"
 
 [functions.drgreen-proxy]
 verify_jwt = false
+
+[functions.drgreen-api-tests]
+verify_jwt = false

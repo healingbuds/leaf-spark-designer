@@ -368,6 +368,123 @@ async function testResponseTime(): Promise<{ success: boolean; message?: string;
   };
 }
 
+// Test 11: Webhook Endpoint Accessible
+async function testWebhookEndpoint(): Promise<{ success: boolean; message?: string; details?: Record<string, unknown> }> {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL');
+  const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY');
+  
+  try {
+    // Test OPTIONS request (CORS preflight)
+    const optionsResponse = await fetch(`${supabaseUrl}/functions/v1/drgreen-webhook`, {
+      method: 'OPTIONS',
+      headers: {
+        'apikey': supabaseKey || '',
+        'Origin': 'https://drgreen.com',
+      },
+    });
+    
+    const corsHeader = optionsResponse.headers.get('Access-Control-Allow-Origin');
+    const hasCors = corsHeader === '*';
+    
+    return {
+      success: hasCors,
+      message: hasCors ? 'Webhook endpoint accessible with CORS' : 'Webhook CORS may be misconfigured',
+      details: { 
+        status: optionsResponse.status,
+        corsHeader,
+      },
+    };
+  } catch (err) {
+    const error = err as Error;
+    return {
+      success: false,
+      message: `Webhook endpoint test failed: ${error.message}`,
+      details: {},
+    };
+  }
+}
+
+// Test 12: Webhook Payload Validation
+async function testWebhookPayloadValidation(): Promise<{ success: boolean; message?: string; details?: Record<string, unknown> }> {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL');
+  const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY');
+  
+  try {
+    // Send invalid payload (missing required fields)
+    const invalidPayload = {
+      // Missing 'event' and 'timestamp'
+      clientId: 'test-client-123',
+    };
+    
+    const response = await fetch(`${supabaseUrl}/functions/v1/drgreen-webhook`, {
+      method: 'POST',
+      headers: {
+        'apikey': supabaseKey || '',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(invalidPayload),
+    });
+    
+    // Should return 400 for invalid payload or 401 for missing signature
+    // Either indicates proper security validation is in place
+    const rejectsInvalid = response.status === 400 || response.status === 401;
+    
+    return {
+      success: rejectsInvalid,
+      message: rejectsInvalid 
+        ? `Webhook security active (${response.status === 401 ? 'signature required' : 'payload validated'})` 
+        : `Unexpected response: ${response.status}`,
+      details: { 
+        status: response.status,
+        expectedStatuses: [400, 401],
+      },
+    };
+  } catch (err) {
+    const error = err as Error;
+    return {
+      success: false,
+      message: `Webhook validation test failed: ${error.message}`,
+      details: {},
+    };
+  }
+}
+
+// Test 13: KYC Journey Logs Table
+async function testKycJourneyLogsTable(): Promise<{ success: boolean; message?: string; details?: Record<string, unknown> }> {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL');
+  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env.get('SUPABASE_ANON_KEY');
+  
+  try {
+    const response = await fetch(`${supabaseUrl}/rest/v1/kyc_journey_logs?select=id,event_type,event_source&limit=5`, {
+      headers: {
+        'apikey': supabaseKey || '',
+        'Authorization': `Bearer ${supabaseKey}`,
+      },
+    });
+    
+    const logs = await response.json();
+    const tableExists = response.ok;
+    
+    return {
+      success: tableExists,
+      message: tableExists 
+        ? `KYC journey logs table accessible, ${logs?.length || 0} records` 
+        : 'KYC journey logs table not accessible',
+      details: { 
+        count: logs?.length || 0,
+        sample: logs?.slice(0, 2),
+      },
+    };
+  } catch (err) {
+    const error = err as Error;
+    return {
+      success: false,
+      message: `Database query failed: ${error.message}`,
+      details: {},
+    };
+  }
+}
+
 // ============================================
 // MAIN HANDLER
 // ============================================
@@ -394,6 +511,9 @@ serve(async (req) => {
     { name: '8. Error Response Format', fn: testErrorResponseFormat },
     { name: '9. CORS Headers', fn: testCorsHeaders },
     { name: '10. Response Time', fn: testResponseTime },
+    { name: '11. Webhook Endpoint', fn: testWebhookEndpoint },
+    { name: '12. Webhook Payload Validation', fn: testWebhookPayloadValidation },
+    { name: '13. KYC Journey Logs Table', fn: testKycJourneyLogsTable },
   ];
 
   for (const test of tests) {

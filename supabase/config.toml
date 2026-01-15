@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.drgreen-api-tests]
 verify_jwt = false
+
+[functions.drgreen-webhook]
+verify_jwt = false

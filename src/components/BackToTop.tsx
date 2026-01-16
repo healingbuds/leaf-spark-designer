@@ -1,26 +1,44 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { scrollToTop, prefersReducedMotion } from "@/lib/scroll";
 
 const BackToTop = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const lastScrollY = useRef(0);
+  const ticking = useRef(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      // Show button after scrolling down 400px
-      setIsVisible(window.scrollY > 400);
+      if (ticking.current) return;
+      
+      ticking.current = true;
+      requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+        const scrollingDown = currentScrollY > lastScrollY.current;
+        
+        // Show conditions:
+        // 1. Scrolled past 400px AND
+        // 2. Either scrolling down OR not too close to top (>200px)
+        const shouldShow = currentScrollY > 400 && 
+          (scrollingDown || currentScrollY > 200);
+        
+        setIsVisible(shouldShow);
+        lastScrollY.current = currentScrollY;
+        ticking.current = false;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial check
+    
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
+  const handleClick = () => {
+    const behavior = prefersReducedMotion() ? 'auto' : 'smooth';
+    scrollToTop(behavior);
   };
 
   return (
@@ -34,9 +52,9 @@ const BackToTop = () => {
             duration: 0.3,
             ease: [0.4, 0, 0.2, 1]
           }}
-          onClick={scrollToTop}
+          onClick={handleClick}
           className={cn(
-            "fixed bottom-32 md:bottom-8 right-4 md:right-8 z-50 w-12 h-12 rounded-full",
+            "fixed bottom-32 md:bottom-8 right-4 md:right-8 z-40 w-12 h-12 rounded-full",
             "bg-gradient-to-br from-primary to-primary/80",
             "text-white shadow-lg hover:shadow-2xl",
             "flex items-center justify-center",

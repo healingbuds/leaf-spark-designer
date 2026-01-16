@@ -17,6 +17,8 @@ import MobileBottomActions from "@/components/MobileBottomActions";
 import SEOHead from "@/components/SEOHead";
 import HBIcon from "@/components/HBIcon";
 import TrustMotifs, { CertifiedMotif, LabTestedMotif, SecureShieldMotif, DeliveryMotif } from "@/components/TrustMotifs";
+import SectionNavigation from "@/components/SectionNavigation";
+import ReadingProgress from "@/components/ReadingProgress";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useShop } from "@/context/ShopContext";
@@ -24,6 +26,14 @@ import heroVideo from "/hero-video.mp4";
 import hbLogoTeal from "@/assets/hb-logo-teal.png";
 import hbIconWhiteTraceability from "@/assets/hb-icon-white-traceability.png";
 import hbIconCta from "@/assets/hb-icon-cta.webp";
+
+// Define sections for navigation
+const sections = [
+  { id: 'hero', label: 'Welcome' },
+  { id: 'how-it-works', label: 'How It Works' },
+  { id: 'compliance', label: 'Our Standards' },
+  { id: 'get-started', label: 'Get Started' },
+];
 
 const eligibilitySteps = [
   { step: 1, title: "Complete Assessment", description: "Fill out our secure medical questionnaire" },
@@ -63,7 +73,7 @@ const Index = () => {
         
         <main>
           {/* Video Hero Section - starts from top, navbar overlays it */}
-          <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
+          <section id="hero" ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
             {/* Video Background with Parallax */}
             <motion.div 
               className="absolute inset-0 z-0"
@@ -214,7 +224,7 @@ const Index = () => {
           )}
 
           {/* Quick Eligibility Process */}
-          <section className="py-16 lg:py-24 bg-muted/30">
+          <section id="how-it-works" className="py-16 lg:py-24 bg-muted/30">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="max-w-5xl mx-auto">
                 <motion.div
@@ -268,7 +278,7 @@ const Index = () => {
 
 
           {/* Medical Compliance Banner */}
-          <section className="py-12 bg-primary/5 border-y border-primary/10">
+          <section id="compliance" className="py-12 bg-primary/5 border-y border-primary/10">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="max-w-5xl mx-auto">
                 <div className="grid md:grid-cols-2 gap-8">
@@ -315,7 +325,7 @@ const Index = () => {
           </section>
 
           {/* Call to Action */}
-          <section className="py-16 lg:py-24">
+          <section id="get-started" className="py-16 lg:py-24">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="max-w-3xl mx-auto text-center">
                 <motion.div
@@ -385,6 +395,11 @@ const Index = () => {
         </main>
 
         <Footer />
+        
+        {/* Scroll Navigation & Progress */}
+        <SectionNavigation sections={sections} />
+        <ReadingProgress height={2} colorMilestones />
+        
         <BackToTop />
         <MobileBottomActions menuOpen={menuOpen} />
       </div>

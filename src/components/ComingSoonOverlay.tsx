@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import hbLogo from '@/assets/hb-logo-white.png';
+import hbLogo from '@/assets/hb-logo-white-full.png';
 
 interface ComingSoonOverlayProps {
   countryCode: 'PT' | 'GB';

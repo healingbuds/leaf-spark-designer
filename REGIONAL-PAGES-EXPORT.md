@@ -147,6 +147,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Globe, CheckCircle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RegionSignupModal } from '@/components/RegionSignupModal';
+import hbLogoWhite from '@/assets/hb-logo-white-full.png'; // Full brand logo
 
 interface Region {
   code: string;
@@ -287,7 +288,7 @@ const GlobalLanding = () => {
           className="flex items-center justify-center"
         >
           <img
-            src="/email-assets/hb-logo-white.png"
+            src={hbLogoWhite}
             alt="Healing Buds"
             className="h-10 md:h-12"
           />
@@ -371,6 +372,7 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import hbLogoWhite from '@/assets/hb-logo-white-full.png'; // Full brand logo
 
 interface RegionSignupModalProps {
   isOpen: boolean;
@@ -501,6 +503,11 @@ export const RegionSignupModal = ({ isOpen, onClose, region }: RegionSignupModal
 
               {/* Header */}
               <div className="px-6 pt-8 pb-4 text-center border-b border-white/10">
+                <img 
+                  src={hbLogoWhite} 
+                  alt="Healing Buds" 
+                  className="h-8 mx-auto mb-4"
+                />
                 <span className="text-5xl mb-3 block">{region.flag}</span>
                 <h2 className="font-pharma text-2xl text-white mb-1">
                   {region.name} Launch
@@ -649,7 +656,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import hbLogo from '@/assets/hb-logo-white.png';
+import hbLogo from '@/assets/hb-logo-white-full.png'; // Full brand logo
 
 interface ComingSoonOverlayProps {
   countryCode: 'PT' | 'GB';

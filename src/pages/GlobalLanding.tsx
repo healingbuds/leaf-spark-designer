@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Globe, CheckCircle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RegionSignupModal } from '@/components/RegionSignupModal';
+import hbLogoWhite from '@/assets/hb-logo-white-full.png';
 
 interface Region {
   code: string;
@@ -143,7 +144,7 @@ const GlobalLanding = () => {
           className="flex items-center justify-center"
         >
           <img
-            src="/email-assets/hb-logo-white.png"
+            src={hbLogoWhite}
             alt="Healing Buds"
             className="h-10 md:h-12"
           />

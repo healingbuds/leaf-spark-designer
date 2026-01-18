@@ -14,7 +14,6 @@ import enTheWire from './locales/en/theWire.json';
 import enLegal from './locales/en/legal.json';
 import enConditionPages from './locales/en/conditionPages.json';
 import enShop from './locales/en/shop.json';
-import enComingSoon from './locales/en/comingSoon.json';
 
 import ptCommon from './locales/pt/common.json';
 import ptHome from './locales/pt/home.json';
@@ -29,7 +28,6 @@ import ptTheWire from './locales/pt/theWire.json';
 import ptLegal from './locales/pt/legal.json';
 import ptConditionPages from './locales/pt/conditionPages.json';
 import ptShop from './locales/pt/shop.json';
-import ptComingSoon from './locales/pt/comingSoon.json';
 
 const resources = {
   en: {
@@ -46,7 +44,6 @@ const resources = {
     legal: enLegal,
     conditionPages: enConditionPages,
     shop: enShop,
-    comingSoon: enComingSoon,
   },
   pt: {
     common: ptCommon,
@@ -62,7 +59,6 @@ const resources = {
     legal: ptLegal,
     conditionPages: ptConditionPages,
     shop: ptShop,
-    comingSoon: ptComingSoon,
   },
 };
 
@@ -108,7 +104,7 @@ i18n
     lng: getInitialLanguage(),
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'home', 'auth', 'research', 'contact', 'conditions', 'whatWeDo', 'aboutUs', 'clinics', 'theWire', 'legal', 'conditionPages', 'shop', 'comingSoon'],
+    ns: ['common', 'home', 'auth', 'research', 'contact', 'conditions', 'whatWeDo', 'aboutUs', 'clinics', 'theWire', 'legal', 'conditionPages', 'shop'],
     interpolation: {
       escapeValue: false,
     },

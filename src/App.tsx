@@ -15,8 +15,6 @@ import SkipLinks from "@/components/SkipLinks";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { ProtectedNFTRoute } from "@/components/ProtectedNFTRoute";
 import { ComplianceGuard } from "@/components/ComplianceGuard";
-import { RegionalGate } from "@/components/RegionalGate";
-import RegionSwitcher from "@/components/dev/RegionSwitcher";
 
 import { ShopProvider } from "@/context/ShopContext";
 import { CursorProvider } from "@/context/CursorContext";
@@ -137,15 +135,12 @@ const App = () => (
                     <Sonner />
                     <BrowserRouter>
                       <TenantProvider>
-                        <RegionalGate>
-                          <RegionSwitcher />
-                          <SkipLinks />
-                          <ScrollToTop />
-                          <RouteProgress />
-                          <main id="main-content" tabIndex={-1}>
-                            <AnimatedRoutes />
-                          </main>
-                        </RegionalGate>
+                        <SkipLinks />
+                        <ScrollToTop />
+                        <RouteProgress />
+                        <main id="main-content" tabIndex={-1}>
+                          <AnimatedRoutes />
+                        </main>
                       </TenantProvider>
                     </BrowserRouter>
                   </CursorFollower>

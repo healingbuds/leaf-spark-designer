@@ -1,5 +1,6 @@
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useMemo, useState, useEffect } from 'react';
 import { ComingSoonOverlay } from './ComingSoonOverlay';
+import GlobalLanding from '@/pages/GlobalLanding';
 
 interface RegionalGateProps {
   children: ReactNode;
@@ -19,9 +20,18 @@ const REGION_CONFIG: Record<string, RegionConfig> = {
   GLOBAL: { status: 'redirect', language: 'en' },
 };
 
-// Detect country from domain - synchronous for no flash
+// Detect country from domain or simulation parameter - synchronous for no flash
 const getCountryFromDomain = (): string => {
   if (typeof window === 'undefined') return 'ZA';
+  
+  // DEV ONLY: Check for simulation query parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const simulatedRegion = urlParams.get('simulate_region');
+  
+  if (simulatedRegion && ['ZA', 'PT', 'GB', 'GLOBAL'].includes(simulatedRegion.toUpperCase())) {
+    console.log(`[RegionalGate] Simulating region: ${simulatedRegion.toUpperCase()}`);
+    return simulatedRegion.toUpperCase();
+  }
   
   const hostname = window.location.hostname;
   
@@ -46,37 +56,69 @@ const getCountryFromDomain = (): string => {
 };
 
 export const RegionalGate = ({ children }: RegionalGateProps) => {
+  const [simulatedRegion, setSimulatedRegion] = useState<string | null>(null);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    setSimulatedRegion(urlParams.get('simulate_region')?.toUpperCase() || null);
+  }, []);
+
   const regionInfo = useMemo(() => {
     const countryCode = getCountryFromDomain();
     const config = REGION_CONFIG[countryCode] || REGION_CONFIG.ZA;
     return { countryCode, ...config };
   }, []);
 
+  // Simulation indicator badge (dev only)
+  const SimulationBadge = simulatedRegion ? (
+    <div className="fixed bottom-4 right-4 z-[200] bg-yellow-500 text-black px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-2">
+      <span>🔬</span>
+      <span>Simulating: {simulatedRegion}</span>
+    </div>
+  ) : null;
+
   // Operational regions: render children normally
   if (regionInfo.status === 'operational') {
-    return <>{children}</>;
+    return (
+      <>
+        {children}
+        {SimulationBadge}
+      </>
+    );
   }
 
-  // Redirect regions: could show a redirect notice or handle externally
-  // For now, we'll treat it like operational to let user-managed redirect handle it
+  // Redirect regions (GLOBAL): show the Global Landing page with region cards
   if (regionInfo.status === 'redirect') {
-    return <>{children}</>;
+    return (
+      <>
+        <GlobalLanding />
+        {SimulationBadge}
+      </>
+    );
   }
 
   // Coming soon regions: show overlay with blurred background
   if (regionInfo.status === 'coming_soon') {
     return (
-      <ComingSoonOverlay
-        countryCode={regionInfo.countryCode as 'PT' | 'GB'}
-        language={regionInfo.language}
-      >
-        {children}
-      </ComingSoonOverlay>
+      <>
+        <ComingSoonOverlay
+          countryCode={regionInfo.countryCode as 'PT' | 'GB'}
+          language={regionInfo.language}
+        >
+          {children}
+        </ComingSoonOverlay>
+        {SimulationBadge}
+      </>
     );
   }
 
   // Fallback: render children
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      {SimulationBadge}
+    </>
+  );
 };
 
 export default RegionalGate;

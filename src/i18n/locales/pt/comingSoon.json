@@ -1,0 +1,42 @@
+{
+  "title": "Em Breve",
+  "subtitle": {
+    "GB": "A Healing Buds está a expandir para o Reino Unido",
+    "PT": "A Healing Buds está a chegar a Portugal"
+  },
+  "description": "Registe o seu interesse para ser o primeiro a saber quando lançarmos serviços de cannabis medicinal na sua região.",
+  "form": {
+    "fullName": "Nome Completo",
+    "fullNamePlaceholder": "Introduza o seu nome completo",
+    "email": "Endereço de Email",
+    "emailPlaceholder": "o.seu@email.pt",
+    "phone": "Número de Telefone (opcional)",
+    "phonePlaceholder": {
+      "GB": "+44 7911 123456",
+      "PT": "+351 912 345 678"
+    },
+    "submit": "Registar o Meu Interesse",
+    "submitting": "A registar..."
+  },
+  "validation": {
+    "fullNameRequired": "O nome completo é obrigatório",
+    "fullNameMin": "O nome deve ter pelo menos 2 caracteres",
+    "fullNameMax": "O nome deve ter menos de 100 caracteres",
+    "emailRequired": "O endereço de email é obrigatório",
+    "emailInvalid": "Por favor, introduza um endereço de email válido"
+  },
+  "success": {
+    "title": "Está na lista!",
+    "message": "Entraremos em contacto consigo assim que lançarmos na sua região. Obrigado pelo seu interesse.",
+    "backToForm": "Registar outro email"
+  },
+  "footer": {
+    "alreadyHaveAccess": "Já tem acesso noutra região?",
+    "visitSouthAfrica": "Visitar o Site da África do Sul"
+  },
+  "privacy": "Respeitamos a sua privacidade e apenas o contactaremos sobre o nosso lançamento.",
+  "error": {
+    "duplicate": "Este email já está registado para esta região.",
+    "generic": "Algo correu mal. Por favor, tente novamente."
+  }
+}

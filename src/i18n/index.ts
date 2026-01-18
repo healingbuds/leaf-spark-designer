@@ -14,6 +14,7 @@ import enTheWire from './locales/en/theWire.json';
 import enLegal from './locales/en/legal.json';
 import enConditionPages from './locales/en/conditionPages.json';
 import enShop from './locales/en/shop.json';
+import enComingSoon from './locales/en/comingSoon.json';
 
 import ptCommon from './locales/pt/common.json';
 import ptHome from './locales/pt/home.json';
@@ -28,6 +29,7 @@ import ptTheWire from './locales/pt/theWire.json';
 import ptLegal from './locales/pt/legal.json';
 import ptConditionPages from './locales/pt/conditionPages.json';
 import ptShop from './locales/pt/shop.json';
+import ptComingSoon from './locales/pt/comingSoon.json';
 
 const resources = {
   en: {
@@ -44,6 +46,7 @@ const resources = {
     legal: enLegal,
     conditionPages: enConditionPages,
     shop: enShop,
+    comingSoon: enComingSoon,
   },
   pt: {
     common: ptCommon,
@@ -59,6 +62,7 @@ const resources = {
     legal: ptLegal,
     conditionPages: ptConditionPages,
     shop: ptShop,
+    comingSoon: ptComingSoon,
   },
 };
 
@@ -73,16 +77,22 @@ const detectLanguageFromDomain = (): string => {
   const hostname = window.location.hostname;
   
   // Portugal domains get Portuguese
-  if (hostname.endsWith('.pt') || hostname.includes('.pt.')) {
+  if (hostname.endsWith('.pt') || hostname.includes('.pt.') || hostname.includes('healingbuds.pt')) {
     return 'pt';
   }
   
-  // UK and South Africa domains get English
-  if (hostname.endsWith('.co.uk') || hostname.endsWith('.co.za') || hostname.includes('.uk') || hostname.includes('.za')) {
+  // UK, South Africa, and Global domains get English
+  if (
+    hostname.endsWith('.co.uk') || 
+    hostname.endsWith('.co.za') || 
+    hostname.endsWith('.global') ||
+    hostname.includes('.uk') || 
+    hostname.includes('.za')
+  ) {
     return 'en';
   }
   
-  // Default to English for all other domains (including .com, localhost, etc.)
+  // Default to English for all other domains (including .com, localhost, lovable.app, etc.)
   return 'en';
 };
 
@@ -98,7 +108,7 @@ i18n
     lng: getInitialLanguage(),
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'home', 'auth', 'research', 'contact', 'conditions', 'whatWeDo', 'aboutUs', 'clinics', 'theWire', 'legal', 'conditionPages', 'shop'],
+    ns: ['common', 'home', 'auth', 'research', 'contact', 'conditions', 'whatWeDo', 'aboutUs', 'clinics', 'theWire', 'legal', 'conditionPages', 'shop', 'comingSoon'],
     interpolation: {
       escapeValue: false,
     },

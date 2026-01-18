@@ -278,6 +278,42 @@ export type Database = {
         }
         Relationships: []
       }
+      launch_interest: {
+        Row: {
+          country_code: string
+          created_at: string | null
+          email: string
+          full_name: string
+          id: string
+          interested_region: string
+          language: string | null
+          phone: string | null
+          source: string | null
+        }
+        Insert: {
+          country_code: string
+          created_at?: string | null
+          email: string
+          full_name: string
+          id?: string
+          interested_region: string
+          language?: string | null
+          phone?: string | null
+          source?: string | null
+        }
+        Update: {
+          country_code?: string
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          interested_region?: string
+          language?: string | null
+          phone?: string | null
+          source?: string | null
+        }
+        Relationships: []
+      }
       prescription_documents: {
         Row: {
           created_at: string

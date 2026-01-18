@@ -77,16 +77,20 @@ function getCountryFromDomain(): string {
     return 'ZA';
   }
   // Portugal domains
-  if (hostname.endsWith('.pt')) {
+  if (hostname.endsWith('.pt') || hostname.includes('healingbuds.pt')) {
     return 'PT';
   }
   // UK domains
-  if (hostname.endsWith('.co.uk')) {
+  if (hostname.endsWith('.co.uk') || hostname.includes('healingbuds.co.uk')) {
     return 'GB';
   }
   // Thailand domains
   if (hostname.endsWith('.co.th') || hostname.endsWith('.th')) {
     return 'TH';
+  }
+  // Global domains → South Africa (operational region)
+  if (hostname.endsWith('.global') || hostname.includes('healingbuds.global')) {
+    return 'ZA';
   }
   // Global/fallback to South Africa
   return 'ZA';

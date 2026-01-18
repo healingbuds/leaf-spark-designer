@@ -136,10 +136,11 @@ const getCountryFromDomain = (): string => {
   if (hostname.includes('lovable.app') || hostname.includes('lovable.dev')) return 'ZA';
   
   // Check specific country TLDs BEFORE generic .com
-  if (hostname.endsWith('.pt') || hostname.includes('.pt.')) return 'PT';
-  if (hostname.endsWith('.co.uk') || hostname.includes('.co.uk.')) return 'GB';
-  if (hostname.endsWith('.co.za') || hostname.includes('.co.za.')) return 'ZA';
+  if (hostname.endsWith('.pt') || hostname.includes('.pt.') || hostname.includes('healingbuds.pt')) return 'PT';
+  if (hostname.endsWith('.co.uk') || hostname.includes('.co.uk.') || hostname.includes('healingbuds.co.uk')) return 'GB';
+  if (hostname.endsWith('.co.za') || hostname.includes('.co.za.') || hostname.includes('healingbuds.co.za')) return 'ZA';
   if (hostname.endsWith('.co.th') || hostname.includes('.co.th.')) return 'TH';
+  if (hostname.endsWith('.global') || hostname.includes('healingbuds.global')) return 'ZA'; // Global defaults to ZA
   
   // Only match explicit US domains - not generic .com
   if (hostname.endsWith('.us')) return 'US';

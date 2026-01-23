@@ -11,6 +11,7 @@ export type KycEventType =
   | 'kyc.link_received'
   | 'kyc.link_clicked'
   | 'kyc.retry_requested'
+  | 'kyc.email_sent'  // Dr Green confirms KYC email was sent to client
   | 'email.requested';
 
 export interface KycEventData {

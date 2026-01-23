@@ -140,6 +140,7 @@ export type Database = {
       drgreen_clients: {
         Row: {
           admin_approval: string | null
+          case_id: string | null
           country_code: string
           created_at: string
           drgreen_client_id: string
@@ -153,6 +154,7 @@ export type Database = {
         }
         Insert: {
           admin_approval?: string | null
+          case_id?: string | null
           country_code?: string
           created_at?: string
           drgreen_client_id: string
@@ -166,6 +168,7 @@ export type Database = {
         }
         Update: {
           admin_approval?: string | null
+          case_id?: string | null
           country_code?: string
           created_at?: string
           drgreen_client_id?: string

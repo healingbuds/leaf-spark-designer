@@ -10,7 +10,8 @@ import {
   Shield,
   FileText,
   ArrowRight,
-  ExternalLink
+  ExternalLink,
+  Settings
 } from 'lucide-react';
 import PrescriptionManager from '@/components/dashboard/PrescriptionManager';
 import DosageTracker from '@/components/dashboard/DosageTracker';
@@ -305,6 +306,14 @@ const PatientDashboard = () => {
                     >
                       <FileText className="mr-2 h-4 w-4" />
                       Help & FAQ
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start"
+                      onClick={() => navigate('/account/settings')}
+                    >
+                      <Settings className="mr-2 h-4 w-4" />
+                      Account Settings
                     </Button>
                   </CardContent>
                 </Card>

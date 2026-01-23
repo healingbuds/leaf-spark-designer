@@ -39,6 +39,7 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PhoneInput } from '@/components/ui/phone-input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -759,45 +760,20 @@ export function ClientOnboarding() {
                           <FormMessage />
                         </FormItem>
                       )} />
-                      <FormField control={step1Form.control} name="phone" render={({ field }) => {
-                        // Get dynamic placeholder and calling code based on selected country
-                        const phoneHint = getPhoneFormatHint(selectedCountry);
-                        const callingCode = getCallingCode(selectedCountry);
-                        
-                        // Auto-normalize on blur - store E.164 directly
-                        const handlePhoneBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-                          field.onBlur();
-                          const value = e.target.value;
-                          if (value && !value.startsWith('+')) {
-                            // Only normalize if not already in E.164 format
-                            const result = normalizePhoneNumber(value, selectedCountry);
-                            if (result.success && result.e164 !== value) {
-                              // Store E.164 format directly (e.g., +351912345678)
-                              field.onChange(result.e164);
-                            }
-                          }
-                        };
-                        
-                        return (
-                          <FormItem>
-                            <FormLabel>Phone</FormLabel>
-                            <div className="flex gap-2">
-                              <div className="flex items-center justify-center px-3 bg-muted rounded-md border border-input text-sm text-muted-foreground min-w-[60px]">
-                                {callingCode}
-                              </div>
-                              <FormControl>
-                                <Input 
-                                  placeholder={phoneHint} 
-                                  {...field} 
-                                  onBlur={handlePhoneBlur}
-                                  className="flex-1"
-                                />
-                              </FormControl>
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        );
-                      }} />
+                      <FormField control={step1Form.control} name="phone" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone</FormLabel>
+                          <FormControl>
+                            <PhoneInput
+                              value={field.value}
+                              onChange={field.onChange}
+                              countryCode={selectedCountry}
+                              onBlur={field.onBlur}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
                     </div>
 
                     {/* DOB + Gender row */}

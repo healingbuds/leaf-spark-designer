@@ -89,7 +89,7 @@ export default function AccountSettings() {
         createdAt: user.created_at,
       });
 
-      // Get drgreen client data
+      // Get drgreen client data - use raw query for new columns not yet in types
       const { data: client } = await supabase
         .from('drgreen_clients')
         .select('*')
@@ -97,17 +97,20 @@ export default function AccountSettings() {
         .maybeSingle();
 
       if (client) {
+        // Cast to any to access new columns before types are regenerated
+        const clientAny = client as any;
+        
         // Parse shipping_address safely
         let shippingAddress = null;
-        if (client.shipping_address) {
-          if (typeof client.shipping_address === 'string') {
+        if (clientAny.shipping_address) {
+          if (typeof clientAny.shipping_address === 'string') {
             try {
-              shippingAddress = JSON.parse(client.shipping_address);
+              shippingAddress = JSON.parse(clientAny.shipping_address);
             } catch {
               shippingAddress = null;
             }
           } else {
-            shippingAddress = client.shipping_address as ClientData['shippingAddress'];
+            shippingAddress = clientAny.shipping_address as ClientData['shippingAddress'];
           }
         }
 
@@ -117,7 +120,7 @@ export default function AccountSettings() {
           email: client.email,
           fullName: client.full_name,
           countryCode: client.country_code,
-          phone: (client as any).phone || null,
+          phone: clientAny.phone || null,
           shippingAddress,
           isKycVerified: client.is_kyc_verified || false,
           adminApproval: client.admin_approval || 'PENDING',
@@ -201,11 +204,12 @@ export default function AccountSettings() {
     if (!clientData) return;
 
     try {
+      // Use raw update for new columns not yet in types
       const { error } = await supabase
         .from('drgreen_clients')
         .update({ 
-          shipping_address: data as any,
-        })
+          shipping_address: data,
+        } as any)
         .eq('id', clientData.id);
 
       if (error) throw error;

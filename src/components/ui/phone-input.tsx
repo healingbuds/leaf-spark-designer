@@ -73,10 +73,10 @@ export function validatePhoneRealtime(
     };
   }
 
-  // Determine specific error message
+  // Determine specific error message based on digits count
   const digitsEntered = digitsOnly.length;
   
-  if (result.code === 'TOO_SHORT') {
+  if (digitsEntered < digitsRequired) {
     const needed = digitsRequired - digitsEntered;
     return {
       isValid: false,
@@ -89,7 +89,7 @@ export function validatePhoneRealtime(
     };
   }
   
-  if (result.code === 'TOO_LONG') {
+  if (digitsEntered > maxDigits) {
     const excess = digitsEntered - maxDigits;
     return {
       isValid: false,
@@ -105,7 +105,7 @@ export function validatePhoneRealtime(
   return {
     isValid: false,
     isPartiallyValid: false,
-    message: result.error || "Invalid format",
+    message: result.success ? null : "Invalid format",
     digitsEntered,
     digitsRequired,
   };

@@ -9,6 +9,7 @@ import { Cart } from '@/components/shop/Cart';
 import { FloatingCartButton } from '@/components/shop/FloatingCartButton';
 import { RestrictedRegionGate } from '@/components/shop/RestrictedRegionGate';
 import { VerificationProgress } from '@/components/shop/VerificationProgress';
+import { DevToolsPanel } from '@/components/DevToolsPanel';
 
 import { useShop } from '@/context/ShopContext';
 import { useTranslation } from 'react-i18next';
@@ -122,6 +123,9 @@ export default function Shop() {
 
         {/* Floating Cart Button */}
         <FloatingCartButton />
+
+        {/* DevTools Panel - only shows in development */}
+        <DevToolsPanel />
 
         {/* Cart drawer */}
         <Cart />

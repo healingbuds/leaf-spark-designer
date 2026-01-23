@@ -200,8 +200,21 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
         },
       });
 
+      // Handle errors gracefully - don't propagate to UI
       if (error) {
-        console.error('Error syncing from Dr Green:', error);
+        const errorMessage = error.message || '';
+        // Handle 401 specifically - client may not exist in Dr Green API
+        if (errorMessage.includes('401') || errorMessage.includes('Unauthorized')) {
+          console.warn('[ShopContext] Client not found in Dr Green API (401) - using local data only');
+          return false;
+        }
+        console.warn('[ShopContext] Error syncing from Dr Green:', error.message);
+        return false;
+      }
+
+      // Also check for 401 in the response data itself
+      if (data?.error && (data.statusCode === 401 || data.message?.includes('Unauthorized'))) {
+        console.warn('[ShopContext] Dr Green API returned 401 - client may not exist');
         return false;
       }
 
@@ -222,7 +235,7 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
             .eq('user_id', user.id);
 
           if (updateError) {
-            console.error('Error updating client status:', updateError);
+            console.error('[ShopContext] Error updating client status:', updateError);
             return false;
           }
 
@@ -233,7 +246,8 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
       }
       return false;
     } catch (err) {
-      console.error('Sync verification error:', err);
+      // Gracefully handle - log warning instead of error to avoid alarming console output
+      console.warn('[ShopContext] Sync verification warning:', err);
       return false;
     } finally {
       setIsSyncing(false);

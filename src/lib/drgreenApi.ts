@@ -571,6 +571,7 @@ export function buildLegacyClientPayload(formData: {
     contactNumber: phoneInfo.contactNumber,
     shipping: {
       address1: formData.address.street.trim(),
+      address2: '', // Required by Dr. Green API - must be empty string, not omitted
       city: formData.address.city.trim(),
       state: formData.address.state?.trim() || formData.address.city.trim(),
       country: formData.address.country,

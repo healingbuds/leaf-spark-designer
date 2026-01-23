@@ -669,11 +669,28 @@ export function ClientOnboarding() {
 
           if (!error && result?.clientId) {
             clientId = result.clientId;
-            kycLink = result.kycLink || null;
+            // Note: Dr Green API doesn't return kycLink - email is sent directly to customer
+            // We check kycEmailSent (derived from message field) instead
+            kycLink = result.kycLink || null;  // Will be null per API design
             apiSuccess = true;
-            logEvent('registration.success', clientId, { hasKycLink: !!kycLink, countryCode: formData.address?.country });
-            if (kycLink) {
-              logEvent('kyc.link_received', clientId, { linkPresent: true });
+            
+            // Log success with new fields from Postman docs
+            logEvent('registration.success', clientId, { 
+              hasKycLink: !!kycLink,
+              kycEmailSent: result.kycEmailSent || false,
+              caseId: result.caseId || null,
+              countryCode: formData.address?.country,
+            });
+            
+            // Log KYC email status based on message field (per Postman docs)
+            if (result.kycEmailSent) {
+              logEvent('kyc.email_sent', clientId, { 
+                message: result.message,
+                caseId: result.caseId,
+              });
+              console.log('[Registration] ✓ KYC email confirmed sent by Dr Green');
+            } else if (result.message) {
+              console.log('[Registration] API message:', result.message);
             }
           }
           
@@ -723,16 +740,17 @@ export function ClientOnboarding() {
       setKycProgress(100);
 
       // Store client info locally (upsert to handle re-registration attempts)
-      // Include email and full_name for manual email triggers if API fails
+      // Include email, full_name, and case_id for tracking
       const { error: dbError } = await supabase.from('drgreen_clients').upsert({
         user_id: user.id,
         drgreen_client_id: clientId,
         country_code: formData.address?.country || 'PT',
         is_kyc_verified: false,
         admin_approval: 'PENDING',
-        kyc_link: kycLink,
+        kyc_link: kycLink,  // Will be null (Dr Green sends email directly)
         email: formData.personal?.email || null,
         full_name: formData.personal ? `${formData.personal.firstName} ${formData.personal.lastName}`.trim() : null,
+        // case_id will be added in migration
       }, {
         onConflict: 'user_id',
       });
@@ -788,20 +806,16 @@ export function ClientOnboarding() {
       }
 
       // Show appropriate toast based on API success
-      if (kycLink) {
+      // Per Postman docs: Dr Green sends KYC email directly, no link returned in response
+      if (apiSuccess) {
         toast({
-          title: 'Registration complete!',
-          description: 'Check your email for next steps.',
-        });
-      } else if (apiSuccess) {
-        toast({
-          title: 'Registration saved!',
-          description: "We'll email your verification link shortly.",
+          title: 'Registration complete! ✓',
+          description: 'Check your email for your KYC verification link from First AML.',
         });
       } else {
         toast({
           title: 'Registration saved',
-          description: 'This is taking longer than expected. Your information is saved.',
+          description: 'Your information is saved. Our team will contact you shortly.',
         });
       }
     } catch (error: any) {

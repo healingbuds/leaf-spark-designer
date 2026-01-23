@@ -1,5 +1,5 @@
 project_id = "fgpvsucxdwvehhkpygpa"
 
-# First AML webhook - disable JWT verification for external webhook calls
-[functions.first-aml-webhook]
+# Dr Green webhook - disable JWT verification for external webhook calls
+[functions.drgreen-webhook]
 verify_jwt = false

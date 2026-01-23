@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useId, useCallback, KeyboardEvent } from 'react';
+import { useId, useCallback, useEffect, KeyboardEvent, forwardRef } from 'react';
 
 interface TappableYesNoProps {
   question: string;
@@ -15,9 +15,15 @@ interface TappableYesNoProps {
   noLabel?: string;
   /** Show warning icon when "Yes" is selected for safety questions */
   showYesWarning?: boolean;
+  /** Called when a selection is made (for auto-advance behavior) */
+  onComplete?: () => void;
+  /** Delay in ms before calling onComplete (default: 300) */
+  autoAdvanceDelay?: number;
+  /** Whether this is the first question in a group (for initial focus) */
+  autoFocus?: boolean;
 }
 
-export function TappableYesNo({
+export const TappableYesNo = forwardRef<HTMLDivElement, TappableYesNoProps>(function TappableYesNo({
   question,
   description,
   value,
@@ -28,10 +34,33 @@ export function TappableYesNo({
   yesLabel = 'Yes',
   noLabel = 'No',
   showYesWarning = false,
-}: TappableYesNoProps) {
+  onComplete,
+  autoAdvanceDelay = 300,
+  autoFocus = false,
+}, ref) {
   const groupId = useId();
   const questionId = `${groupId}-question`;
   const descriptionId = `${groupId}-description`;
+
+  // Call onComplete after selection with optional delay
+  useEffect(() => {
+    if (value && onComplete) {
+      const timer = setTimeout(onComplete, autoAdvanceDelay);
+      return () => clearTimeout(timer);
+    }
+  }, [value, onComplete, autoAdvanceDelay]);
+
+  // Auto-focus first button when autoFocus is true (mobile-safe: uses ref)
+  useEffect(() => {
+    if (autoFocus && ref && 'current' in ref && ref.current) {
+      const firstButton = ref.current.querySelector<HTMLButtonElement>('button[role="radio"]');
+      // Only focus on desktop - check for coarse pointer (touch)
+      const isTouch = window.matchMedia('(pointer: coarse)').matches;
+      if (firstButton && !isTouch) {
+        setTimeout(() => firstButton.focus(), 150);
+      }
+    }
+  }, [autoFocus, ref]);
 
   const borderColors = {
     default: 'border-border/50',
@@ -54,6 +83,13 @@ export function TappableYesNo({
     } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       e.preventDefault();
       onChange('no');
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      // Allow Enter/Space on focused button
+      const target = e.target as HTMLElement;
+      if (target.role === 'radio') {
+        e.preventDefault();
+        target.click();
+      }
     }
   }, [disabled, onChange]);
 
@@ -91,6 +127,7 @@ export function TappableYesNo({
 
   return (
     <div 
+      ref={ref}
       className={cn(
         'p-4 sm:p-5 rounded-2xl border-2 transition-all duration-200',
         borderColors[variant],
@@ -219,4 +256,4 @@ export function TappableYesNo({
       <p className="sr-only">Use arrow keys to change selection</p>
     </div>
   );
-}
+});

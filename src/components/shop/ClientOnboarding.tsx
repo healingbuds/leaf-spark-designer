@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
@@ -60,6 +60,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useShop } from '@/context/ShopContext';
 import { useKycJourneyLog } from '@/hooks/useKycJourneyLog';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { TappableYesNo } from './TappableYesNo';
 import { ConditionChips } from './ConditionChips';
 
@@ -250,6 +251,13 @@ export function ClientOnboarding() {
   const navigate = useNavigate();
   const { refreshClient } = useShop();
   const { logEvent } = useKycJourneyLog();
+  const isMobile = useIsMobile();
+  
+  // Refs for focus management
+  const firstInputRef = useRef<HTMLInputElement>(null);
+  const firstYesNoRef = useRef<HTMLDivElement>(null);
+  const firstChipsRef = useRef<HTMLDivElement>(null);
+  const firstCheckboxRef = useRef<HTMLButtonElement>(null);
 
   // Check existing registration
   useEffect(() => {
@@ -272,7 +280,7 @@ export function ClientOnboarding() {
     logEvent('registration.started', 'pending', { step: 0 });
   }, [navigate, logEvent]);
 
-  // Forms
+  // Forms - must be defined before effects that use them
   const step1Form = useForm<Step1Data>({
     resolver: zodResolver(step1Schema),
     defaultValues: formData.step1 || {
@@ -325,11 +333,59 @@ export function ClientOnboarding() {
     setCurrentStep(1);
   };
 
-  const handleStep2Submit = (data: Step2Data) => {
+  const handleStep2Submit = useCallback((data: Step2Data) => {
     setFormData(prev => ({ ...prev, step2: data }));
     logEvent('registration.step_completed', 'pending', { step: 1 });
     setCurrentStep(2);
-  };
+  }, [logEvent]);
+
+  // Auto-focus on step transitions (desktop only - mobile-first approach)
+  useEffect(() => {
+    // Skip on mobile to prevent keyboard popup
+    if (isMobile) return;
+    
+    const timer = setTimeout(() => {
+      switch (currentStep) {
+        case 0:
+          firstInputRef.current?.focus();
+          break;
+        case 1:
+          // Focus first TappableYesNo
+          const firstRadio = firstYesNoRef.current?.querySelector<HTMLButtonElement>('button[role="radio"]');
+          firstRadio?.focus();
+          break;
+        case 2:
+          // Focus first chip in conditions
+          const firstChip = document.querySelector<HTMLButtonElement>('[role="listbox"] button[role="option"]');
+          firstChip?.focus();
+          break;
+        case 3:
+          // Focus first checkbox
+          firstCheckboxRef.current?.focus();
+          break;
+      }
+    }, 300); // After framer-motion animation completes
+
+    return () => clearTimeout(timer);
+  }, [currentStep, isMobile]);
+
+  // Auto-advance on Step 2 when all questions are answered
+  const step2Values = step2Form.watch();
+  const step2HandleSubmit = step2Form.handleSubmit;
+  
+  useEffect(() => {
+    // Only auto-advance if all 3 questions are answered and we're on step 2
+    if (currentStep !== 1) return;
+    
+    const { heartProblems, psychosisHistory, cannabisReaction } = step2Values;
+    if (heartProblems && psychosisHistory && cannabisReaction) {
+      // All answered - submit after a brief delay for user feedback
+      const timer = setTimeout(() => {
+        step2HandleSubmit(handleStep2Submit)();
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [step2Values, currentStep, step2HandleSubmit, handleStep2Submit]);
 
   const handleStep3Submit = (data: Step3Data) => {
     setFormData(prev => ({ ...prev, step3: data }));
@@ -593,7 +649,13 @@ export function ClientOnboarding() {
                       <FormField control={step1Form.control} name="firstName" render={({ field }) => (
                         <FormItem>
                           <FormLabel>First Name</FormLabel>
-                          <FormControl><Input placeholder="John" {...field} /></FormControl>
+                          <FormControl>
+                            <Input 
+                              ref={firstInputRef} 
+                              placeholder="John" 
+                              {...field} 
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )} />
@@ -746,12 +808,14 @@ export function ClientOnboarding() {
                     <FormField control={step2Form.control} name="heartProblems" render={({ field }) => (
                       <FormItem>
                         <TappableYesNo
+                          ref={firstYesNoRef}
                           question="Do you have a history of heart problems?"
                           description="Including palpitations, heart attack, stroke, angina, or pacemaker"
                           value={field.value}
                           onChange={field.onChange}
                           variant="warning"
                           required
+                          showYesWarning
                         />
                         <FormMessage />
                       </FormItem>
@@ -766,6 +830,7 @@ export function ClientOnboarding() {
                           onChange={field.onChange}
                           variant="warning"
                           required
+                          showYesWarning
                         />
                         <FormMessage />
                       </FormItem>
@@ -780,16 +845,26 @@ export function ClientOnboarding() {
                           onChange={field.onChange}
                           variant="warning"
                           required
+                          showYesWarning
                         />
                         <FormMessage />
                       </FormItem>
                     )} />
 
+                    {/* Keyboard hint for desktop users */}
+                    {!isMobile && (
+                      <p className="text-xs text-muted-foreground text-center">
+                        <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono">←</kbd>
+                        <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono ml-1">→</kbd>
+                        <span className="ml-2">to select • Auto-advances when complete</span>
+                      </p>
+                    )}
+
                     <div className="flex gap-3 pt-2">
-                      <Button type="button" variant="outline" onClick={goBack} className="flex-1">
+                      <Button type="button" variant="outline" onClick={goBack} className="flex-1 min-h-[44px]">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Back
                       </Button>
-                      <Button type="submit" className="flex-1" size="lg">
+                      <Button type="submit" className="flex-1 min-h-[44px]" size="lg">
                         Continue <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </div>

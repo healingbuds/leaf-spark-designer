@@ -1688,72 +1688,54 @@ serve(async (req) => {
             const rawData = JSON.parse(respBody);
             
             console.log("[create-client-legacy] Raw response keys:", Object.keys(rawData));
+            console.log("[create-client-legacy] Full raw response:", JSON.stringify(rawData, null, 2));
             
-            // Extract clientId and kycLink from various possible response structures
+            // Per Postman docs: KYC email is automatically sent on successful client creation
+            // The API returns a message like "KYC link has been sent to client at [email]"
+            // and a caseId (First AML case ID) but NO kycLink in the response
+            const responseMessage = rawData.message || '';
+            const kycEmailSent = responseMessage.toLowerCase().includes('kyc link has been sent');
+            
+            // Extract client data from the documented response structure: data.client
+            const clientData = rawData.data?.client || rawData.client || {};
+            
+            // Extract clientId and caseId from response
             const normalizedResponse = {
               success: true,
-              clientId: rawData.client?.id || rawData.data?.id || rawData.clientId || rawData.client_id || rawData.id,
-              kycLink: rawData.client?.kycLink || rawData.client?.kyc_link || rawData.data?.kycLink || rawData.data?.kyc_link || rawData.kycLink || rawData.kyc_link,
-              isKYCVerified: rawData.client?.isKYCVerified || rawData.client?.is_kyc_verified || rawData.data?.isKYCVerified || rawData.isKYCVerified || rawData.is_kyc_verified || false,
-              adminApproval: rawData.client?.adminApproval || rawData.client?.admin_approval || rawData.data?.adminApproval || rawData.adminApproval || rawData.admin_approval || null,
+              clientId: clientData.id || rawData.data?.id || rawData.clientId || rawData.client_id || rawData.id,
+              caseId: clientData.caseId || rawData.data?.caseId || rawData.caseId,  // First AML case ID
+              email: clientData.email || rawData.data?.email || rawData.email,
+              message: responseMessage,
+              kycEmailSent: kycEmailSent,  // Derived from message field
+              // Note: kycLink is NOT returned by Dr Green API - email goes directly to customer
+              kycLink: null,  // Dr Green sends email directly, no link returned
+              isKYCVerified: clientData.isKYCVerified || rawData.data?.isKYCVerified || rawData.isKYCVerified || false,
+              adminApproval: clientData.adminApproval || rawData.data?.adminApproval || rawData.adminApproval || 'PENDING',
+              isActive: clientData.isActive || rawData.data?.isActive || rawData.isActive || false,
               raw: rawData,
             };
             
-            // ========== ENHANCED KYC DIAGNOSTIC LOGGING ==========
+            // ========== KYC EMAIL TRIGGER DIAGNOSTICS (Postman-based) ==========
             console.log("[create-client-legacy] ========== KYC EMAIL TRIGGER DIAGNOSTICS ==========");
-            console.log("[create-client-legacy] Extracted clientId:", normalizedResponse.clientId || 'NOT FOUND');
-            console.log("[create-client-legacy] Extracted kycLink:", normalizedResponse.kycLink || 'NOT FOUND');
+            console.log("[create-client-legacy] Response message:", responseMessage);
+            console.log("[create-client-legacy] KYC email sent confirmation:", kycEmailSent ? "YES ✓" : "NO ✗");
+            console.log("[create-client-legacy] First AML caseId:", normalizedResponse.caseId || "NOT FOUND");
+            console.log("[create-client-legacy] Client ID:", normalizedResponse.clientId || "NOT FOUND");
+            console.log("[create-client-legacy] Email destination:", normalizedResponse.email || "NOT FOUND");
             console.log("[create-client-legacy] isKYCVerified:", normalizedResponse.isKYCVerified);
             console.log("[create-client-legacy] adminApproval:", normalizedResponse.adminApproval);
+            console.log("[create-client-legacy] isActive:", normalizedResponse.isActive);
             
-            // Check all possible KYC-related fields in raw response
-            console.log("[create-client-legacy] Raw response KYC fields check:", {
-              'rawData.kycLink': rawData.kycLink,
-              'rawData.kyc_link': rawData.kyc_link,
-              'rawData.kycUrl': rawData.kycUrl,
-              'rawData.kyc_url': rawData.kyc_url,
-              'rawData.verificationLink': rawData.verificationLink,
-              'rawData.verification_link': rawData.verification_link,
-              'rawData.firstAmlLink': rawData.firstAmlLink,
-              'rawData.first_aml_link': rawData.first_aml_link,
-              'rawData.manifestStatus': rawData.manifestStatus,
-              'rawData.manifest_status': rawData.manifest_status,
-              'rawData.emailSent': rawData.emailSent,
-              'rawData.email_sent': rawData.email_sent,
-              'rawData.kycEmailTriggered': rawData.kycEmailTriggered,
-              'rawData.kyc_email_triggered': rawData.kyc_email_triggered,
-              // Check nested in client object
-              'rawData.client?.kycLink': rawData.client?.kycLink,
-              'rawData.client?.emailSent': rawData.client?.emailSent,
-              'rawData.client?.verificationStatus': rawData.client?.verificationStatus,
-              // Check nested in data object  
-              'rawData.data?.kycLink': rawData.data?.kycLink,
-              'rawData.data?.emailSent': rawData.data?.emailSent,
-            });
-            
-            // Log if sendRequestImmediately was acknowledged
-            console.log("[create-client-legacy] Trigger acknowledgment check:", {
-              'rawData.triggerAcknowledged': rawData.triggerAcknowledged,
-              'rawData.manifestCreated': rawData.manifestCreated,
-              'rawData.requestSent': rawData.requestSent,
-            });
-            
-            // Check if there are any error/warning messages in response
-            if (rawData.warnings || rawData.errors || rawData.messages) {
-              console.log("[create-client-legacy] Response warnings/errors:", {
-                warnings: rawData.warnings,
-                errors: rawData.errors,
-                messages: rawData.messages,
-              });
-            }
+            // Log full client data for debugging
+            console.log("[create-client-legacy] Client data from response:", JSON.stringify(clientData, null, 2));
             
             console.log("[create-client-legacy] ========== END KYC DIAGNOSTICS ==========");
             
             logInfo("Client creation normalized response", {
               hasClientId: !!normalizedResponse.clientId,
-              hasKycLink: !!normalizedResponse.kycLink,
-              kycLinkValue: normalizedResponse.kycLink || 'none',
-              emailSent: rawData.emailSent || rawData.email_sent || rawData.client?.emailSent || 'unknown',
+              hasCaseId: !!normalizedResponse.caseId,
+              kycEmailSent: kycEmailSent,
+              message: responseMessage.slice(0, 100),
             });
             
             // Return normalized response directly

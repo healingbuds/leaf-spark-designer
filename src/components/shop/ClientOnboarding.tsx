@@ -7,9 +7,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { buildLegacyClientPayload } from '@/lib/drgreenApi';
 import { 
   normalizePhoneNumber, 
-  formatPhoneForDisplay, 
   getPhoneFormatHint,
+  getCallingCode,
   isValidPhoneNumber,
+  COUNTRY_CALLING_CODES,
 } from '@/lib/phoneNormalization';
 import { 
   isMockModeEnabled, 
@@ -759,19 +760,19 @@ export function ClientOnboarding() {
                         </FormItem>
                       )} />
                       <FormField control={step1Form.control} name="phone" render={({ field }) => {
-                        // Get dynamic placeholder based on selected country
+                        // Get dynamic placeholder and calling code based on selected country
                         const phoneHint = getPhoneFormatHint(selectedCountry);
+                        const callingCode = getCallingCode(selectedCountry);
                         
-                        // Auto-normalize on blur
+                        // Auto-normalize on blur - store E.164 directly
                         const handlePhoneBlur = (e: React.FocusEvent<HTMLInputElement>) => {
                           field.onBlur();
                           const value = e.target.value;
                           if (value) {
                             const result = normalizePhoneNumber(value, selectedCountry);
                             if (result.success) {
-                              // Update field with normalized E.164 format
-                              const successResult = result as { success: true; e164: string };
-                              field.onChange(formatPhoneForDisplay(successResult.e164));
+                              // Store E.164 format directly (e.g., +351912345678)
+                              field.onChange(result.e164);
                             }
                           }
                         };
@@ -779,13 +780,19 @@ export function ClientOnboarding() {
                         return (
                           <FormItem>
                             <FormLabel>Phone</FormLabel>
-                            <FormControl>
-                              <Input 
-                                placeholder={phoneHint} 
-                                {...field} 
-                                onBlur={handlePhoneBlur}
-                              />
-                            </FormControl>
+                            <div className="flex gap-2">
+                              <div className="flex items-center justify-center px-3 bg-muted rounded-md border border-input text-sm text-muted-foreground min-w-[60px]">
+                                {callingCode}
+                              </div>
+                              <FormControl>
+                                <Input 
+                                  placeholder={phoneHint} 
+                                  {...field} 
+                                  onBlur={handlePhoneBlur}
+                                  className="flex-1"
+                                />
+                              </FormControl>
+                            </div>
                             <FormMessage />
                           </FormItem>
                         );

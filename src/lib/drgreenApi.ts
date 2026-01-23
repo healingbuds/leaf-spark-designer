@@ -10,6 +10,11 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { 
+  normalizePhoneNumber, 
+  COUNTRY_CALLING_CODES,
+  type PhoneNormalizationOutput 
+} from '@/lib/phoneNormalization';
 
 // Country code conversion (Alpha-2 to Alpha-3 ISO codes)
 export const countryCodeMap: Record<string, string> = {
@@ -349,9 +354,7 @@ export function parsePhoneNumber(
   phoneCountryCode: string; 
   contactNumber: string 
 } {
-  // Import and use canonical normalization
-  const { normalizePhoneNumber, COUNTRY_CALLING_CODES } = require('@/lib/phoneNormalization');
-  
+  // Use the statically imported normalizePhoneNumber
   const result = normalizePhoneNumber(fullNumber, selectedCountry);
   
   if (result.success) {

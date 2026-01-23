@@ -207,13 +207,25 @@ export function isValidPhoneNumber(rawPhone: string, countryAlpha2: string): boo
 
 /**
  * Get the expected phone format hint for a country.
+ * Returns a placeholder example for the phone input.
  */
 export function getPhoneFormatHint(countryAlpha2: string): string {
+  const hints: Record<string, string> = {
+    PT: '912 345 678',
+    GB: '7911 123456',
+    ZA: '71 234 5678',
+    TH: '81 234 5678',
+    US: '(555) 123-4567',
+  };
+  return hints[countryAlpha2.toUpperCase()] || 'Enter your phone number';
+}
+
+/**
+ * Get the calling code for display purposes.
+ */
+export function getCallingCode(countryAlpha2: string): string {
   const country = COUNTRY_CALLING_CODES[countryAlpha2.toUpperCase()];
-  if (!country) return 'Enter your phone number';
-  
-  const exampleDigits = '9'.repeat(country.minNationalLength);
-  return `e.g., ${country.callingCode} ${exampleDigits.replace(/(\d{3})(?=\d)/g, '$1 ')}`.trim();
+  return country?.callingCode || '+351';
 }
 
 /**

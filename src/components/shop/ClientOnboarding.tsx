@@ -492,6 +492,14 @@ export function ClientOnboarding() {
             clientId = result.clientId;
             kycLink = result.kycLink || null;
             apiSuccess = true;
+          } else if (error || result?.error) {
+            // API call failed - show error but continue with local save
+            const errorMsg = error?.message || result?.message || result?.error || 'Registration issue';
+            console.error('[Registration] API error:', errorMsg);
+            toast({ 
+              title: 'Registration saved locally', 
+              description: 'Our team will contact you to complete verification.',
+            });
           }
         }
       } catch (apiError: any) {
@@ -1243,6 +1251,20 @@ export function ClientOnboarding() {
                     <div className="flex items-center justify-center gap-2 text-primary">
                       <Mail className="h-5 w-5" />
                       <p className="text-muted-foreground">Check your email for verification instructions.</p>
+                    </div>
+                    <Button onClick={() => navigate('/patient-dashboard')}>Go to Dashboard</Button>
+                  </div>
+                ) : storedClientId?.startsWith('local-') ? (
+                  // Local ID - team will contact manually
+                  <div className="space-y-4">
+                    <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg text-left">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Clock className="h-5 w-5 text-amber-600" />
+                        <span className="font-medium text-amber-700 dark:text-amber-400">Registration saved</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Your registration was saved locally. Our team will contact you within 24-48 hours to complete your verification.
+                      </p>
                     </div>
                     <Button onClick={() => navigate('/patient-dashboard')}>Go to Dashboard</Button>
                   </div>

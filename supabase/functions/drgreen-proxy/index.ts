@@ -1488,8 +1488,10 @@ serve(async (req) => {
           runManifest: true, // Legacy param name
           
           // Required shipping object (with required fields)
+          // NOTE: address2 MUST always be included as a string (even empty) per API spec
           shipping: {
             address1: String(shipping.address1 || "").trim(),
+            address2: String(shipping.address2 || "").trim(), // Always include as string (required by API)
             city: String(shipping.city || "").trim(),
             state: String(shipping.state || shipping.city || "").trim(),
             country: String(shipping.country || "Portugal").trim(),
@@ -1524,9 +1526,7 @@ serve(async (req) => {
         };
         
         // Add optional shipping fields only if present (per API note: omit empty optional fields)
-        if (shipping.address2 && String(shipping.address2).trim()) {
-          (dappPayload.shipping as Record<string, string>).address2 = String(shipping.address2).trim();
-        }
+        // NOTE: address2 is now included in the base shipping object above
         if (shipping.landmark && String(shipping.landmark).trim()) {
           (dappPayload.shipping as Record<string, string>).landmark = String(shipping.landmark).trim();
         }

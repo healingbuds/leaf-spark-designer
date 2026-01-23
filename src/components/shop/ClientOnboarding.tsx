@@ -240,6 +240,8 @@ export function ClientOnboarding() {
   const [kycStatus, setKycStatus] = useState<'idle' | 'verifying' | 'success' | 'error'>('idle');
   const [kycProgress, setKycProgress] = useState(0);
   const [documentError, setDocumentError] = useState<string | null>(null);
+  const [apiRetryAvailable, setApiRetryAvailable] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const [formData, setFormData] = useState<{
     step1?: Step1Data;
     step2?: Step2Data;
@@ -493,13 +495,10 @@ export function ClientOnboarding() {
             kycLink = result.kycLink || null;
             apiSuccess = true;
           } else if (error || result?.error) {
-            // API call failed - show error but continue with local save
+            // API call failed - enable retry option
             const errorMsg = error?.message || result?.message || result?.error || 'Registration issue';
             console.error('[Registration] API error:', errorMsg);
-            toast({ 
-              title: 'Registration saved locally', 
-              description: 'Our team will contact you to complete verification.',
-            });
+            setApiRetryAvailable(true);
           }
         }
       } catch (apiError: any) {
@@ -604,6 +603,36 @@ export function ClientOnboarding() {
   const goBack = () => {
     if (currentStep > 0) setCurrentStep(currentStep - 1);
   };
+
+  // Retry API submission using preserved form data
+  const retryApiSubmission = async () => {
+    if (!formData.step4) return;
+    
+    setIsSubmitting(true);
+    setApiRetryAvailable(false);
+    setRetryCount(prev => prev + 1);
+    setKycStatus('verifying');
+    setKycProgress(0);
+    setStoredClientId(null); // Clear any local ID
+    
+    // Re-trigger the Step 4 submit with preserved data
+    await handleStep4Submit(formData.step4);
+  };
+
+  // Warn user before leaving with unsaved data
+  useEffect(() => {
+    const hasData = formData.step1 || formData.step2 || formData.step3;
+    
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasData && currentStep < 4 && currentStep > 0) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [formData, currentStep]);
 
   // ==================== RENDER ====================
 
@@ -1254,19 +1283,48 @@ export function ClientOnboarding() {
                     </div>
                     <Button onClick={() => navigate('/patient-dashboard')}>Go to Dashboard</Button>
                   </div>
-                ) : storedClientId?.startsWith('local-') ? (
-                  // Local ID - team will contact manually
+                ) : storedClientId?.startsWith('local-') || apiRetryAvailable ? (
+                  // Local ID or API failed - show retry option
                   <div className="space-y-4">
                     <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg text-left">
                       <div className="flex items-center gap-2 mb-2">
-                        <Clock className="h-5 w-5 text-amber-600" />
-                        <span className="font-medium text-amber-700 dark:text-amber-400">Registration saved</span>
+                        <AlertTriangle className="h-5 w-5 text-amber-600" />
+                        <span className="font-medium text-amber-700 dark:text-amber-400">
+                          Connection issue
+                        </span>
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        Your registration was saved locally. Our team will contact you within 24-48 hours to complete your verification.
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Your details are saved. You can retry the verification now or we'll contact you within 24-48 hours.
                       </p>
+                      
+                      {/* Large touch-friendly retry button */}
+                      <Button 
+                        onClick={retryApiSubmission} 
+                        disabled={isSubmitting}
+                        className="w-full min-h-[48px] mb-3"
+                      >
+                        {isSubmitting ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <RefreshCw className="mr-2 h-4 w-4" />
+                        )}
+                        Try Again Now
+                      </Button>
+                      
+                      {retryCount > 0 && (
+                        <p className="text-xs text-muted-foreground text-center">
+                          Attempt {retryCount + 1} • Still having issues? Contact support.
+                        </p>
+                      )}
                     </div>
-                    <Button onClick={() => navigate('/patient-dashboard')}>Go to Dashboard</Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      onClick={() => navigate('/patient-dashboard')}
+                      className="w-full min-h-[48px]"
+                    >
+                      Continue to Dashboard
+                    </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">

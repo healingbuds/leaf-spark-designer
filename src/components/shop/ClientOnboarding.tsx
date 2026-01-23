@@ -768,9 +768,10 @@ export function ClientOnboarding() {
                         const handlePhoneBlur = (e: React.FocusEvent<HTMLInputElement>) => {
                           field.onBlur();
                           const value = e.target.value;
-                          if (value) {
+                          if (value && !value.startsWith('+')) {
+                            // Only normalize if not already in E.164 format
                             const result = normalizePhoneNumber(value, selectedCountry);
-                            if (result.success) {
+                            if (result.success && result.e164 !== value) {
                               // Store E.164 format directly (e.g., +351912345678)
                               field.onChange(result.e164);
                             }

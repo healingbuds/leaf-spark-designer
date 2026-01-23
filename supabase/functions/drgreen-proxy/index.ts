@@ -687,6 +687,189 @@ async function generatePrivateKeySignature(
   return bytesToBase64(new Uint8Array(signatureBuffer));
 }
 
+// ==========================================
+// PHONE NORMALIZATION (E.164 COMPLIANCE)
+// ==========================================
+
+// Supported country calling codes with metadata
+const COUNTRY_PHONE_DATA: Record<string, {
+  callingCode: string;
+  alpha2: string;
+  alpha3: string;
+  minNationalLength: number;
+  maxNationalLength: number;
+}> = {
+  PT: { callingCode: '+351', alpha2: 'PT', alpha3: 'PRT', minNationalLength: 9, maxNationalLength: 9 },
+  GB: { callingCode: '+44', alpha2: 'GB', alpha3: 'GBR', minNationalLength: 10, maxNationalLength: 10 },
+  ZA: { callingCode: '+27', alpha2: 'ZA', alpha3: 'ZAF', minNationalLength: 9, maxNationalLength: 9 },
+  TH: { callingCode: '+66', alpha2: 'TH', alpha3: 'THA', minNationalLength: 9, maxNationalLength: 9 },
+  US: { callingCode: '+1', alpha2: 'US', alpha3: 'USA', minNationalLength: 10, maxNationalLength: 10 },
+};
+
+// Alpha-3 to Alpha-2 mapping
+const ALPHA3_TO_ALPHA2: Record<string, string> = {
+  PRT: 'PT', GBR: 'GB', ZAF: 'ZA', THA: 'TH', USA: 'US',
+};
+
+// Sorted calling codes by length (longest first) for prefix matching
+const SORTED_CALLING_CODES = Object.values(COUNTRY_PHONE_DATA)
+  .map(c => c.callingCode.replace('+', ''))
+  .sort((a, b) => b.length - a.length);
+
+// Reverse lookup: calling code digits -> country data
+const CALLING_CODE_TO_COUNTRY: Record<string, typeof COUNTRY_PHONE_DATA[keyof typeof COUNTRY_PHONE_DATA]> = {};
+Object.values(COUNTRY_PHONE_DATA).forEach(country => {
+  const code = country.callingCode.replace('+', '');
+  CALLING_CODE_TO_COUNTRY[code] = country;
+});
+
+interface PhoneNormResult {
+  success: boolean;
+  phoneCode?: string;
+  contactNumber?: string;
+  phoneCountryCode?: string;
+  e164?: string;
+  error?: string;
+}
+
+/**
+ * Normalize phone to E.164 format.
+ * Server-side enforcement - this is the last line of defense.
+ */
+function normalizePhoneForApi(
+  rawPhone: string | undefined | null,
+  rawPhoneCode: string | undefined | null,
+  rawContactNumber: string | undefined | null,
+  countryHint: string = 'PT'
+): PhoneNormResult {
+  // Determine country from hint (may be Alpha-2 or Alpha-3)
+  let alpha2 = countryHint.toUpperCase();
+  if (alpha2.length === 3) {
+    alpha2 = ALPHA3_TO_ALPHA2[alpha2] || 'PT';
+  }
+  
+  const countryData = COUNTRY_PHONE_DATA[alpha2] || COUNTRY_PHONE_DATA['PT'];
+  
+  // If we have phoneCode + contactNumber, try to use them directly
+  if (rawPhoneCode && rawContactNumber) {
+    let phoneCode = String(rawPhoneCode).trim();
+    if (!phoneCode.startsWith('+')) {
+      phoneCode = '+' + phoneCode;
+    }
+    
+    // Extract just digits from contactNumber
+    let contactNumber = String(rawContactNumber).replace(/\D/g, '');
+    
+    // Remove leading trunk zeros
+    while (contactNumber.startsWith('0') && contactNumber.length > countryData.minNationalLength) {
+      contactNumber = contactNumber.slice(1);
+    }
+    
+    // Check if phoneCode matches expected calling code for country
+    const expectedCode = countryData.callingCode;
+    
+    // If phoneCode doesn't match expected, try to fix it
+    if (phoneCode !== expectedCode) {
+      // Check if contactNumber has the calling code embedded
+      const codeDigits = phoneCode.replace('+', '');
+      if (contactNumber.startsWith(codeDigits)) {
+        contactNumber = contactNumber.slice(codeDigits.length);
+      }
+      
+      // Use the country's expected calling code
+      phoneCode = expectedCode;
+    }
+    
+    // Remove trunk zeros again after potential code removal
+    while (contactNumber.startsWith('0') && contactNumber.length > countryData.minNationalLength) {
+      contactNumber = contactNumber.slice(1);
+    }
+    
+    // Validate length
+    if (contactNumber.length < countryData.minNationalLength) {
+      return { success: false, error: `Phone number too short for ${alpha2}. Expected at least ${countryData.minNationalLength} digits.` };
+    }
+    if (contactNumber.length > countryData.maxNationalLength) {
+      return { success: false, error: `Phone number too long for ${alpha2}. Expected at most ${countryData.maxNationalLength} digits.` };
+    }
+    
+    const e164 = phoneCode + contactNumber;
+    const e164Digits = e164.replace(/\D/g, '');
+    if (e164Digits.length < 6 || e164Digits.length > 15) {
+      return { success: false, error: 'Invalid E.164 phone format' };
+    }
+    
+    return {
+      success: true,
+      phoneCode,
+      contactNumber,
+      phoneCountryCode: alpha2,
+      e164,
+    };
+  }
+  
+  // If we only have rawPhone, parse it
+  if (rawPhone) {
+    let cleaned = String(rawPhone).trim();
+    const hasPlus = cleaned.startsWith('+');
+    cleaned = cleaned.replace(/\D/g, '');
+    
+    if (cleaned.length === 0) {
+      return { success: false, error: 'Phone number contains no digits' };
+    }
+    
+    let nationalNumber: string;
+    let detectedCountry = countryData;
+    
+    if (hasPlus) {
+      // Try to find calling code prefix
+      for (const code of SORTED_CALLING_CODES) {
+        if (cleaned.startsWith(code)) {
+          detectedCountry = CALLING_CODE_TO_COUNTRY[code];
+          nationalNumber = cleaned.slice(code.length);
+          break;
+        }
+      }
+      nationalNumber = nationalNumber! || cleaned;
+    } else {
+      nationalNumber = cleaned;
+    }
+    
+    // Remove leading trunk zeros
+    while (nationalNumber.startsWith('0') && nationalNumber.length > detectedCountry.minNationalLength) {
+      nationalNumber = nationalNumber.slice(1);
+    }
+    
+    // Validate
+    if (nationalNumber.length < detectedCountry.minNationalLength) {
+      return { success: false, error: `Phone too short for ${detectedCountry.alpha2}` };
+    }
+    if (nationalNumber.length > detectedCountry.maxNationalLength) {
+      // Try to trim embedded calling code
+      const codeDigits = detectedCountry.callingCode.replace('+', '');
+      if (nationalNumber.startsWith(codeDigits)) {
+        nationalNumber = nationalNumber.slice(codeDigits.length);
+      }
+    }
+    
+    if (nationalNumber.length > detectedCountry.maxNationalLength) {
+      return { success: false, error: `Phone too long for ${detectedCountry.alpha2}` };
+    }
+    
+    const e164 = detectedCountry.callingCode + nationalNumber;
+    
+    return {
+      success: true,
+      phoneCode: detectedCountry.callingCode,
+      contactNumber: nationalNumber,
+      phoneCountryCode: detectedCountry.alpha2,
+      e164,
+    };
+  }
+  
+  return { success: false, error: 'No phone number provided' };
+}
+
 
 /**
  * Fallback HMAC-SHA256 signature for legacy compatibility
@@ -1462,20 +1645,49 @@ serve(async (req) => {
         // Build EXACT payload structure per Dr. Green API documentation
         // Required fields only - omit optional fields if empty/undefined
         
-        // Ensure phoneCode always has + prefix (First AML requirement)
-        let phoneCode = String(legacyPayload.phoneCode || "+351").trim();
-        if (!phoneCode.startsWith('+')) {
-          phoneCode = '+' + phoneCode;
+        // =============================================
+        // E.164 PHONE NORMALIZATION (SERVER-SIDE ENFORCEMENT)
+        // This is the last line of defense before calling Dr. Green API
+        // =============================================
+        const countryHint = shipping.countryCode || legacyPayload.phoneCountryCode || 'PT';
+        const phoneNormResult = normalizePhoneForApi(
+          null, // No rawPhone - use phoneCode + contactNumber
+          legacyPayload.phoneCode,
+          legacyPayload.contactNumber,
+          countryHint
+        );
+        
+        if (!phoneNormResult.success) {
+          // Return a clear error instead of sending malformed data to Dr. Green
+          logError("Phone normalization failed", { error: phoneNormResult.error });
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              message: phoneNormResult.error || 'Phone numbers must be in E.164 format',
+              errorCode: 400,
+              error: 'Bad Request',
+              url: '/api/v1/dapp/clients',
+              urlMethod: 'POST'
+            }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
         }
+        
+        logInfo("Phone normalized successfully", {
+          phoneCode: phoneNormResult.phoneCode,
+          phoneCountryCode: phoneNormResult.phoneCountryCode,
+          contactNumberLength: phoneNormResult.contactNumber?.length || 0,
+        });
         
         const dappPayload: Record<string, unknown> = {
           // Required personal fields
           firstName: String(legacyPayload.firstName || "").trim(),
           lastName: String(legacyPayload.lastName || "").trim(),
           email: String(legacyPayload.email || "").toLowerCase().trim(),
-          phoneCode: phoneCode, // Ensured to have + prefix for First AML
-          phoneCountryCode: String(legacyPayload.phoneCountryCode || "PT").toUpperCase(),
-          contactNumber: String(legacyPayload.contactNumber || ""),
+          // Use normalized phone fields (guaranteed E.164 compliant)
+          phoneCode: phoneNormResult.phoneCode,
+          phoneCountryCode: phoneNormResult.phoneCountryCode,
+          contactNumber: phoneNormResult.contactNumber,
           
           // =============================================
           // FIRST AML MANIFEST TRIGGER - CRITICAL

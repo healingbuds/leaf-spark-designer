@@ -6,6 +6,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { buildLegacyClientPayload } from '@/lib/drgreenApi';
 import { 
+  normalizePhoneNumber, 
+  formatPhoneForDisplay, 
+  getPhoneFormatHint,
+  isValidPhoneNumber,
+} from '@/lib/phoneNormalization';
+import { 
   isMockModeEnabled, 
   createMockClientResponse, 
   simulateApiDelay,
@@ -92,12 +98,32 @@ const getMinimumAge = (countryCode: string): number => legalAgeByCountry[country
 
 // ==================== SCHEMAS ====================
 
+// Phone validation function that uses our canonical normalization
+const validatePhone = (phone: string, ctx: z.RefinementCtx) => {
+  // Get country from context if available (will be refined in form handler)
+  // For now, use PT as default - the form handler will validate with actual country
+  const result = normalizePhoneNumber(phone, 'PT');
+  if (!result.success) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: (result as { success: false; error: string }).error,
+    });
+  }
+};
+
 const step1Schema = z.object({
   // Personal
   firstName: z.string().min(2, 'First name required').max(50),
   lastName: z.string().min(2, 'Last name required').max(50),
   email: z.string().email('Invalid email').max(255),
-  phone: z.string().min(10, 'Phone must be at least 10 digits').max(20),
+  // Phone: more permissive at schema level, strict validation in handler
+  phone: z.string()
+    .min(6, 'Phone number too short')
+    .max(25, 'Phone number too long')
+    .refine(
+      (val) => /[\d]/.test(val), 
+      { message: 'Phone must contain digits' }
+    ),
   dateOfBirth: z.string().min(1, 'Date of birth required'),
   gender: z.string().min(1, 'Please select gender'),
   // Address
@@ -330,7 +356,25 @@ export function ClientOnboarding() {
       navigate('/not-eligible', { state: { reason: 'postal', country: data.country } });
       return;
     }
-    setFormData(prev => ({ ...prev, step1: data }));
+    
+    // Phone normalization with selected country
+    const phoneResult = normalizePhoneNumber(data.phone, data.country);
+    if (!phoneResult.success) {
+      step1Form.setError('phone', { 
+        type: 'manual', 
+        message: (phoneResult as { success: false; error: string }).error 
+      });
+      return;
+    }
+    
+    // Store normalized phone (narrowed to success type)
+    const successResult = phoneResult as { success: true; e164: string; phoneCode: string; contactNumber: string; phoneCountryCode: string };
+    const normalizedData = { 
+      ...data, 
+      phone: successResult.e164 
+    };
+    
+    setFormData(prev => ({ ...prev, step1: normalizedData }));
     logEvent('registration.step_completed', 'pending', { step: 0 });
     setCurrentStep(1);
   };
@@ -714,13 +758,38 @@ export function ClientOnboarding() {
                           <FormMessage />
                         </FormItem>
                       )} />
-                      <FormField control={step1Form.control} name="phone" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Phone</FormLabel>
-                          <FormControl><Input placeholder="+351 912 345 678" {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
+                      <FormField control={step1Form.control} name="phone" render={({ field }) => {
+                        // Get dynamic placeholder based on selected country
+                        const phoneHint = getPhoneFormatHint(selectedCountry);
+                        
+                        // Auto-normalize on blur
+                        const handlePhoneBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+                          field.onBlur();
+                          const value = e.target.value;
+                          if (value) {
+                            const result = normalizePhoneNumber(value, selectedCountry);
+                            if (result.success) {
+                              // Update field with normalized E.164 format
+                              const successResult = result as { success: true; e164: string };
+                              field.onChange(formatPhoneForDisplay(successResult.e164));
+                            }
+                          }
+                        };
+                        
+                        return (
+                          <FormItem>
+                            <FormLabel>Phone</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder={phoneHint} 
+                                {...field} 
+                                onBlur={handlePhoneBlur}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        );
+                      }} />
                     </div>
 
                     {/* DOB + Gender row */}

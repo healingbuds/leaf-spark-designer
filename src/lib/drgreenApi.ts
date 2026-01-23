@@ -335,58 +335,45 @@ export async function getOrders(clientId: string): Promise<DrGreenResponse<Order
 /**
  * Parse phone number into components matching WordPress format
  * 
- * CRITICAL: First AML requires phone numbers with + prefix.
- * This function ensures phoneCode ALWAYS starts with +
+ * CRITICAL: First AML requires phone numbers with + prefix in E.164 format.
+ * This function uses the canonical normalizePhoneNumber() for proper parsing.
+ * 
+ * @param fullNumber - Raw phone input from user
+ * @param selectedCountry - Alpha-2 country code from form (PT, GB, ZA, TH, US)
  */
-export function parsePhoneNumber(fullNumber: string): { 
+export function parsePhoneNumber(
+  fullNumber: string,
+  selectedCountry: string = 'PT'
+): { 
   phoneCode: string; 
   phoneCountryCode: string; 
   contactNumber: string 
 } {
-  // Remove all non-digit characters except +
-  const cleaned = fullNumber.replace(/[^\d+]/g, '');
+  // Import and use canonical normalization
+  const { normalizePhoneNumber, COUNTRY_CALLING_CODES } = require('@/lib/phoneNormalization');
   
-  // Extract country code (first 1-4 digits after +)
-  const match = cleaned.match(/^\+(\d{1,4})(.*)/);
+  const result = normalizePhoneNumber(fullNumber, selectedCountry);
   
-  // Map common prefixes to country codes
-  const prefixToCountry: Record<string, string> = {
-    '351': 'PT',
-    '44': 'GB',
-    '27': 'ZA',
-    '66': 'TH',
-    '1': 'US',
-  };
-  
-  if (match) {
-    const prefix = match[1];
-    const number = match[2];
-    
+  if (result.success) {
     return {
-      phoneCode: `+${prefix}`, // Always include + prefix for First AML
-      phoneCountryCode: prefixToCountry[prefix] || 'PT',
-      contactNumber: number,
+      phoneCode: result.phoneCode,
+      phoneCountryCode: result.phoneCountryCode,
+      contactNumber: result.contactNumber,
     };
   }
   
-  // Try to detect country code without + prefix
-  // Check if it starts with a known country prefix
-  for (const [prefix, countryCode] of Object.entries(prefixToCountry)) {
-    if (cleaned.startsWith(prefix)) {
-      const number = cleaned.slice(prefix.length);
-      return {
-        phoneCode: `+${prefix}`, // Ensure + prefix for First AML
-        phoneCountryCode: countryCode,
-        contactNumber: number,
-      };
-    }
-  }
+  // Fallback for invalid input: use selected country's calling code
+  // This ensures we never send malformed data to Dr. Green
+  const countryData = COUNTRY_CALLING_CODES[selectedCountry.toUpperCase()] || 
+                      COUNTRY_CALLING_CODES['PT'];
   
-  // Default fallback - always include + prefix
+  // Strip all non-digits from input
+  const digitsOnly = fullNumber.replace(/\D/g, '');
+  
   return {
-    phoneCode: '+351',
-    phoneCountryCode: 'PT',
-    contactNumber: cleaned.replace(/^\+/, ''),
+    phoneCode: countryData.callingCode,
+    phoneCountryCode: countryData.alpha2,
+    contactNumber: digitsOnly.slice(0, countryData.maxNationalLength),
   };
 }
 
@@ -476,8 +463,10 @@ export function buildLegacyClientPayload(formData: {
     otherMedicalTreatments?: string;
   };
 }): LegacyClientPayload {
-  const phoneInfo = parsePhoneNumber(formData.personal.phone);
-  const countryCode = toAlpha3(formData.address.country);
+  // Use country from address for phone normalization (authoritative source)
+  const selectedCountry = formData.address.country || 'PT';
+  const phoneInfo = parsePhoneNumber(formData.personal.phone, selectedCountry);
+  const countryCode = toAlpha3(selectedCountry);
   const mh = formData.medicalHistory || {};
   
   // Map frontend condition values to exact API values

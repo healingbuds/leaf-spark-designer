@@ -47,6 +47,7 @@ const AdminStrains = lazy(() => import("./pages/AdminStrains"));
 const AdminStrainSync = lazy(() => import("./pages/AdminStrainSync"));
 const AdminStrainKnowledge = lazy(() => import("./pages/AdminStrainKnowledge"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AccountSettings = lazy(() => import("./pages/AccountSettings"));
 const Research = lazy(() => import("./pages/Research"));
 const TheWire = lazy(() => import("./pages/TheWire"));
 const ArticleDetail = lazy(() => import("./pages/ArticleDetail"));
@@ -77,6 +78,7 @@ const AnimatedRoutes = () => {
           {/* Patient Portal */}
           <Route path="/dashboard" element={<PatientDashboard />} />
           <Route path="/dashboard/status" element={<DashboardStatus />} />
+          <Route path="/account/settings" element={<AccountSettings />} />
           <Route path="/orders" element={
             <ComplianceGuard>
               <Orders />

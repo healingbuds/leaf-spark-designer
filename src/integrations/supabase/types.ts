@@ -149,6 +149,8 @@ export type Database = {
           id: string
           is_kyc_verified: boolean | null
           kyc_link: string | null
+          phone: string | null
+          shipping_address: Json | null
           updated_at: string
           user_id: string
         }
@@ -163,6 +165,8 @@ export type Database = {
           id?: string
           is_kyc_verified?: boolean | null
           kyc_link?: string | null
+          phone?: string | null
+          shipping_address?: Json | null
           updated_at?: string
           user_id: string
         }
@@ -177,6 +181,8 @@ export type Database = {
           id?: string
           is_kyc_verified?: boolean | null
           kyc_link?: string | null
+          phone?: string | null
+          shipping_address?: Json | null
           updated_at?: string
           user_id?: string
         }

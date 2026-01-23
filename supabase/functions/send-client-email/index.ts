@@ -333,14 +333,8 @@ const handler = async (req: Request): Promise<Response> => {
     // Generate email content
     const emailContent = getEmailTemplate(request, domainConfig);
 
-    // Determine from address
-    // Check if we have a verified domain, otherwise use Resend's testing domain
-    // For testing: onboarding@resend.dev can only send to the account owner's email
-    // For production: Verify your domain at resend.com/domains
-    const useTestMode = Deno.env.get('RESEND_TEST_MODE') === 'true';
-    const fromAddress = useTestMode 
-      ? `${domainConfig.brandName} <onboarding@resend.dev>`
-      : `${domainConfig.brandName} <noreply@tx.healingbuds.co.za>`;  // Using verified transactional subdomain
+    // Use verified Resend domain: send.healingbuds.co.za
+    const fromAddress = `${domainConfig.brandName} <noreply@send.healingbuds.co.za>`;
 
     console.log('[send-client-email] Sending email:', {
       from: fromAddress,

@@ -1461,14 +1461,31 @@ serve(async (req) => {
         
         // Build EXACT payload structure per Dr. Green API documentation
         // Required fields only - omit optional fields if empty/undefined
+        
+        // Ensure phoneCode always has + prefix (First AML requirement)
+        let phoneCode = String(legacyPayload.phoneCode || "+351").trim();
+        if (!phoneCode.startsWith('+')) {
+          phoneCode = '+' + phoneCode;
+        }
+        
         const dappPayload: Record<string, unknown> = {
           // Required personal fields
           firstName: String(legacyPayload.firstName || "").trim(),
           lastName: String(legacyPayload.lastName || "").trim(),
           email: String(legacyPayload.email || "").toLowerCase().trim(),
-          phoneCode: String(legacyPayload.phoneCode || "+351"),
+          phoneCode: phoneCode, // Ensured to have + prefix for First AML
           phoneCountryCode: String(legacyPayload.phoneCountryCode || "PT").toUpperCase(),
           contactNumber: String(legacyPayload.contactNumber || ""),
+          
+          // =============================================
+          // FIRST AML MANIFEST TRIGGER - CRITICAL
+          // Triggers immediate KYC verification email
+          // Without this, cases remain as "Draft" in First AML
+          // =============================================
+          sendRequestImmediately: true,
+          triggerKyc: true, // Alternative param name
+          autoVerify: true, // Fallback param name
+          runManifest: true, // Legacy param name
           
           // Required shipping object (with required fields)
           shipping: {
@@ -1587,7 +1604,7 @@ serve(async (req) => {
           }
         }
         
-        // Enhanced logging for debugging
+        // Enhanced logging for debugging - includes First AML trigger status
         console.log("[create-client-legacy] ========== CLIENT CREATION START ==========");
         console.log("[create-client-legacy] Timestamp:", new Date().toISOString());
         console.log("[create-client-legacy] API credentials check:", {
@@ -1600,17 +1617,30 @@ serve(async (req) => {
         console.log("[create-client-legacy] Shipping keys:", Object.keys(dappPayload.shipping as object));
         console.log("[create-client-legacy] MedicalRecord keys:", Object.keys(dappPayload.medicalRecord as object));
         console.log("[create-client-legacy] Has clientBusiness:", !!dappPayload.clientBusiness);
+        
+        // Log First AML trigger params specifically
+        console.log("[create-client-legacy] ========== FIRST AML TRIGGER PARAMS ==========");
+        console.log("[create-client-legacy] sendRequestImmediately:", dappPayload.sendRequestImmediately);
+        console.log("[create-client-legacy] triggerKyc:", dappPayload.triggerKyc);
+        console.log("[create-client-legacy] autoVerify:", dappPayload.autoVerify);
+        console.log("[create-client-legacy] runManifest:", dappPayload.runManifest);
+        console.log("[create-client-legacy] phoneCode (with + prefix):", dappPayload.phoneCode);
+        console.log("[create-client-legacy] phoneCountryCode:", dappPayload.phoneCountryCode);
+        console.log("[create-client-legacy] contactNumber length:", (dappPayload.contactNumber as string)?.length || 0);
+        
         console.log("[create-client-legacy] Payload (sanitized):", JSON.stringify({
           ...dappPayload,
           email: (dappPayload.email as string)?.slice(0, 5) + '***',
           contactNumber: '***',
         }, null, 2).slice(0, 1500));
         
-        logInfo("Creating client with exact API payload structure", {
+        logInfo("Creating client with First AML manifest triggers", {
           hasApiKey: !!Deno.env.get("DRGREEN_API_KEY"),
           hasPrivateKey: !!Deno.env.get("DRGREEN_PRIVATE_KEY"),
           countryCode: (dappPayload.shipping as Record<string, string>).countryCode,
           hasClientBusiness: !!dappPayload.clientBusiness,
+          sendRequestImmediately: true,
+          phoneCodeHasPlus: (dappPayload.phoneCode as string).startsWith('+'),
         });
         
         // Call API with detailed logging enabled

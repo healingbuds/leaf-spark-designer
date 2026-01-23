@@ -334,6 +334,9 @@ export async function getOrders(clientId: string): Promise<DrGreenResponse<Order
 
 /**
  * Parse phone number into components matching WordPress format
+ * 
+ * CRITICAL: First AML requires phone numbers with + prefix.
+ * This function ensures phoneCode ALWAYS starts with +
  */
 export function parsePhoneNumber(fullNumber: string): { 
   phoneCode: string; 
@@ -346,27 +349,40 @@ export function parsePhoneNumber(fullNumber: string): {
   // Extract country code (first 1-4 digits after +)
   const match = cleaned.match(/^\+(\d{1,4})(.*)/);
   
+  // Map common prefixes to country codes
+  const prefixToCountry: Record<string, string> = {
+    '351': 'PT',
+    '44': 'GB',
+    '27': 'ZA',
+    '66': 'TH',
+    '1': 'US',
+  };
+  
   if (match) {
     const prefix = match[1];
     const number = match[2];
     
-    // Map common prefixes to country codes
-    const prefixToCountry: Record<string, string> = {
-      '351': 'PT',
-      '44': 'GB',
-      '27': 'ZA',
-      '66': 'TH',
-      '1': 'US',
-    };
-    
     return {
-      phoneCode: `+${prefix}`,
+      phoneCode: `+${prefix}`, // Always include + prefix for First AML
       phoneCountryCode: prefixToCountry[prefix] || 'PT',
       contactNumber: number,
     };
   }
   
-  // Default fallback
+  // Try to detect country code without + prefix
+  // Check if it starts with a known country prefix
+  for (const [prefix, countryCode] of Object.entries(prefixToCountry)) {
+    if (cleaned.startsWith(prefix)) {
+      const number = cleaned.slice(prefix.length);
+      return {
+        phoneCode: `+${prefix}`, // Ensure + prefix for First AML
+        phoneCountryCode: countryCode,
+        contactNumber: number,
+      };
+    }
+  }
+  
+  // Default fallback - always include + prefix
   return {
     phoneCode: '+351',
     phoneCountryCode: 'PT',

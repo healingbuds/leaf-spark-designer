@@ -14,7 +14,7 @@ import {
 import {
   User,
   MapPin,
-  Stethoscope,
+  ShieldCheck,
   CheckCircle2,
   ArrowRight,
   ArrowLeft,
@@ -24,17 +24,16 @@ import {
   Mail,
   Clock,
   Camera,
-  ShieldCheck,
   FileWarning,
-  HeartPulse,
+  Heart,
   Building2,
+  ChevronDown,
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Form,
   FormControl,
@@ -51,13 +50,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useShop } from '@/context/ShopContext';
 import { useKycJourneyLog } from '@/hooks/useKycJourneyLog';
+import { TappableYesNo } from './TappableYesNo';
+import { ConditionChips } from './ConditionChips';
 
-// Age calculation helper
+// ==================== HELPERS ====================
+
 const calculateAge = (dateOfBirth: string): number => {
   const today = new Date();
   const birthDate = new Date(dateOfBirth);
@@ -69,160 +76,72 @@ const calculateAge = (dateOfBirth: string): number => {
   return age;
 };
 
-// Valid postal code zones per country
 const validPostalZones: Record<string, { pattern: RegExp; description: string }> = {
-  PT: { 
-    pattern: /^\d{4}(-\d{3})?$/, 
-    description: 'Portuguese postal codes (e.g., 1000-001)' 
-  },
-  ZA: { 
-    pattern: /^(0[1-9]\d{2}|1[0-8]\d{2}|19[0-5]\d|[2-9]\d{3})$/, 
-    description: 'South African postal codes (0100-9999)' 
-  },
-  TH: { 
-    pattern: /^10[0-9]{3}$/, 
-    description: 'Bangkok area postal codes only (10XXX)' 
-  },
-  GB: { 
-    pattern: /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i, 
-    description: 'UK postal codes (England & Wales delivery zones)' 
-  },
+  PT: { pattern: /^\d{4}(-\d{3})?$/, description: 'Portuguese postal codes (e.g., 1000-001)' },
+  ZA: { pattern: /^(0[1-9]\d{2}|1[0-8]\d{2}|19[0-5]\d|[2-9]\d{3})$/, description: 'South African postal codes (0100-9999)' },
+  TH: { pattern: /^10[0-9]{3}$/, description: 'Bangkok area postal codes only (10XXX)' },
+  GB: { pattern: /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i, description: 'UK postal codes' },
 };
 
-// Legal minimum ages by country
 const legalAgeByCountry: Record<string, number> = {
-  PT: 18, // Portugal - Medical cannabis legal at 18
-  GB: 18, // UK - Medical cannabis legal at 18
-  ZA: 18, // South Africa - Private use legal at 18
-  TH: 20, // Thailand - Legal age for cannabis is 20
-  US: 21, // USA - Federal standard
+  PT: 18, GB: 18, ZA: 18, TH: 20, US: 21,
 };
 
-const DEFAULT_MINIMUM_AGE = 21; // Conservative fallback
+const getMinimumAge = (countryCode: string): number => legalAgeByCountry[countryCode] || 21;
 
-// Get minimum age for a country
-const getMinimumAge = (countryCode: string): number => {
-  return legalAgeByCountry[countryCode] || DEFAULT_MINIMUM_AGE;
-};
+// ==================== SCHEMAS ====================
 
-// Create personal details schema with country-specific age validation
-const createPersonalDetailsSchema = (countryCode: string) => {
-  const minimumAge = getMinimumAge(countryCode);
-  return z.object({
-    firstName: z.string().min(2, 'First name must be at least 2 characters').max(50, 'First name is too long'),
-    lastName: z.string().min(2, 'Last name must be at least 2 characters').max(50, 'Last name is too long'),
-    email: z.string().email('Invalid email address').max(255, 'Email is too long'),
-    phone: z.string().min(10, 'Phone number must be at least 10 digits').max(20, 'Phone number is too long'),
-    dateOfBirth: z.string().min(1, 'Date of birth is required').refine(
-      (dob) => {
-        const age = calculateAge(dob);
-        return age >= minimumAge;
-      },
-      { message: `You must be at least ${minimumAge} years old to register for medical cannabis in your region` }
-    ),
-    gender: z.string().min(1, 'Please select your gender'),
-  });
-};
-
-// Default schema for initial form (uses conservative age)
-const personalDetailsSchema = createPersonalDetailsSchema('US');
-
-const createAddressSchema = (country: string) => z.object({
-  street: z.string().min(5, 'Street address is required').max(200, 'Street address is too long'),
-  city: z.string().min(2, 'City is required').max(100, 'City name is too long'),
-  postalCode: z.string().min(4, 'Postal code is required').refine(
-    (code) => {
-      const zone = validPostalZones[country];
-      if (!zone) return true; // Allow if country not in our list
-      return zone.pattern.test(code.trim());
-    },
-    { message: 'Delivery is not available in your postal zone' }
-  ),
-  country: z.string().min(2, 'Country is required'),
+const step1Schema = z.object({
+  // Personal
+  firstName: z.string().min(2, 'First name required').max(50),
+  lastName: z.string().min(2, 'Last name required').max(50),
+  email: z.string().email('Invalid email').max(255),
+  phone: z.string().min(10, 'Phone must be at least 10 digits').max(20),
+  dateOfBirth: z.string().min(1, 'Date of birth required'),
+  gender: z.string().min(1, 'Please select gender'),
+  // Address
+  country: z.string().min(2, 'Country required'),
+  street: z.string().min(5, 'Street address required').max(200),
+  city: z.string().min(2, 'City required').max(100),
+  postalCode: z.string().min(4, 'Postal code required'),
 });
 
-const addressSchema = z.object({
-  street: z.string().min(5, 'Street address is required').max(200, 'Street address is too long'),
-  city: z.string().min(2, 'City is required').max(100, 'City name is too long'),
-  postalCode: z.string().min(4, 'Postal code is required'),
-  country: z.string().min(2, 'Country is required'),
+const step2Schema = z.object({
+  heartProblems: z.enum(['yes', 'no'], { required_error: 'Please answer this question' }),
+  psychosisHistory: z.enum(['yes', 'no'], { required_error: 'Please answer this question' }),
+  cannabisReaction: z.enum(['yes', 'no'], { required_error: 'Please answer this question' }),
 });
 
-// Medical history schema matching exact Dr. Green API requirements
-const medicalHistorySchema = z.object({
-  // Safety gates - Yes/No required (stored as string for radio buttons)
-  heartProblems: z.enum(['yes', 'no'], { required_error: 'This field is required' }),
-  psychosisHistory: z.enum(['yes', 'no'], { required_error: 'This field is required' }),
-  cannabisReaction: z.enum(['yes', 'no'], { required_error: 'This field is required' }),
-  // Diagnosed conditions - checkbox array
+const step3Schema = z.object({
   conditions: z.array(z.string()).default([]),
-  // Current medications - checkbox array
   medications: z.array(z.string()).default([]),
-  // Required boolean fields
-  medicalHistory1: z.boolean().default(false), // Cancer treatment
-  medicalHistory2: z.boolean().default(false), // Immunosuppressants
-  medicalHistory3: z.boolean().default(false), // Liver disease
-  medicalHistory6: z.boolean().default(false), // Suicidal history (optional per API)
-  medicalHistory8: z.boolean().default(false), // Drug abuse history
-  medicalHistory9: z.boolean().default(false), // Alcohol abuse history
-  medicalHistory10: z.boolean().default(false), // Drug services care history
-  medicalHistory11: z.string().default('0'), // Alcohol units per week
-  medicalHistory12: z.boolean().default(false), // Using cannabis to reduce other meds
-  medicalHistory13: z.string().default('never'), // How often cannabis used (API values)
-  medicalHistory14: z.array(z.string()).default(['never']), // How cannabis used (API values)
-  medicalHistory15: z.string().max(500).optional(), // Cannabis amount per day
-  otherMedicalCondition: z.string().max(500).optional(), // Other condition text
-  otherMedicalTreatments: z.string().max(500).optional(), // Other treatment text
-  prescriptionsSupplements: z.string().max(1000).optional(), // Current prescriptions
+  medicalHistory13: z.string().default('never'),
+  medicalHistory14: z.array(z.string()).default(['never']),
+  otherMedicalCondition: z.string().max(500).optional(),
+  otherMedicalTreatments: z.string().max(500).optional(),
+  prescriptionsSupplements: z.string().max(1000).optional(),
 });
 
-const medicalSchema = z.object({
-  conditions: z.string().min(10, 'Please describe your medical conditions').max(2000, 'Description is too long'),
-  currentMedications: z.string().max(1000, 'Text is too long').optional(),
-  allergies: z.string().max(500, 'Text is too long').optional(),
-  previousCannabisUse: z.boolean(),
-  doctorApproval: z.boolean().refine(
-    (val) => val === true,
-    { message: 'Healthcare provider consultation is required for medical cannabis registration' }
-  ),
-  consent: z.boolean().refine((val) => val, 'You must consent to continue'),
-});
-
-// Business registration schema
-const businessSchema = z.object({
+const step4Schema = z.object({
+  doctorApproval: z.boolean().refine(val => val === true, 'Healthcare consultation required'),
+  consent: z.boolean().refine(val => val, 'Consent required'),
   isBusiness: z.boolean().default(false),
   businessType: z.string().optional(),
   businessName: z.string().optional(),
-  businessAddress1: z.string().optional(),
-  businessAddress2: z.string().optional(),
-  businessCity: z.string().optional(),
-  businessState: z.string().optional(),
-  businessCountryCode: z.string().optional(),
-  businessPostalCode: z.string().optional(),
 });
 
-type PersonalDetails = z.infer<typeof personalDetailsSchema>;
-type Address = z.infer<typeof addressSchema>;
-type Business = z.infer<typeof businessSchema>;
-type MedicalHistory = z.infer<typeof medicalHistorySchema>;
-type Medical = z.infer<typeof medicalSchema>;
+type Step1Data = z.infer<typeof step1Schema>;
+type Step2Data = z.infer<typeof step2Schema>;
+type Step3Data = z.infer<typeof step3Schema>;
+type Step4Data = z.infer<typeof step4Schema>;
+
+// ==================== CONSTANTS ====================
 
 const steps = [
-  { id: 'personal', title: 'Personal Details', icon: User },
-  { id: 'address', title: 'Shipping Address', icon: MapPin },
-  { id: 'business', title: 'Business Details', icon: Building2 },
-  { id: 'history', title: 'Medical History', icon: HeartPulse },
-  { id: 'medical', title: 'Medical Information', icon: Stethoscope },
-  { id: 'complete', title: 'Complete', icon: CheckCircle2 },
-];
-
-const businessTypes = [
-  { value: 'dispensary', label: 'Dispensary' },
-  { value: 'clinic', label: 'Clinic' },
-  { value: 'pharmacy', label: 'Pharmacy' },
-  { value: 'wellness_center', label: 'Wellness Center' },
-  { value: 'research', label: 'Research Institution' },
-  { value: 'other', label: 'Other' },
+  { id: 'identity', title: 'Your Details', icon: User },
+  { id: 'safety', title: 'Safety Check', icon: ShieldCheck },
+  { id: 'medical', title: 'Medical Profile', icon: Heart },
+  { id: 'consent', title: 'Complete', icon: CheckCircle2 },
 ];
 
 const countries = [
@@ -232,281 +151,200 @@ const countries = [
   { code: 'GB', name: 'United Kingdom' },
 ];
 
-// Medical condition options - EXACT API VALUES per Dr. Green spec
-const conditionOptions = [
-  { value: 'adhd', label: 'ADHD' },
-  { value: 'agoraphobia', label: 'Agoraphobia' },
+const businessTypes = [
+  { value: 'dispensary', label: 'Dispensary' },
+  { value: 'clinic', label: 'Clinic' },
+  { value: 'pharmacy', label: 'Pharmacy' },
+  { value: 'other', label: 'Other' },
+];
+
+// Top 8 most common conditions for quick selection
+const topConditions = [
   { value: 'anxiety', label: 'Anxiety' },
-  { value: 'appetite_disorders', label: 'Appetite Disorders' },
-  { value: 'arthritis', label: 'Arthritis' },
-  { value: 'autistic_spectrum_disorder', label: 'Autistic Spectrum Disorder' },
-  { value: 'back_and_neck_pain', label: 'Back & Neck Pain' },
-  { value: 'bipolar', label: 'Bipolar' },
-  { value: 'chronic_and_long_term_pain', label: 'Chronic/Long-term Pain' },
-  { value: 'chronic_fatigue_syndrome', label: 'Chronic Fatigue Syndrome' },
-  { value: 'cluster_headaches', label: 'Cluster Headaches' },
-  { value: 'complex_regional_pain_syndrome', label: 'Complex Regional Pain Syndrome' },
+  { value: 'chronic_and_long_term_pain', label: 'Chronic Pain' },
   { value: 'depression', label: 'Depression' },
-  { value: 'endometriosis', label: 'Endometriosis' },
-  { value: 'epilepsy', label: 'Epilepsy' },
-  { value: 'fibromyalgia', label: 'Fibromyalgia' },
-  { value: 'irritable_bowel_syndrome', label: 'Irritable Bowel Syndrome' },
+  { value: 'sleep_disorders', label: 'Sleep Issues' },
+  { value: 'back_and_neck_pain', label: 'Back Pain' },
+  { value: 'arthritis', label: 'Arthritis' },
   { value: 'migraine', label: 'Migraine' },
+  { value: 'post_traumatic_stress_disorder', label: 'PTSD' },
+];
+
+const allConditions = [
+  ...topConditions,
+  { value: 'adhd', label: 'ADHD' },
+  { value: 'fibromyalgia', label: 'Fibromyalgia' },
+  { value: 'epilepsy', label: 'Epilepsy' },
   { value: 'multiple_sclerosis_pain_and_muscle_spasm', label: 'Multiple Sclerosis' },
   { value: 'nerve_pain', label: 'Nerve Pain' },
+  { value: 'endometriosis', label: 'Endometriosis' },
+  { value: 'irritable_bowel_syndrome', label: 'IBS' },
+  { value: 'parkinsons_disease', label: "Parkinson's" },
+  { value: 'bipolar', label: 'Bipolar' },
   { value: 'ocd', label: 'OCD' },
-  { value: 'parkinsons_disease', label: "Parkinson's Disease" },
-  { value: 'post_traumatic_stress_disorder', label: 'PTSD' },
+  { value: 'chronic_fatigue_syndrome', label: 'Chronic Fatigue' },
   { value: 'sciatica', label: 'Sciatica' },
-  { value: 'sleep_disorders', label: 'Sleep Disorders/Insomnia' },
   { value: 'tourette_syndrome', label: 'Tourette Syndrome' },
-  { value: 'trigeminal_neuralgia', label: 'Trigeminal Neuralgia' },
   { value: 'other_medical_condition', label: 'Other' },
 ];
 
-// Medication options - EXACT API VALUES per Dr. Green spec
-const medicationOptions = [
+const topMedications = [
+  { value: 'gabapentin', label: 'Gabapentin' },
   { value: 'amitriptyline', label: 'Amitriptyline' },
   { value: 'codeine', label: 'Codeine' },
+  { value: 'tramadol', label: 'Tramadol' },
   { value: 'diazepam', label: 'Diazepam' },
-  { value: 'diclofenac', label: 'Diclofenac' },
+  { value: 'sertraline', label: 'Sertraline' },
+];
+
+const allMedications = [
+  ...topMedications,
   { value: 'fluoxetine', label: 'Fluoxetine' },
-  { value: 'gabapentin', label: 'Gabapentin' },
-  { value: 'lorazepam', label: 'Lorazepam' },
-  { value: 'melatonin', label: 'Melatonin' },
   { value: 'mirtazapine', label: 'Mirtazapine' },
   { value: 'morphine', label: 'Morphine' },
-  { value: 'naproxen', label: 'Naproxen' },
   { value: 'oxycodone', label: 'Oxycodone' },
-  { value: 'sertraline', label: 'Sertraline' },
-  { value: 'tramadol', label: 'Tramadol' },
+  { value: 'naproxen', label: 'Naproxen' },
+  { value: 'diclofenac', label: 'Diclofenac' },
   { value: 'venlafaxine', label: 'Venlafaxine' },
+  { value: 'lorazepam', label: 'Lorazepam' },
   { value: 'zolpidem', label: 'Zolpidem' },
   { value: 'zopiclone', label: 'Zopiclone' },
+  { value: 'melatonin', label: 'Melatonin' },
   { value: 'other_prescribed_medicines_treatments', label: 'Other' },
 ];
 
-// Legacy medical history field labels for additional checkboxes
-const medicalHistoryFields = [
-  { key: 'medicalHistory1', label: 'Currently treated for cancer', description: 'Undergoing chemotherapy, radiation, or other cancer treatments' },
-  { key: 'medicalHistory2', label: 'Taking immunosuppressants', description: 'Medications that suppress the immune system' },
-  { key: 'medicalHistory3', label: 'History of liver disease', description: 'Including hepatitis, cirrhosis, or fatty liver' },
-  { key: 'medicalHistory6', label: 'History of suicidal thoughts or self-harm', description: 'Past or current suicidal ideation' },
-  { key: 'medicalHistory8', label: 'History of drug abuse or dependency', description: 'Including heroin, cocaine, prescription drug abuse' },
-  { key: 'medicalHistory9', label: 'History of alcohol abuse', description: 'Past or current alcohol dependency' },
-  { key: 'medicalHistory10', label: 'History of drug services care', description: 'Previous treatment for substance abuse' },
-  { key: 'medicalHistory12', label: 'Using cannabis to reduce other medications', description: 'Seeking to reduce reliance on other prescribed medications' },
-] as const;
-
-// Cannabis frequency options - EXACT API VALUES
 const cannabisUsageOptions = [
   { value: 'never', label: 'Never used' },
-  { value: '1_2_times_per_week', label: 'Occasionally (1-2 times/week)' },
-  { value: 'every_other_day', label: 'Regularly (every other day)' },
+  { value: '1_2_times_per_week', label: '1-2 times/week' },
+  { value: 'every_other_day', label: 'Every other day' },
   { value: 'everyday', label: 'Daily' },
 ];
 
-// Cannabis method options - EXACT API VALUES
 const cannabisMethodOptions = [
-  { value: 'never', label: 'Never used' },
-  { value: 'smoking_joints', label: 'Smoking (Joints)' },
+  { value: 'never', label: 'Never' },
   { value: 'vaporizing', label: 'Vaporizing' },
-  { value: 'ingestion', label: 'Edibles/Oils/Tinctures' },
+  { value: 'ingestion', label: 'Oils/Edibles' },
+  { value: 'smoking_joints', label: 'Smoking' },
   { value: 'topical', label: 'Topical' },
 ];
+
+// ==================== COMPONENT ====================
 
 export function ClientOnboarding() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
-  const [ageError, setAgeError] = useState<string | null>(null);
-  const [postalError, setPostalError] = useState<string | null>(null);
   const [kycLinkReceived, setKycLinkReceived] = useState<boolean | null>(null);
   const [storedClientId, setStoredClientId] = useState<string | null>(null);
   const [kycStatus, setKycStatus] = useState<'idle' | 'verifying' | 'success' | 'error'>('idle');
   const [kycProgress, setKycProgress] = useState(0);
   const [documentError, setDocumentError] = useState<string | null>(null);
   const [formData, setFormData] = useState<{
-    personal?: PersonalDetails;
-    address?: Address;
-    business?: Business;
-    medicalHistory?: MedicalHistory;
-    medical?: Medical;
+    step1?: Step1Data;
+    step2?: Step2Data;
+    step3?: Step3Data;
+    step4?: Step4Data;
   }>({});
+  
   const { toast } = useToast();
   const navigate = useNavigate();
   const { refreshClient } = useShop();
   const { logEvent } = useKycJourneyLog();
 
-  // Check for existing registration on mount
+  // Check existing registration
   useEffect(() => {
-    const checkExistingRegistration = async () => {
+    const checkExisting = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const { data: existingClient } = await supabase
         .from('drgreen_clients')
-        .select('id, drgreen_client_id, is_kyc_verified, admin_approval, kyc_link')
+        .select('id')
         .eq('user_id', user.id)
         .maybeSingle();
 
       if (existingClient) {
-        // User already registered - redirect to dashboard
         navigate('/patient-dashboard');
         return;
       }
     };
-
-    checkExistingRegistration();
-    logEvent('registration.started', 'pending', { step: 0, stepName: 'personal' });
+    checkExisting();
+    logEvent('registration.started', 'pending', { step: 0 });
   }, [navigate, logEvent]);
 
-  const personalForm = useForm<PersonalDetails>({
-    resolver: zodResolver(personalDetailsSchema),
-    defaultValues: formData.personal || {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      dateOfBirth: '',
-      gender: '',
+  // Forms
+  const step1Form = useForm<Step1Data>({
+    resolver: zodResolver(step1Schema),
+    defaultValues: formData.step1 || {
+      firstName: '', lastName: '', email: '', phone: '',
+      dateOfBirth: '', gender: '',
+      country: 'PT', street: '', city: '', postalCode: '',
     },
   });
 
-  const addressForm = useForm<Address>({
-    resolver: zodResolver(addressSchema),
-    defaultValues: formData.address || {
-      street: '',
-      city: '',
-      postalCode: '',
-      country: 'PT',
+  const step2Form = useForm<Step2Data>({
+    resolver: zodResolver(step2Schema),
+    defaultValues: formData.step2 || {},
+  });
+
+  const step3Form = useForm<Step3Data>({
+    resolver: zodResolver(step3Schema),
+    defaultValues: formData.step3 || {
+      conditions: [], medications: [],
+      medicalHistory13: 'never', medicalHistory14: ['never'],
     },
   });
 
-  const businessForm = useForm<Business>({
-    resolver: zodResolver(businessSchema),
-    defaultValues: formData.business || {
-      isBusiness: false,
-      businessType: '',
-      businessName: '',
-      businessAddress1: '',
-      businessAddress2: '',
-      businessCity: '',
-      businessState: '',
-      businessCountryCode: '',
-      businessPostalCode: '',
+  const step4Form = useForm<Step4Data>({
+    resolver: zodResolver(step4Schema),
+    defaultValues: formData.step4 || {
+      doctorApproval: false, consent: false, isBusiness: false,
     },
   });
 
-  const medicalHistoryForm = useForm<MedicalHistory>({
-    resolver: zodResolver(medicalHistorySchema),
-    defaultValues: formData.medicalHistory || {
-      // Safety gates - required Yes/No
-      heartProblems: undefined,
-      psychosisHistory: undefined,
-      cannabisReaction: undefined,
-      // Condition and medication arrays
-      conditions: [],
-      medications: [],
-      // Boolean fields
-      medicalHistory1: false,
-      medicalHistory2: false,
-      medicalHistory3: false,
-      medicalHistory6: false,
-      medicalHistory8: false,
-      medicalHistory9: false,
-      medicalHistory10: false,
-      medicalHistory11: '0',
-      medicalHistory12: false,
-      medicalHistory13: 'never', // API value
-      medicalHistory14: ['never'], // API value
-      medicalHistory15: '',
-      otherMedicalCondition: '',
-      otherMedicalTreatments: '',
-      prescriptionsSupplements: '',
-    },
-  });
-
-  const medicalForm = useForm<Medical>({
-    resolver: zodResolver(medicalSchema),
-    defaultValues: formData.medical || {
-      conditions: '',
-      currentMedications: '',
-      allergies: '',
-      previousCannabisUse: false,
-      doctorApproval: false,
-      consent: false,
-    },
-  });
-
-  // Watch country for age and postal code validation
-  const selectedCountry = addressForm.watch('country') || 'PT';
+  const selectedCountry = step1Form.watch('country') || 'PT';
   const minimumAge = getMinimumAge(selectedCountry);
 
-  const handlePersonalSubmit = (data: PersonalDetails) => {
-    // Double-check age validation with country-specific minimum
-    const minAge = getMinimumAge(selectedCountry);
+  // ==================== HANDLERS ====================
+
+  const handleStep1Submit = (data: Step1Data) => {
+    // Age validation
     const age = calculateAge(data.dateOfBirth);
-    if (age < minAge) {
-      logEvent('registration.step_completed', 'pending', { step: 0, stepName: 'personal', blocked: true, reason: 'age' });
-      // Redirect to Not Eligible page with context
-      navigate('/not-eligible', { 
-        state: { 
-          reason: 'age', 
-          country: countries.find(c => c.code === selectedCountry)?.name,
-          minimumAge: minAge 
-        } 
-      });
+    if (age < minimumAge) {
+      navigate('/not-eligible', { state: { reason: 'age', minimumAge } });
       return;
     }
-    setAgeError(null);
-    setFormData((prev) => ({ ...prev, personal: data }));
-    logEvent('registration.step_completed', 'pending', { step: 0, stepName: 'personal' });
+    // Postal validation
+    const zone = validPostalZones[data.country];
+    if (zone && !zone.pattern.test(data.postalCode.trim())) {
+      navigate('/not-eligible', { state: { reason: 'postal', country: data.country } });
+      return;
+    }
+    setFormData(prev => ({ ...prev, step1: data }));
+    logEvent('registration.step_completed', 'pending', { step: 0 });
     setCurrentStep(1);
   };
 
-  const handleAddressSubmit = (data: Address) => {
-    // Validate postal code against country zones
-    const zone = validPostalZones[data.country];
-    if (zone && !zone.pattern.test(data.postalCode.trim())) {
-      logEvent('registration.step_completed', 'pending', { step: 1, stepName: 'address', blocked: true, reason: 'postal' });
-      // Redirect to Not Eligible page with context
-      navigate('/not-eligible', { 
-        state: { 
-          reason: 'postal',
-          country: countries.find(c => c.code === data.country)?.name
-        } 
-      });
-      return;
-    }
-    setPostalError(null);
-    setFormData((prev) => ({ ...prev, address: data }));
-    logEvent('registration.step_completed', 'pending', { step: 1, stepName: 'address', countryCode: data.country });
-    setCurrentStep(2); // Go to Business Details step
+  const handleStep2Submit = (data: Step2Data) => {
+    setFormData(prev => ({ ...prev, step2: data }));
+    logEvent('registration.step_completed', 'pending', { step: 1 });
+    setCurrentStep(2);
   };
 
-  const handleBusinessSubmit = (data: Business) => {
-    setFormData((prev) => ({ ...prev, business: data }));
-    logEvent('registration.step_completed', 'pending', { step: 2, stepName: 'business', isBusiness: data.isBusiness });
-    setCurrentStep(3); // Go to Medical History step
+  const handleStep3Submit = (data: Step3Data) => {
+    setFormData(prev => ({ ...prev, step3: data }));
+    logEvent('registration.step_completed', 'pending', { step: 2 });
+    setCurrentStep(3);
   };
 
-  const handleMedicalHistorySubmit = (data: MedicalHistory) => {
-    setFormData((prev) => ({ ...prev, medicalHistory: data }));
-    logEvent('registration.step_completed', 'pending', { step: 3, stepName: 'medical_history' });
-    setCurrentStep(4); // Go to Medical Information step
-  };
-
-  const handleMedicalSubmit = async (data: Medical) => {
-    setFormData((prev) => ({ ...prev, medical: data }));
-    logEvent('registration.step_completed', 'pending', { step: 4, stepName: 'medical' });
-    logEvent('registration.submitted', 'pending', { countryCode: formData.address?.country });
+  const handleStep4Submit = async (data: Step4Data) => {
+    setFormData(prev => ({ ...prev, step4: data }));
+    logEvent('registration.submitted', 'pending', { countryCode: formData.step1?.country });
     setIsSubmitting(true);
     setDocumentError(null);
     setKycStatus('verifying');
     setKycProgress(0);
 
-    // Simulate progress while waiting for API
     const progressInterval = setInterval(() => {
       setKycProgress(prev => Math.min(prev + 10, 90));
     }, 500);
@@ -516,333 +354,160 @@ export function ClientOnboarding() {
       if (!user) {
         clearInterval(progressInterval);
         setKycStatus('idle');
-        toast({
-          title: 'Authentication required',
-          description: 'Please sign in to continue.',
-          variant: 'destructive',
-        });
+        toast({ title: 'Please sign in', variant: 'destructive' });
         return;
       }
 
-      // Prepare client data
+      // Build legacy payload from combined form data
+      const legacyPayload = buildLegacyClientPayload({
+        personal: {
+          firstName: formData.step1!.firstName,
+          lastName: formData.step1!.lastName,
+          email: formData.step1!.email,
+          phone: formData.step1!.phone,
+          dateOfBirth: formData.step1!.dateOfBirth,
+          gender: formData.step1!.gender,
+        },
+        address: {
+          street: formData.step1!.street,
+          city: formData.step1!.city,
+          postalCode: formData.step1!.postalCode,
+          country: formData.step1!.country,
+        },
+        business: data.isBusiness ? {
+          isBusiness: true,
+          businessType: data.businessType,
+          businessName: data.businessName,
+        } : undefined,
+        medicalHistory: {
+          heartProblems: formData.step2!.heartProblems,
+          psychosisHistory: formData.step2!.psychosisHistory,
+          cannabisReaction: formData.step2!.cannabisReaction,
+          conditions: formData.step3!.conditions,
+          medications: formData.step3!.medications,
+          medicalHistory13: formData.step3!.medicalHistory13,
+          medicalHistory14: formData.step3!.medicalHistory14,
+          otherMedicalCondition: formData.step3!.otherMedicalCondition,
+          otherMedicalTreatments: formData.step3!.otherMedicalTreatments,
+          prescriptionsSupplements: formData.step3!.prescriptionsSupplements,
+        },
+      });
+
+      console.log('[Registration] Payload:', JSON.stringify(legacyPayload, null, 2));
+
       let clientId = `local-${Date.now()}`;
       let kycLink = null;
       let apiSuccess = false;
 
-      // Build legacy-compatible payload
-      const legacyPayload = buildLegacyClientPayload({
-        personal: formData.personal as {
-          firstName: string;
-          lastName: string;
-          email: string;
-          phone: string;
-          dateOfBirth: string;
-          gender?: string;
-        },
-        address: formData.address as {
-          street: string;
-          city: string;
-          postalCode: string;
-          country: string;
-          state?: string;
-        },
-        business: formData.business,
-        medicalHistory: formData.medicalHistory || {},
-      });
-
-      // Debug logging for testing
-      console.log('[Registration] Form data collected:', {
-        personal: formData.personal,
-        address: formData.address,
-        business: formData.business,
-        medicalHistory: formData.medicalHistory,
-      });
-      console.log('[Registration] Legacy payload built:', JSON.stringify(legacyPayload, null, 2));
-      console.log('[Registration] Has clientBusiness:', !!legacyPayload.clientBusiness);
-
-      // Check if mock mode is enabled
       const mockStatus = getMockModeStatus();
       if (mockStatus.enabled) {
-        console.log('[Registration] 🎭 MOCK MODE ENABLED via', mockStatus.source);
+        console.log('[Registration] Mock mode enabled');
       }
 
-      // Try to call edge function to create client (non-blocking)
       try {
-        // === MOCK MODE: Simulate successful API response ===
         if (isMockModeEnabled()) {
-          console.log('[Registration] 🎭 ========== MOCK MODE ACTIVE ==========');
-          console.log('[Registration] 🎭 Simulating API call with delay...');
-          
           await simulateApiDelay(800, 1500);
-          
           const mockResponse = createMockClientResponse({
-            email: formData.personal?.email || '',
-            firstName: formData.personal?.firstName || '',
-            lastName: formData.personal?.lastName || '',
-            countryCode: formData.address?.country || 'PT',
+            email: formData.step1?.email || '',
+            firstName: formData.step1?.firstName || '',
+            lastName: formData.step1?.lastName || '',
+            countryCode: formData.step1?.country || 'PT',
           });
-          
-          console.log('[Registration] 🎭 Mock response:', mockResponse);
-          
           clientId = mockResponse.clientId;
           kycLink = mockResponse.kycLink;
           apiSuccess = true;
-          
-          logEvent('registration.success', clientId, { 
-            hasKycLink: true, 
-            countryCode: formData.address?.country,
-            mockMode: true 
-          });
-          
-          toast({
-            title: '🎭 Mock Mode Active',
-            description: 'Registration simulated successfully. This is test mode.',
-          });
-          
+          toast({ title: '🎭 Mock Mode', description: 'Registration simulated.' });
         } else {
-          // === LIVE MODE: Call real API ===
-          console.log('[Registration] ========== PRE-REQUEST DIAGNOSTICS ==========');
-          console.log('[Registration] Timestamp:', new Date().toISOString());
-          console.log('[Registration] Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
-          console.log('[Registration] User ID:', user.id);
-          
-          // Verify session is still valid
-          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-          console.log('[Registration] Session check:', { 
-            hasSession: !!session, 
-            error: sessionError?.message,
-            expiresAt: session?.expires_at,
-            tokenLength: session?.access_token?.length 
-          });
-          
-          if (!session) {
-            console.error('[Registration] No valid session - user may need to re-authenticate');
-            toast({
-              title: 'Session expired',
-              description: 'Please sign in again to complete registration.',
-              variant: 'destructive',
-            });
-            setIsSubmitting(false);
-            clearInterval(progressInterval);
-            return;
-          }
-          
-          // Quick health check to verify edge function is reachable
-          console.log('[Registration] Running health check...');
-          const healthCheck = await supabase.functions.invoke('drgreen-proxy', {
-            body: { action: 'health-check' }
-          });
-          console.log('[Registration] Health check result:', healthCheck);
-          
-          if (healthCheck.error) {
-            console.error('[Registration] Health check failed:', healthCheck.error);
-          }
-          
-          console.log('[Registration] ========== CALLING DRGREEN-PROXY ==========');
-          console.log('[Registration] Action: create-client-legacy');
-          
           const { data: result, error } = await supabase.functions.invoke('drgreen-proxy', {
-            body: {
-              action: 'create-client-legacy',
-              payload: legacyPayload,
-            },
+            body: { action: 'create-client-legacy', payload: legacyPayload },
           });
-          
-          console.log('[Registration] ========== EDGE FUNCTION RESPONSE ==========');
-          console.log('[Registration] Result:', JSON.stringify(result, null, 2));
-          console.log('[Registration] Error:', error ? JSON.stringify(error, null, 2) : 'none');
-          console.log('[Registration] Result type:', typeof result);
-          console.log('[Registration] Has clientId:', !!result?.clientId);
-          console.log('[Registration] Has kycLink:', !!result?.kycLink);
 
-          // Handle 422 Unprocessable Entity (e.g., blurry ID)
-          if (error) {
-            const errorData = error as any;
-            if (errorData?.context?.status === 422 || result?.errorCode === 'DOCUMENT_QUALITY') {
-              clearInterval(progressInterval);
-              setKycStatus('error');
-              setDocumentError('document_quality');
-              setIsSubmitting(false);
-              return;
-            }
+          console.log('[Registration] API Response:', result);
+
+          if (error?.context?.status === 422) {
+            clearInterval(progressInterval);
+            setKycStatus('error');
+            setDocumentError('document_quality');
+            setIsSubmitting(false);
+            return;
           }
 
           if (!error && result?.clientId) {
             clientId = result.clientId;
-            // Note: Dr Green API doesn't return kycLink - email is sent directly to customer
-            // We check kycEmailSent (derived from message field) instead
-            kycLink = result.kycLink || null;  // Will be null per API design
+            kycLink = result.kycLink || null;
             apiSuccess = true;
-            
-            // Log success with new fields from Postman docs
-            logEvent('registration.success', clientId, { 
-              hasKycLink: !!kycLink,
-              kycEmailSent: result.kycEmailSent || false,
-              caseId: result.caseId || null,
-              countryCode: formData.address?.country,
-            });
-            
-            // Log KYC email status based on message field (per Postman docs)
-            if (result.kycEmailSent) {
-              logEvent('kyc.email_sent', clientId, { 
-                message: result.message,
-                caseId: result.caseId,
-              });
-              console.log('[Registration] ✓ KYC email confirmed sent by Dr Green');
-            } else if (result.message) {
-              console.log('[Registration] API message:', result.message);
-            }
-          }
-          
-          // Check for API-level errors in the result (even without JS error)
-          if (result?.error || result?.statusCode >= 400) {
-            console.warn('[Registration] Dr Green API returned error:', {
-              error: result?.error,
-              statusCode: result?.statusCode,
-              message: result?.message,
-            });
-            logEvent('registration.api_error', 'pending', { 
-              error: result?.error || 'Unknown',
-              statusCode: result?.statusCode,
-            });
           }
         }
       } catch (apiError: any) {
-        console.error('[Registration] ========== API CALL FAILED ==========');
-        console.error('[Registration] Error type:', typeof apiError);
-        console.error('[Registration] Error name:', apiError?.name);
-        console.error('[Registration] Error message:', apiError?.message);
-        console.error('[Registration] Error status:', apiError?.status);
-        console.error('[Registration] Error stack:', apiError?.stack);
-        console.error('[Registration] Full error object:', JSON.stringify(apiError, Object.getOwnPropertyNames(apiError), 2));
-        
-        // Check for 422 error in catch block
-        if (apiError?.status === 422 || apiError?.message?.includes('Unprocessable')) {
+        console.error('[Registration] API Error:', apiError);
+        if (apiError?.status === 422) {
           clearInterval(progressInterval);
           setKycStatus('error');
           setDocumentError('document_quality');
-          logEvent('registration.error', 'pending', { error: 'document_quality' });
           setIsSubmitting(false);
           return;
         }
-        // Edge function failed - continue with local client ID
-        console.warn('[Registration] Dr Green API unavailable, using local client ID');
-        logEvent('registration.error', 'pending', { error: 'api_unavailable', errorMessage: apiError?.message });
-        
-        // Show user feedback about fallback
-        toast({
-          title: 'Registration saved locally',
-          description: 'We saved your details but could not connect to the verification service. Our team will contact you.',
-        });
+        toast({ title: 'Saved locally', description: 'Our team will contact you.' });
       }
 
       clearInterval(progressInterval);
       setKycProgress(100);
 
-      // Store client info locally (upsert to handle re-registration attempts)
-      // Include email, full_name, and case_id for tracking
-      const { error: dbError } = await supabase.from('drgreen_clients').upsert({
+      // Save to database
+      await supabase.from('drgreen_clients').upsert({
         user_id: user.id,
         drgreen_client_id: clientId,
-        country_code: formData.address?.country || 'PT',
+        country_code: formData.step1?.country || 'PT',
         is_kyc_verified: false,
         admin_approval: 'PENDING',
-        kyc_link: kycLink,  // Will be null (Dr Green sends email directly)
-        email: formData.personal?.email || null,
-        full_name: formData.personal ? `${formData.personal.firstName} ${formData.personal.lastName}`.trim() : null,
-        // case_id will be added in migration
-      }, {
-        onConflict: 'user_id',
-      });
-
-      if (dbError) {
-        // Only show error if DB upsert fails
-        throw dbError;
-      }
+        kyc_link: kycLink,
+        email: formData.step1?.email || null,
+        full_name: `${formData.step1?.firstName} ${formData.step1?.lastName}`.trim(),
+      }, { onConflict: 'user_id' });
 
       await refreshClient();
       setStoredClientId(clientId);
       setKycLinkReceived(!!kycLink);
       setKycStatus('success');
-      setCurrentStep(5); // Go to Complete step
+      setCurrentStep(4);
 
-      // Send welcome email
+      // Send emails
       try {
-        console.log('[Registration] Sending welcome email...');
         await supabase.functions.invoke('send-client-email', {
           body: {
             type: 'welcome',
-            email: formData.personal?.email,
-            name: `${formData.personal?.firstName} ${formData.personal?.lastName}`,
-            region: formData.address?.country || 'global',
-            kycLink: kycLink || undefined,
-            clientId: clientId,
+            email: formData.step1?.email,
+            name: `${formData.step1?.firstName} ${formData.step1?.lastName}`,
+            region: formData.step1?.country || 'global',
+            clientId,
           },
         });
-        console.log('[Registration] Welcome email sent successfully');
-      } catch (emailError) {
-        // Don't fail registration if email fails
-        console.warn('[Registration] Failed to send welcome email:', emailError);
+      } catch (e) {
+        console.warn('[Registration] Email failed:', e);
       }
 
-      // Send dedicated KYC verification email if link is available
-      if (kycLink) {
-        try {
-          console.log('[Registration] Sending KYC verification email...');
-          await supabase.functions.invoke('send-client-email', {
-            body: {
-              type: 'kyc-link',
-              email: formData.personal?.email,
-              name: `${formData.personal?.firstName} ${formData.personal?.lastName}`,
-              region: formData.address?.country || 'global',
-              kycLink: kycLink,
-              clientId: clientId,
-            },
-          });
-          console.log('[Registration] KYC verification email sent successfully');
-        } catch (emailError) {
-          console.warn('[Registration] Failed to send KYC email:', emailError);
-        }
-      }
-
-      // Show appropriate toast based on API success
-      // Per Postman docs: Dr Green sends KYC email directly, no link returned in response
-      if (apiSuccess) {
-        toast({
-          title: 'Registration complete! ✓',
-          description: 'Check your email for your KYC verification link from First AML.',
-        });
-      } else {
-        toast({
-          title: 'Registration saved',
-          description: 'Your information is saved. Our team will contact you shortly.',
-        });
-      }
-    } catch (error: any) {
+      toast({
+        title: apiSuccess ? 'Registration complete! ✓' : 'Registration saved',
+        description: apiSuccess 
+          ? 'Check your email for verification instructions.' 
+          : 'Our team will contact you shortly.',
+      });
+    } catch (error) {
       clearInterval(progressInterval);
       setKycStatus('idle');
       console.error('Registration error:', error);
-      toast({
-        title: 'Something went wrong',
-        description: 'Please try again. Contact support if the problem persists.',
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', description: 'Please try again.', variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Retry submission after document quality error
   const retrySubmission = () => {
     setDocumentError(null);
     setKycStatus('idle');
-    // Re-trigger submission with existing form data
-    if (formData.medical) {
-      handleMedicalSubmit(formData.medical);
-    }
+    if (formData.step4) handleStep4Submit(formData.step4);
   };
 
-  // Retry function to request verification link
   const retryKycLink = async () => {
     setIsRetrying(true);
     try {
@@ -852,37 +517,21 @@ export function ClientOnboarding() {
       const { data: result, error } = await supabase.functions.invoke('drgreen-proxy', {
         body: {
           action: 'request-kyc-link',
-          data: {
-            clientId: storedClientId,
-            personal: formData.personal,
-            address: formData.address,
-          },
+          data: { clientId: storedClientId },
         },
       });
 
       if (!error && result?.kycLink) {
-        // Update the stored KYC link
         await supabase.from('drgreen_clients')
           .update({ kyc_link: result.kycLink })
           .eq('user_id', user.id);
-
         setKycLinkReceived(true);
-        toast({
-          title: 'Verification link sent!',
-          description: 'Please check your email.',
-        });
+        toast({ title: 'Verification link sent!', description: 'Check your email.' });
       } else {
-        toast({
-          title: 'Still processing',
-          description: 'Please contact support if the problem persists.',
-        });
+        toast({ title: 'Still processing', description: 'Contact support if needed.' });
       }
-    } catch (error) {
-      console.error('Retry KYC error:', error);
-      toast({
-        title: 'Still processing',
-        description: 'Please contact support if the problem persists.',
-      });
+    } catch {
+      toast({ title: 'Still processing', description: 'Contact support if needed.' });
     } finally {
       setIsRetrying(false);
     }
@@ -892,182 +541,181 @@ export function ClientOnboarding() {
     if (currentStep > 0) setCurrentStep(currentStep - 1);
   };
 
+  // ==================== RENDER ====================
+
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
-      {/* Progress indicator */}
+    <div className="max-w-2xl mx-auto py-6 px-4">
+      {/* Progress */}
       <div className="mb-8">
-        <div className="flex justify-between">
-          {steps.map((step, index) => (
-            <div
-              key={step.id}
-              className={`flex flex-col items-center ${
-                index <= currentStep ? 'text-primary' : 'text-muted-foreground'
-              }`}
-            >
-              <div
-                className={`h-10 w-10 rounded-full flex items-center justify-center mb-2 ${
-                  index < currentStep
-                    ? 'bg-primary text-primary-foreground'
-                    : index === currentStep
-                    ? 'bg-primary/20 text-primary border-2 border-primary'
-                    : 'bg-muted text-muted-foreground'
-                }`}
-              >
-                {index < currentStep ? (
-                  <CheckCircle2 className="h-5 w-5" />
-                ) : (
-                  <step.icon className="h-5 w-5" />
-                )}
+        <div className="flex justify-between mb-3">
+          {steps.map((step, idx) => (
+            <div key={step.id} className="flex flex-col items-center flex-1">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                idx < currentStep ? 'bg-primary text-primary-foreground' :
+                idx === currentStep ? 'bg-primary text-primary-foreground ring-4 ring-primary/20' :
+                'bg-muted text-muted-foreground'
+              }`}>
+                {idx < currentStep ? <CheckCircle2 className="h-5 w-5" /> : <step.icon className="h-5 w-5" />}
               </div>
-              <span className="text-xs hidden sm:block">{step.title}</span>
+              <span className={`text-xs mt-2 text-center hidden sm:block ${
+                idx <= currentStep ? 'text-foreground font-medium' : 'text-muted-foreground'
+              }`}>
+                {step.title}
+              </span>
             </div>
           ))}
         </div>
-        <div className="relative mt-2">
-          <div className="absolute h-1 bg-muted w-full rounded" />
-          <motion.div
-            className="absolute h-1 bg-primary rounded"
-            initial={{ width: '0%' }}
-            animate={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
-            transition={{ duration: 0.3 }}
-          />
-        </div>
+        <Progress value={(currentStep / (steps.length - 1)) * 100} className="h-1.5" />
       </div>
 
       <AnimatePresence mode="wait">
-        {/* Step 1: Personal Details */}
+        {/* ==================== STEP 1: Identity + Address ==================== */}
         {currentStep === 0 && (
           <motion.div
-            key="personal"
+            key="step1"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
           >
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  Personal Details
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <User className="h-5 w-5 text-primary" />
+                  Your Details
                 </CardTitle>
+                <p className="text-sm text-muted-foreground">We need some basic information to get started</p>
               </CardHeader>
               <CardContent>
-                <Form {...personalForm}>
-                  <form
-                    onSubmit={personalForm.handleSubmit(handlePersonalSubmit)}
-                    className="space-y-4"
-                  >
+                <Form {...step1Form}>
+                  <form onSubmit={step1Form.handleSubmit(handleStep1Submit)} className="space-y-5">
+                    {/* Name row */}
                     <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={personalForm.control}
-                        name="firstName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>First Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="John" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={personalForm.control}
-                        name="lastName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Last Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Doe" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      <FormField control={step1Form.control} name="firstName" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>First Name</FormLabel>
+                          <FormControl><Input placeholder="John" {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={step1Form.control} name="lastName" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Last Name</FormLabel>
+                          <FormControl><Input placeholder="Doe" {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
                     </div>
-                    <FormField
-                      control={personalForm.control}
-                      name="email"
-                      render={({ field }) => (
+
+                    {/* Contact row */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <FormField control={step1Form.control} name="email" render={({ field }) => (
                         <FormItem>
                           <FormLabel>Email</FormLabel>
+                          <FormControl><Input type="email" placeholder="you@example.com" {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={step1Form.control} name="phone" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone</FormLabel>
+                          <FormControl><Input placeholder="+351 912 345 678" {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </div>
+
+                    {/* DOB + Gender row */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField control={step1Form.control} name="dateOfBirth" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Date of Birth</FormLabel>
                           <FormControl>
-                            <Input
-                              type="email"
-                              placeholder="john@example.com"
-                              {...field}
+                            <Input 
+                              type="date" 
+                              max={new Date(new Date().setFullYear(new Date().getFullYear() - minimumAge)).toISOString().split('T')[0]}
+                              {...field} 
                             />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={personalForm.control}
-                      name="phone"
-                      render={({ field }) => (
+                      )} />
+                      <FormField control={step1Form.control} name="gender" render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Phone Number</FormLabel>
-                          <FormControl>
-                            <Input placeholder="+351 123 456 789" {...field} />
-                          </FormControl>
+                          <FormLabel>Gender</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger></FormControl>
+                            <SelectContent>
+                              <SelectItem value="male">Male</SelectItem>
+                              <SelectItem value="female">Female</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                              <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
-                      )}
-                    />
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={personalForm.control}
-                        name="dateOfBirth"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Date of Birth</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="date" 
-                                max={new Date(new Date().setFullYear(new Date().getFullYear() - minimumAge)).toISOString().split('T')[0]}
-                                {...field} 
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={personalForm.control}
-                        name="gender"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Gender</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="male">Male</SelectItem>
-                                <SelectItem value="female">Female</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
-                                <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      )} />
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      You must be at least {minimumAge} years old to register in {countries.find(c => c.code === selectedCountry)?.name || 'your region'}
-                    </p>
-                    {ageError && (
-                      <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
-                        <AlertTriangle className="h-4 w-4 flex-shrink-0" />
-                        <span>{ageError}</span>
+
+                    {/* Divider */}
+                    <div className="relative py-2">
+                      <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border/50" /></div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-card px-2 text-muted-foreground flex items-center gap-1">
+                          <MapPin className="h-3 w-3" /> Shipping Address
+                        </span>
                       </div>
-                    )}
-                    <Button type="submit" className="w-full">
-                      Continue
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </div>
+
+                    {/* Country */}
+                    <FormField control={step1Form.control} name="country" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Country</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl><SelectTrigger><SelectValue placeholder="Select country" /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            {countries.map(c => <SelectItem key={c.code} value={c.code}>{c.name}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+
+                    {/* Street */}
+                    <FormField control={step1Form.control} name="street" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Street Address</FormLabel>
+                        <FormControl><Input placeholder="123 Main Street, Apt 4" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+
+                    {/* City + Postal */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField control={step1Form.control} name="city" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>City</FormLabel>
+                          <FormControl><Input placeholder="Lisbon" {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={step1Form.control} name="postalCode" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Postal Code</FormLabel>
+                          <FormControl><Input placeholder="1000-001" {...field} /></FormControl>
+                          <FormMessage />
+                          {validPostalZones[selectedCountry] && (
+                            <p className="text-xs text-muted-foreground">{validPostalZones[selectedCountry].description}</p>
+                          )}
+                        </FormItem>
+                      )} />
+                    </div>
+
+                    <p className="text-xs text-muted-foreground">
+                      You must be at least {minimumAge} years old in {countries.find(c => c.code === selectedCountry)?.name}
+                    </p>
+
+                    <Button type="submit" className="w-full" size="lg">
+                      Continue <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </form>
                 </Form>
@@ -1076,119 +724,249 @@ export function ClientOnboarding() {
           </motion.div>
         )}
 
-        {/* Step 2: Address */}
+        {/* ==================== STEP 2: Safety Screening ==================== */}
         {currentStep === 1 && (
           <motion.div
-            key="address"
+            key="step2"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
           >
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
-                  Shipping Address
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <ShieldCheck className="h-5 w-5 text-primary" />
+                  Safety Screening
                 </CardTitle>
+                <p className="text-sm text-muted-foreground">Three quick questions for your safety</p>
               </CardHeader>
               <CardContent>
-                <Form {...addressForm}>
-                  <form
-                    onSubmit={addressForm.handleSubmit(handleAddressSubmit)}
-                    className="space-y-4"
-                  >
-                    <FormField
-                      control={addressForm.control}
-                      name="country"
-                      render={({ field }) => (
+                <Form {...step2Form}>
+                  <form onSubmit={step2Form.handleSubmit(handleStep2Submit)} className="space-y-4">
+                    <FormField control={step2Form.control} name="heartProblems" render={({ field }) => (
+                      <FormItem>
+                        <TappableYesNo
+                          question="Do you have a history of heart problems?"
+                          description="Including palpitations, heart attack, stroke, angina, or pacemaker"
+                          value={field.value}
+                          onChange={field.onChange}
+                          variant="warning"
+                          required
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+
+                    <FormField control={step2Form.control} name="psychosisHistory" render={({ field }) => (
+                      <FormItem>
+                        <TappableYesNo
+                          question="Do you have a history of psychosis or schizophrenia?"
+                          description="Including family history of these conditions"
+                          value={field.value}
+                          onChange={field.onChange}
+                          variant="warning"
+                          required
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+
+                    <FormField control={step2Form.control} name="cannabisReaction" render={({ field }) => (
+                      <FormItem>
+                        <TappableYesNo
+                          question="Have you ever had an adverse reaction to cannabis?"
+                          description="Severe anxiety, paranoia, allergic reactions, or other negative responses"
+                          value={field.value}
+                          onChange={field.onChange}
+                          variant="warning"
+                          required
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+
+                    <div className="flex gap-3 pt-2">
+                      <Button type="button" variant="outline" onClick={goBack} className="flex-1">
+                        <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                      </Button>
+                      <Button type="submit" className="flex-1" size="lg">
+                        Continue <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* ==================== STEP 3: Medical Profile ==================== */}
+        {currentStep === 2 && (
+          <motion.div
+            key="step3"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+          >
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Heart className="h-5 w-5 text-primary" />
+                  Medical Profile
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">Tell us about your health so we can help you better</p>
+              </CardHeader>
+              <CardContent>
+                <Form {...step3Form}>
+                  <form onSubmit={step3Form.handleSubmit(handleStep3Submit)} className="space-y-6">
+                    {/* Conditions */}
+                    <FormField control={step3Form.control} name="conditions" render={({ field }) => (
+                      <FormItem>
+                        <ConditionChips
+                          title="Medical Conditions"
+                          description="Select conditions you've been diagnosed with"
+                          options={allConditions}
+                          selectedValues={field.value || []}
+                          onChange={field.onChange}
+                          maxVisible={8}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+
+                    {/* Other condition text */}
+                    {step3Form.watch('conditions')?.includes('other_medical_condition') && (
+                      <FormField control={step3Form.control} name="otherMedicalCondition" render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Country</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select country" />
-                              </SelectTrigger>
-                            </FormControl>
+                          <FormLabel>Please describe your condition</FormLabel>
+                          <FormControl><Input placeholder="Enter condition..." {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    )}
+
+                    {/* Medications - Collapsible */}
+                    <Collapsible>
+                      <CollapsibleTrigger asChild>
+                        <Button variant="ghost" type="button" className="w-full justify-between p-4 h-auto border border-border/50 rounded-xl hover:bg-muted/30">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold">Current Medications</span>
+                            {(step3Form.watch('medications')?.length || 0) > 0 && (
+                              <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                                {step3Form.watch('medications')?.length} selected
+                              </span>
+                            )}
+                          </div>
+                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pt-4">
+                        <FormField control={step3Form.control} name="medications" render={({ field }) => (
+                          <FormItem>
+                            <ConditionChips
+                              options={allMedications}
+                              selectedValues={field.value || []}
+                              onChange={field.onChange}
+                              maxVisible={6}
+                            />
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                        {step3Form.watch('medications')?.includes('other_prescribed_medicines_treatments') && (
+                          <FormField control={step3Form.control} name="otherMedicalTreatments" render={({ field }) => (
+                            <FormItem className="mt-3">
+                              <FormLabel>Other medications</FormLabel>
+                              <FormControl><Input placeholder="Enter medications..." {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                        )}
+                      </CollapsibleContent>
+                    </Collapsible>
+
+                    {/* Cannabis history */}
+                    <div className="space-y-4 p-4 bg-muted/20 rounded-xl border border-border/50">
+                      <h4 className="font-semibold">Cannabis History</h4>
+                      
+                      <FormField control={step3Form.control} name="medicalHistory13" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>How often do you use cannabis?</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger></FormControl>
                             <SelectContent>
-                              {countries.map((country) => (
-                                <SelectItem key={country.code} value={country.code}>
-                                  {country.name}
-                                </SelectItem>
+                              {cannabisUsageOptions.map(opt => (
+                                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                           <FormMessage />
                         </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={addressForm.control}
-                      name="street"
-                      render={({ field }) => (
+                      )} />
+
+                      <FormField control={step3Form.control} name="medicalHistory14" render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Street Address</FormLabel>
-                          <FormControl>
-                            <Input placeholder="123 Main Street" {...field} />
-                          </FormControl>
+                          <FormLabel>How have you used cannabis?</FormLabel>
+                          <div className="flex flex-wrap gap-2">
+                            {cannabisMethodOptions.map(method => {
+                              const isSelected = field.value?.includes(method.value);
+                              return (
+                                <button
+                                  key={method.value}
+                                  type="button"
+                                  onClick={() => {
+                                    const current = field.value || [];
+                                    if (method.value === 'never') {
+                                      field.onChange(['never']);
+                                    } else if (isSelected) {
+                                      const newVal = current.filter(v => v !== method.value);
+                                      field.onChange(newVal.length ? newVal : ['never']);
+                                    } else {
+                                      field.onChange([...current.filter(v => v !== 'never'), method.value]);
+                                    }
+                                  }}
+                                  className={`px-3 py-2 rounded-full text-sm font-medium transition-all ${
+                                    isSelected
+                                      ? 'bg-primary text-primary-foreground'
+                                      : 'bg-muted/50 hover:bg-muted border border-border/50'
+                                  }`}
+                                >
+                                  {method.label}
+                                </button>
+                              );
+                            })}
+                          </div>
                           <FormMessage />
                         </FormItem>
-                      )}
-                    />
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={addressForm.control}
-                        name="city"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>City</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Lisbon" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={addressForm.control}
-                        name="postalCode"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Postal Code</FormLabel>
-                            <FormControl>
-                              <Input placeholder="1000-001" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            {validPostalZones[selectedCountry] && (
-                              <p className="text-xs text-muted-foreground">
-                                {validPostalZones[selectedCountry].description}
-                              </p>
-                            )}
-                          </FormItem>
-                        )}
-                      />
+                      )} />
                     </div>
-                    {postalError && (
-                      <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
-                        <AlertTriangle className="h-4 w-4 flex-shrink-0" />
-                        <span>{postalError}</span>
-                      </div>
-                    )}
-                    <div className="flex gap-3">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={goBack}
-                        className="flex-1"
-                      >
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back
+
+                    {/* Additional notes - Collapsible */}
+                    <Collapsible>
+                      <CollapsibleTrigger asChild>
+                        <Button variant="ghost" type="button" className="w-full justify-between p-4 h-auto border border-border/50 rounded-xl hover:bg-muted/30">
+                          <span className="font-semibold">Additional Notes (Optional)</span>
+                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pt-4">
+                        <FormField control={step3Form.control} name="prescriptionsSupplements" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Current prescriptions & supplements</FormLabel>
+                            <FormControl>
+                              <Textarea placeholder="List any prescriptions, supplements, or CBD products..." className="min-h-[80px]" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                      </CollapsibleContent>
+                    </Collapsible>
+
+                    <div className="flex gap-3 pt-2">
+                      <Button type="button" variant="outline" onClick={goBack} className="flex-1">
+                        <ArrowLeft className="mr-2 h-4 w-4" /> Back
                       </Button>
-                      <Button type="submit" className="flex-1">
-                        Continue
-                        <ArrowRight className="ml-2 h-4 w-4" />
+                      <Button type="submit" className="flex-1" size="lg">
+                        Continue <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </div>
                   </form>
@@ -1198,843 +976,106 @@ export function ClientOnboarding() {
           </motion.div>
         )}
 
-        {/* Step 3: Business Details (Optional) */}
-        {currentStep === 2 && (
+        {/* ==================== STEP 4: Consent & Submit ==================== */}
+        {currentStep === 3 && kycStatus === 'idle' && (
           <motion.div
-            key="business"
+            key="step4"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
           >
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5" />
-                  Business Details
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  Almost Done!
                 </CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">
-                  If you're registering on behalf of a business, please provide the details below. Otherwise, you can skip this step.
-                </p>
+                <p className="text-sm text-muted-foreground">Confirm your consent to complete registration</p>
               </CardHeader>
               <CardContent>
-                <Form {...businessForm}>
-                  <form
-                    onSubmit={businessForm.handleSubmit(handleBusinessSubmit)}
-                    className="space-y-4"
-                  >
-                    <FormField
-                      control={businessForm.control}
-                      name="isBusiness"
-                      render={({ field }) => (
-                        <FormItem className="flex items-start space-x-3 space-y-0 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                <Form {...step4Form}>
+                  <form onSubmit={step4Form.handleSubmit(handleStep4Submit)} className="space-y-5">
+                    <FormField control={step4Form.control} name="doctorApproval" render={({ field }) => (
+                      <FormItem className="flex items-start space-x-3 space-y-0 p-4 rounded-xl border-2 border-primary/20 bg-primary/5">
+                        <FormControl>
+                          <Checkbox checked={field.value} onCheckedChange={field.onChange} className="mt-0.5" />
+                        </FormControl>
+                        <div className="space-y-1">
+                          <FormLabel className="font-medium cursor-pointer">
+                            I have discussed medical cannabis with my healthcare provider
+                          </FormLabel>
+                          <p className="text-xs text-muted-foreground">Required for patient safety</p>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+
+                    <FormField control={step4Form.control} name="consent" render={({ field }) => (
+                      <FormItem className="flex items-start space-x-3 space-y-0 p-4 rounded-xl border border-border/50 hover:bg-muted/30 transition-colors">
+                        <FormControl>
+                          <Checkbox checked={field.value} onCheckedChange={field.onChange} className="mt-0.5" />
+                        </FormControl>
+                        <div className="space-y-1">
+                          <FormLabel className="font-normal cursor-pointer">
+                            I consent to the processing of my medical information
+                          </FormLabel>
+                          <p className="text-xs text-muted-foreground">In accordance with GDPR and medical data protection regulations</p>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+
+                    {/* Business toggle */}
+                    <Collapsible>
+                      <FormField control={step4Form.control} name="isBusiness" render={({ field }) => (
+                        <FormItem className="flex items-start space-x-3 space-y-0 p-4 rounded-xl border border-border/50 hover:bg-muted/30 transition-colors">
                           <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Checkbox checked={field.value} onCheckedChange={field.onChange} className="mt-0.5" />
                           </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel className="font-medium cursor-pointer">
+                          <div className="space-y-1">
+                            <FormLabel className="font-normal cursor-pointer flex items-center gap-2">
+                              <Building2 className="h-4 w-4" />
                               I am registering as a business
                             </FormLabel>
-                            <FormDescription className="text-xs">
-                              Select this if you're a dispensary, clinic, pharmacy, or other business
-                            </FormDescription>
+                            <p className="text-xs text-muted-foreground">Dispensary, clinic, or pharmacy</p>
                           </div>
                         </FormItem>
-                      )}
-                    />
-
-                    {businessForm.watch('isBusiness') && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="space-y-4 pt-2"
-                      >
-                        <FormField
-                          control={businessForm.control}
-                          name="businessType"
-                          render={({ field }) => (
+                      )} />
+                      
+                      {step4Form.watch('isBusiness') && (
+                        <CollapsibleContent className="pt-4 space-y-4">
+                          <FormField control={step4Form.control} name="businessType" render={({ field }) => (
                             <FormItem>
                               <FormLabel>Business Type</FormLabel>
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select type" />
-                                  </SelectTrigger>
-                                </FormControl>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger></FormControl>
                                 <SelectContent>
-                                  {businessTypes.map((type) => (
-                                    <SelectItem key={type.value} value={type.value}>
-                                      {type.label}
-                                    </SelectItem>
-                                  ))}
+                                  {businessTypes.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                                 </SelectContent>
                               </Select>
                               <FormMessage />
                             </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={businessForm.control}
-                          name="businessName"
-                          render={({ field }) => (
+                          )} />
+                          <FormField control={step4Form.control} name="businessName" render={({ field }) => (
                             <FormItem>
                               <FormLabel>Business Name</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Your Company Ltd" {...field} />
-                              </FormControl>
+                              <FormControl><Input placeholder="Your Company Ltd" {...field} /></FormControl>
                               <FormMessage />
                             </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={businessForm.control}
-                          name="businessAddress1"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Business Address</FormLabel>
-                              <FormControl>
-                                <Input placeholder="123 Business Street" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={businessForm.control}
-                          name="businessAddress2"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Address Line 2 (Optional)</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Suite, Floor, Building" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={businessForm.control}
-                            name="businessCity"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>City</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Lisbon" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={businessForm.control}
-                            name="businessState"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>State/Province</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Optional" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={businessForm.control}
-                            name="businessCountryCode"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Country</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value || formData.address?.country}>
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Select country" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {countries.map((country) => (
-                                      <SelectItem key={country.code} value={country.code}>
-                                        {country.name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={businessForm.control}
-                            name="businessPostalCode"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Postal Code</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="1000-001" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      </motion.div>
-                    )}
+                          )} />
+                        </CollapsibleContent>
+                      )}
+                    </Collapsible>
 
                     <div className="flex gap-3 pt-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={goBack}
-                        className="flex-1"
-                      >
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back
+                      <Button type="button" variant="outline" onClick={goBack} className="flex-1" disabled={isSubmitting}>
+                        <ArrowLeft className="mr-2 h-4 w-4" /> Back
                       </Button>
-                      <Button type="submit" className="flex-1">
-                        {businessForm.watch('isBusiness') ? 'Continue' : 'Skip & Continue'}
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </div>
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-
-        {/* Step 4: Medical History (Legacy DAPP fields) */}
-        {currentStep === 3 && (
-          <motion.div
-            key="medical-history"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-          >
-            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <HeartPulse className="h-5 w-5" />
-                  Medical History
-                </CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Please answer the following health screening questions honestly. This information helps us ensure your safety.
-                </p>
-              </CardHeader>
-              <CardContent>
-                <Form {...medicalHistoryForm}>
-                  <form
-                    onSubmit={medicalHistoryForm.handleSubmit(handleMedicalHistorySubmit)}
-                    className="space-y-8"
-                  >
-                    {/* SAFETY GATES - Yes/No Radio Buttons (Required) */}
-                    <div className="space-y-4">
-                      <h4 className="font-semibold text-base flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4 text-amber-500" />
-                        Safety Screening
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        These questions are critical for your safety. Please answer honestly.
-                      </p>
-                      
-                      {/* Heart Problems */}
-                      <FormField
-                        control={medicalHistoryForm.control}
-                        name="heartProblems"
-                        render={({ field }) => (
-                          <FormItem className="p-4 rounded-xl border-2 border-amber-500/30 bg-amber-500/5">
-                            <FormLabel className="font-medium text-base">
-                              Do you have a history of heart problems? *
-                            </FormLabel>
-                            <FormDescription className="text-sm">
-                              Including heart disease, arrhythmia, heart attacks, or cardiovascular conditions
-                            </FormDescription>
-                            <FormControl>
-                              <RadioGroup
-                                onValueChange={field.onChange}
-                                value={field.value}
-                                className="flex gap-4 mt-3"
-                              >
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="yes" id="heart-yes" />
-                                  <label htmlFor="heart-yes" className="font-medium cursor-pointer">Yes</label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="no" id="heart-no" />
-                                  <label htmlFor="heart-no" className="font-medium cursor-pointer">No</label>
-                                </div>
-                              </RadioGroup>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* Psychosis History */}
-                      <FormField
-                        control={medicalHistoryForm.control}
-                        name="psychosisHistory"
-                        render={({ field }) => (
-                          <FormItem className="p-4 rounded-xl border-2 border-amber-500/30 bg-amber-500/5">
-                            <FormLabel className="font-medium text-base">
-                              Do you have a history of Psychosis? *
-                            </FormLabel>
-                            <FormDescription className="text-sm">
-                              Including schizophrenia, psychotic episodes, or severe psychiatric conditions
-                            </FormDescription>
-                            <FormControl>
-                              <RadioGroup
-                                onValueChange={field.onChange}
-                                value={field.value}
-                                className="flex gap-4 mt-3"
-                              >
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="yes" id="psychosis-yes" />
-                                  <label htmlFor="psychosis-yes" className="font-medium cursor-pointer">Yes</label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="no" id="psychosis-no" />
-                                  <label htmlFor="psychosis-no" className="font-medium cursor-pointer">No</label>
-                                </div>
-                              </RadioGroup>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* Cannabis Reaction */}
-                      <FormField
-                        control={medicalHistoryForm.control}
-                        name="cannabisReaction"
-                        render={({ field }) => (
-                          <FormItem className="p-4 rounded-xl border-2 border-amber-500/30 bg-amber-500/5">
-                            <FormLabel className="font-medium text-base">
-                              Have you ever had an adverse reaction to Cannabis? *
-                            </FormLabel>
-                            <FormDescription className="text-sm">
-                              Including severe anxiety, paranoia, allergic reactions, or other negative responses
-                            </FormDescription>
-                            <FormControl>
-                              <RadioGroup
-                                onValueChange={field.onChange}
-                                value={field.value}
-                                className="flex gap-4 mt-3"
-                              >
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="yes" id="reaction-yes" />
-                                  <label htmlFor="reaction-yes" className="font-medium cursor-pointer">Yes</label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="no" id="reaction-no" />
-                                  <label htmlFor="reaction-no" className="font-medium cursor-pointer">No</label>
-                                </div>
-                              </RadioGroup>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    {/* CONDITIONS - Checkbox Grid */}
-                    <div className="space-y-4">
-                      <h4 className="font-semibold text-base">Diagnosed Conditions</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Select any conditions you have been diagnosed with:
-                      </p>
-                      <FormField
-                        control={medicalHistoryForm.control}
-                        name="conditions"
-                        render={({ field }) => (
-                          <FormItem>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                              {conditionOptions.map((condition) => (
-                                <label
-                                  key={condition.value}
-                                  className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-                                    field.value?.includes(condition.value)
-                                      ? 'border-primary bg-primary/10 text-primary'
-                                      : 'border-border/50 hover:border-primary/50 hover:bg-muted/30'
-                                  }`}
-                                >
-                                  <Checkbox
-                                    checked={field.value?.includes(condition.value)}
-                                    onCheckedChange={(checked) => {
-                                      const currentValues = field.value || [];
-                                      if (checked) {
-                                        field.onChange([...currentValues, condition.value]);
-                                      } else {
-                                        field.onChange(currentValues.filter((v) => v !== condition.value));
-                                      }
-                                    }}
-                                  />
-                                  <span className="font-medium text-sm">{condition.label}</span>
-                                </label>
-                              ))}
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    {/* MEDICATIONS - Checkbox Grid */}
-                    <div className="space-y-4">
-                      <h4 className="font-semibold text-base">Current Medications</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Select any medications you are currently taking:
-                      </p>
-                      <FormField
-                        control={medicalHistoryForm.control}
-                        name="medications"
-                        render={({ field }) => (
-                          <FormItem>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                              {medicationOptions.map((medication) => (
-                                <label
-                                  key={medication.value}
-                                  className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-                                    field.value?.includes(medication.value)
-                                      ? 'border-primary bg-primary/10 text-primary'
-                                      : 'border-border/50 hover:border-primary/50 hover:bg-muted/30'
-                                  }`}
-                                >
-                                  <Checkbox
-                                    checked={field.value?.includes(medication.value)}
-                                    onCheckedChange={(checked) => {
-                                      const currentValues = field.value || [];
-                                      if (checked) {
-                                        field.onChange([...currentValues, medication.value]);
-                                      } else {
-                                        field.onChange(currentValues.filter((v) => v !== medication.value));
-                                      }
-                                    }}
-                                  />
-                                  <span className="font-medium text-sm">{medication.label}</span>
-                                </label>
-                              ))}
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    {/* Additional Health Conditions - Legacy Checkboxes */}
-                    <div className="space-y-4">
-                      <h4 className="font-semibold text-base">Additional Health Information</h4>
-                      <div className="space-y-3">
-                        {medicalHistoryFields.map((field) => (
-                          <FormField
-                            key={field.key}
-                            control={medicalHistoryForm.control}
-                            name={field.key as keyof MedicalHistory}
-                            render={({ field: formField }) => (
-                              <FormItem className="flex items-start space-x-3 space-y-0 p-3 rounded-lg border border-border/50 hover:bg-muted/30 transition-colors">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={formField.value as boolean}
-                                    onCheckedChange={formField.onChange}
-                                  />
-                                </FormControl>
-                                <div className="space-y-1 leading-none">
-                                  <FormLabel className="font-normal cursor-pointer">
-                                    {field.label}
-                                  </FormLabel>
-                                  <FormDescription className="text-xs">
-                                    {field.description}
-                                  </FormDescription>
-                                </div>
-                              </FormItem>
-                            )}
-                          />
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Alcohol consumption */}
-                    <div className="space-y-3">
-                      <h4 className="font-semibold text-base">Alcohol Consumption</h4>
-                      <FormField
-                        control={medicalHistoryForm.control}
-                        name="medicalHistory11"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Alcohol units per week</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select amount" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="0">None</SelectItem>
-                                <SelectItem value="1-7">1-7 units</SelectItem>
-                                <SelectItem value="8-14">8-14 units</SelectItem>
-                                <SelectItem value="15-21">15-21 units</SelectItem>
-                                <SelectItem value="22+">22+ units</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormDescription>
-                              1 unit = 1 small glass of wine, half pint of beer, or 1 shot
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    {/* Cannabis usage section */}
-                    <div className="space-y-6">
-                      <h4 className="font-semibold text-base">Cannabis History</h4>
-                      
-                      {/* Cannabis frequency */}
-                      <FormField
-                        control={medicalHistoryForm.control}
-                        name="medicalHistory13"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>How often do you currently use cannabis? *</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select frequency" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {cannabisUsageOptions.map((option) => (
-                                  <SelectItem key={option.value} value={option.value}>
-                                    {option.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* Cannabis usage methods - multi-select */}
-                      <FormField
-                        control={medicalHistoryForm.control}
-                        name="medicalHistory14"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>How have you used cannabis? *</FormLabel>
-                            <FormDescription>Select all that apply</FormDescription>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
-                              {cannabisMethodOptions.map((method) => (
-                                <label
-                                  key={method.value}
-                                  className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-                                    field.value?.includes(method.value)
-                                      ? 'border-primary bg-primary/10 text-primary'
-                                      : 'border-border/50 hover:border-primary/50 hover:bg-muted/30'
-                                  }`}
-                                >
-                                  <Checkbox
-                                    checked={field.value?.includes(method.value)}
-                                    onCheckedChange={(checked) => {
-                                      const currentValues = field.value || [];
-                                      if (checked) {
-                                        // Remove 'never' if selecting other options
-                                        const newValues = method.value === 'never' 
-                                          ? ['never'] 
-                                          : [...currentValues.filter(v => v !== 'never'), method.value];
-                                        field.onChange(newValues);
-                                      } else {
-                                        const newValues = currentValues.filter((v) => v !== method.value);
-                                        field.onChange(newValues.length ? newValues : ['never']);
-                                      }
-                                    }}
-                                  />
-                                  <span className="font-medium text-sm">{method.label}</span>
-                                </label>
-                              ))}
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* Cannabis amount per day - only show if user has used cannabis */}
-                      {medicalHistoryForm.watch('medicalHistory13') !== 'never' && (
-                        <FormField
-                          control={medicalHistoryForm.control}
-                          name="medicalHistory15"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>How much cannabis do you currently use per day?</FormLabel>
-                              <FormDescription>
-                                Please specify in grams, ounces, or number of joints
-                              </FormDescription>
-                              <FormControl>
-                                <Input
-                                  placeholder="e.g., 0.5g, 1 joint, 2g"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      )}
-                    </div>
-
-                    {/* Prescriptions and supplements */}
-                    <FormField
-                      control={medicalHistoryForm.control}
-                      name="prescriptionsSupplements"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Current Prescriptions & Supplements (Optional)</FormLabel>
-                          <FormDescription>
-                            List any current prescriptions and over the counter supplements, including CBD oils/products
-                          </FormDescription>
-                          <FormControl>
-                            <Textarea
-                              placeholder="e.g., Vitamin D 1000IU daily, CBD oil 10mg..."
-                              className="min-h-[80px]"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* Other medical condition details */}
-                    {medicalHistoryForm.watch('conditions')?.includes('other_medical_condition') && (
-                      <FormField
-                        control={medicalHistoryForm.control}
-                        name="otherMedicalCondition"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Please specify your other medical condition</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="Describe your condition..."
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    )}
-
-                    {/* Other medications details */}
-                    {medicalHistoryForm.watch('medications')?.includes('other_prescribed_medicines_treatments') && (
-                      <FormField
-                        control={medicalHistoryForm.control}
-                        name="otherMedicalTreatments"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Please specify your other medications/treatments</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="List your other medications..."
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    )}
-
-                    <div className="flex gap-3">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={goBack}
-                        className="flex-1"
-                      >
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back
-                      </Button>
-                      <Button type="submit" className="flex-1">
-                        Continue
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </div>
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-
-        {/* Step 5: Medical Information */}
-        {currentStep === 4 && (
-          <motion.div
-            key="medical"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-          >
-            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Stethoscope className="h-5 w-5" />
-                  Medical Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Form {...medicalForm}>
-                  <form
-                    onSubmit={medicalForm.handleSubmit(handleMedicalSubmit)}
-                    className="space-y-4"
-                  >
-                    <FormField
-                      control={medicalForm.control}
-                      name="conditions"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Medical Conditions</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="Describe your medical conditions that you're seeking treatment for..."
-                              className="min-h-[100px]"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={medicalForm.control}
-                      name="currentMedications"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Current Medications (Optional)</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="List any medications you're currently taking..."
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={medicalForm.control}
-                      name="allergies"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Allergies (Optional)</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="List any known allergies..."
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={medicalForm.control}
-                      name="previousCannabisUse"
-                      render={({ field }) => (
-                        <FormItem className="flex items-start space-x-3 space-y-0">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            I have previous experience with medical cannabis
-                          </FormLabel>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={medicalForm.control}
-                      name="doctorApproval"
-                      render={({ field }) => (
-                        <FormItem className="flex items-start space-x-3 space-y-0 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <div className="space-y-1">
-                            <FormLabel className="font-medium">
-                              I have discussed medical cannabis with my healthcare provider *
-                            </FormLabel>
-                            <p className="text-xs text-muted-foreground">
-                              Medical consultation is required before accessing cannabis products
-                            </p>
-                            <FormMessage />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={medicalForm.control}
-                      name="consent"
-                      render={({ field }) => (
-                        <FormItem className="flex items-start space-x-3 space-y-0 p-4 bg-muted/30 rounded-lg">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <div className="space-y-1">
-                            <FormLabel className="font-normal">
-                              I consent to the processing of my medical information
-                            </FormLabel>
-                            <p className="text-xs text-muted-foreground">
-                              Your information will be handled in accordance with GDPR
-                              and medical data protection regulations.
-                            </p>
-                          </div>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <div className="flex gap-3">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={goBack}
-                        className="flex-1"
-                        disabled={isSubmitting}
-                      >
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back
-                      </Button>
-                      <Button
-                        type="submit"
-                        className="flex-1"
-                        disabled={isSubmitting}
-                      >
+                      <Button type="submit" className="flex-1" size="lg" disabled={isSubmitting}>
                         {isSubmitting ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Submitting...
-                          </>
+                          <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</>
                         ) : (
-                          <>
-                            Submit
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                          </>
+                          <>Complete Registration <CheckCircle2 className="ml-2 h-4 w-4" /></>
                         )}
                       </Button>
                     </div>
@@ -2045,8 +1086,8 @@ export function ClientOnboarding() {
           </motion.div>
         )}
 
-        {/* KYC Verification In Progress Screen */}
-        {currentStep === 4 && kycStatus === 'verifying' && (
+        {/* ==================== VERIFYING STATE ==================== */}
+        {currentStep === 3 && kycStatus === 'verifying' && (
           <motion.div
             key="verifying"
             initial={{ opacity: 0 }}
@@ -2062,26 +1103,16 @@ export function ClientOnboarding() {
                 >
                   <ShieldCheck className="h-10 w-10 text-primary" />
                 </motion.div>
-                <h2 className="text-2xl font-bold mb-2">We're Verifying Your ID</h2>
-                <p className="text-muted-foreground mb-6">
-                  Please wait while we process your information. This usually takes a few moments.
-                </p>
-                <div className="space-y-2">
-                  <Progress value={kycProgress} className="h-2" />
-                  <p className="text-xs text-muted-foreground">
-                    {kycProgress < 30 && 'Validating your information...'}
-                    {kycProgress >= 30 && kycProgress < 60 && 'Checking eligibility...'}
-                    {kycProgress >= 60 && kycProgress < 90 && 'Preparing verification link...'}
-                    {kycProgress >= 90 && 'Almost done...'}
-                  </p>
-                </div>
+                <h2 className="text-2xl font-bold mb-2">Verifying Your Details</h2>
+                <p className="text-muted-foreground mb-6">This usually takes a few moments...</p>
+                <Progress value={kycProgress} className="h-2" />
               </CardContent>
             </Card>
           </motion.div>
         )}
 
-        {/* Document Quality Error Screen (422) */}
-        {currentStep === 4 && documentError === 'document_quality' && (
+        {/* ==================== DOCUMENT ERROR STATE ==================== */}
+        {currentStep === 3 && documentError === 'document_quality' && (
           <motion.div
             key="document-error"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -2089,73 +1120,32 @@ export function ClientOnboarding() {
           >
             <Card className="bg-card/50 backdrop-blur-sm border-destructive/30">
               <CardContent className="pt-8 pb-8 text-center">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', delay: 0.2 }}
-                  className="h-20 w-20 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-6"
-                >
+                <div className="h-20 w-20 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-6">
                   <FileWarning className="h-10 w-10 text-destructive" />
-                </motion.div>
-                <h2 className="text-2xl font-bold mb-2 text-destructive">Document Issue Detected</h2>
-                <p className="text-muted-foreground mb-6">
-                  We couldn't process your submission. This is usually due to image quality issues.
-                </p>
-                
+                </div>
+                <h2 className="text-2xl font-bold mb-2 text-destructive">Document Issue</h2>
+                <p className="text-muted-foreground mb-6">We couldn't process your submission.</p>
                 <div className="bg-muted/30 rounded-lg p-4 mb-6 text-left">
                   <h3 className="font-medium mb-3 flex items-center gap-2">
-                    <Camera className="h-4 w-4" />
-                    Tips for a successful submission:
+                    <Camera className="h-4 w-4" /> Tips for success:
                   </h3>
                   <ul className="text-sm text-muted-foreground space-y-2">
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      Ensure your ID photo is clear and not blurry
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      Use good lighting — avoid glare or shadows
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      Make sure all corners of the document are visible
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      Use a plain background without patterns
-                    </li>
+                    <li>• Ensure ID photo is clear and not blurry</li>
+                    <li>• Use good lighting — avoid glare or shadows</li>
+                    <li>• All corners of the document should be visible</li>
                   </ul>
                 </div>
-
-                <div className="space-y-3">
-                  <Button
-                    onClick={retrySubmission}
-                    className="w-full"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Retrying...
-                      </>
-                    ) : (
-                      <>
-                        <RefreshCw className="mr-2 h-4 w-4" />
-                        Try Again
-                      </>
-                    )}
-                  </Button>
-                  <p className="text-xs text-muted-foreground">
-                    Still having issues? Please <button onClick={() => navigate('/support')} className="text-primary underline">contact support</button> for assistance.
-                  </p>
-                </div>
+                <Button onClick={retrySubmission} className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+                  Try Again
+                </Button>
               </CardContent>
             </Card>
           </motion.div>
         )}
 
-        {/* Step 6: Complete */}
-        {currentStep === 5 && (
+        {/* ==================== COMPLETE STATE ==================== */}
+        {currentStep === 4 && (
           <motion.div
             key="complete"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -2171,59 +1161,32 @@ export function ClientOnboarding() {
                 >
                   <CheckCircle2 className="h-10 w-10 text-primary" />
                 </motion.div>
-                <h2 className="text-2xl font-bold mb-2">Registration Submitted!</h2>
+                <h2 className="text-2xl font-bold mb-2">Registration Complete!</h2>
                 
                 {kycLinkReceived ? (
-                  // Success state - KYC link received
                   <div className="space-y-4">
                     <div className="flex items-center justify-center gap-2 text-primary">
                       <Mail className="h-5 w-5" />
-                      <p className="text-muted-foreground">
-                        Your verification link has been sent. Check your email to continue.
-                      </p>
+                      <p className="text-muted-foreground">Check your email for verification instructions.</p>
                     </div>
-                  <Button onClick={() => navigate('/dashboard/status')}>
-                      View Account Status
-                    </Button>
+                    <Button onClick={() => navigate('/patient-dashboard')}>Go to Dashboard</Button>
                   </div>
                 ) : (
-                  // Pending state - KYC link not received yet
                   <div className="space-y-4">
                     <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg text-left">
                       <div className="flex items-center gap-2 mb-2">
                         <Clock className="h-5 w-5 text-amber-600" />
-                        <span className="font-medium text-amber-700 dark:text-amber-400">
-                          Verification link pending
-                        </span>
+                        <span className="font-medium text-amber-700 dark:text-amber-400">Verification pending</span>
                       </div>
                       <p className="text-sm text-muted-foreground mb-4">
-                        Your registration was saved successfully. We're preparing your verification link.
+                        Your registration was saved. We're preparing your verification link.
                       </p>
-                      <Button
-                        variant="outline"
-                        onClick={retryKycLink}
-                        disabled={isRetrying}
-                        className="w-full"
-                      >
-                        {isRetrying ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Requesting...
-                          </>
-                        ) : (
-                          <>
-                            <RefreshCw className="mr-2 h-4 w-4" />
-                            Request Verification Link
-                          </>
-                        )}
+                      <Button variant="outline" onClick={retryKycLink} disabled={isRetrying} className="w-full">
+                        {isRetrying ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+                        Request Verification Link
                       </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Or check your email in the next 24 hours. If you don't receive it, please contact support.
-                    </p>
-                    <Button onClick={() => navigate('/dashboard/status')}>
-                      View Account Status
-                    </Button>
+                    <Button onClick={() => navigate('/patient-dashboard')}>Go to Dashboard</Button>
                   </div>
                 )}
               </CardContent>

@@ -19,7 +19,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { ProductCard } from './ProductCard';
-import { CultivarQuickView } from './CultivarQuickView';
+import { StrainQuickView } from './StrainQuickView';
 import { Product, useProducts, DataSource } from '@/hooks/useProducts';
 import { useShop } from '@/context/ShopContext';
 import { useStockUpdates, StockUpdate } from '@/hooks/useStockUpdates';
@@ -362,7 +362,7 @@ export function ProductGrid() {
       )}
 
       {/* Quick view modal */}
-      <CultivarQuickView
+      <StrainQuickView
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
       />

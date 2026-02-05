@@ -119,35 +119,46 @@ const Index = () => {
                     Access quality-controlled, lab-tested medical cannabis with complete transparency.
                   </p>
 
-                  {/* Primary CTAs */}
+                  {/* Primary CTAs - Dynamic based on eligibility */}
                   <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                    <Button 
-                      size="lg" 
-                      className="text-lg px-8 py-6 bg-highlight hover:bg-highlight/90 text-highlight-foreground shadow-lg"
-                      onClick={() => navigate('/eligibility')}
-                    >
-                      Check Eligibility
-                      <ArrowRight className="ml-2 w-5 h-5" />
-                    </Button>
-                    
                     {isEligible ? (
-                      <Button 
-                        size="lg" 
-                        variant="outline"
-                        className="text-lg px-8 py-6 bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20"
-                        onClick={() => navigate('/shop')}
-                      >
-                        Browse Products
-                      </Button>
+                      <>
+                        <Button 
+                          size="lg" 
+                          className="text-lg px-8 py-6 bg-highlight hover:bg-highlight/90 text-highlight-foreground shadow-lg"
+                          onClick={() => navigate('/shop')}
+                        >
+                          Browse Strains
+                          <ArrowRight className="ml-2 w-5 h-5" />
+                        </Button>
+                        <Button 
+                          size="lg" 
+                          variant="outline"
+                          className="text-lg px-8 py-6 bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20"
+                          onClick={() => navigate('/dashboard')}
+                        >
+                          My Dashboard
+                        </Button>
+                      </>
                     ) : (
-                      <Button 
-                        size="lg" 
-                        variant="outline"
-                        className="text-lg px-8 py-6 bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20"
-                        onClick={() => navigate(drGreenClient ? '/eligibility' : '/auth')}
-                      >
-                        {drGreenClient ? 'Continue Assessment' : 'Sign In'}
-                      </Button>
+                      <>
+                        <Button 
+                          size="lg" 
+                          className="text-lg px-8 py-6 bg-highlight hover:bg-highlight/90 text-highlight-foreground shadow-lg"
+                          onClick={() => navigate('/eligibility')}
+                        >
+                          Check Eligibility
+                          <ArrowRight className="ml-2 w-5 h-5" />
+                        </Button>
+                        <Button 
+                          size="lg" 
+                          variant="outline"
+                          className="text-lg px-8 py-6 bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20"
+                          onClick={() => navigate('/auth')}
+                        >
+                          Sign In
+                        </Button>
+                      </>
                     )}
                   </div>
 
@@ -374,9 +385,9 @@ const Index = () => {
                     <Button 
                       size="lg" 
                       className="text-lg px-8 py-6"
-                      onClick={() => navigate('/eligibility')}
+                      onClick={() => navigate(isEligible ? '/shop' : '/eligibility')}
                     >
-                      Start Medical Assessment
+                      {isEligible ? 'Browse Our Strains' : 'Start Medical Assessment'}
                       <ArrowRight className="ml-2 w-5 h-5" />
                     </Button>
                     <Button 

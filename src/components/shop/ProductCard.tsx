@@ -159,7 +159,7 @@ export function ProductCard({ product, onViewDetails, showDataSource = false }: 
       whileHover={{ y: -8, scale: 1.02 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
       className="h-full cursor-pointer"
-      onClick={() => navigate(`/shop/cultivar/${product.id}`)}
+      onClick={() => navigate(`/shop/strain/${product.id}`)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

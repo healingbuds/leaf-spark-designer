@@ -9,8 +9,8 @@
     "logistics": "Logística Médica Segura",
     "note": "Todos os produtos cumprem os padrões farmacêuticos EU-GMP"
   },
-  "subtitle": "Explore a nossa seleção de cultivares de cannabis de grau farmacêutico",
-  "searchPlaceholder": "Pesquisar cultivares...",
+  "subtitle": "Explore a nossa seleção de estirpes de cannabis de grau farmacêutico",
+  "searchPlaceholder": "Pesquisar estirpes...",
   "showingProducts": "A mostrar {{count}} de {{total}} produtos",
   "noProducts": "Nenhum produto encontrado",
   "noProductsDescription": "Tente ajustar a sua pesquisa ou critérios de filtro",
@@ -45,7 +45,7 @@
   "cart": {
     "title": "O Seu Carrinho",
     "empty": "O seu carrinho está vazio",
-    "emptyDescription": "Navegue pela nossa seleção de cultivares de cannabis medicinal",
+    "emptyDescription": "Navegue pela nossa seleção de estirpes de cannabis medicinal",
     "continueShopping": "Continuar a Comprar",
     "subtotal": "Subtotal",
     "checkout": "Finalizar Compra",

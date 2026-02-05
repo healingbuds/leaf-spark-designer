@@ -38,7 +38,7 @@ const NotEligible = lazy(() => import("./pages/NotEligible"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Shop = lazy(() => import("./pages/Shop"));
 const ShopRegister = lazy(() => import("./pages/ShopRegister"));
-const CultivarDetail = lazy(() => import("./pages/CultivarDetail"));
+const StrainDetail = lazy(() => import("./pages/StrainDetail"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const Orders = lazy(() => import("./pages/Orders"));
 const DashboardStatus = lazy(() => import("./pages/DashboardStatus"));
@@ -94,9 +94,9 @@ const AnimatedRoutes = () => {
             </ComplianceGuard>
           } />
           <Route path="/shop/register" element={<ShopRegister />} />
-          <Route path="/shop/cultivar/:cultivarId" element={
+          <Route path="/shop/strain/:strainId" element={
             <ComplianceGuard>
-              <CultivarDetail />
+              <StrainDetail />
             </ComplianceGuard>
           } />
           <Route path="/checkout" element={

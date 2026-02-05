@@ -26,8 +26,8 @@ import { PriceBreakdownTooltip } from '@/components/shop/PriceBreakdownTooltip';
 import { Cart } from '@/components/shop/Cart';
 import { FloatingCartButton } from '@/components/shop/FloatingCartButton';
 
-export default function CultivarDetail() {
-  const { cultivarId } = useParams<{ cultivarId: string }>();
+export default function StrainDetail() {
+  const { strainId } = useParams<{ strainId: string }>();
   const navigate = useNavigate();
   const { addToCart, isEligible, drGreenClient, countryCode, convertFromEUR } = useShop();
   const { products, isLoading } = useProducts(countryCode);
@@ -40,10 +40,10 @@ export default function CultivarDetail() {
 
   useEffect(() => {
     if (!isLoading && products.length > 0) {
-      const found = products.find(p => p.id === cultivarId);
+      const found = products.find(p => p.id === strainId);
       setProduct(found || null);
     }
-  }, [products, cultivarId, isLoading]);
+  }, [products, strainId, isLoading]);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -124,7 +124,7 @@ export default function CultivarDetail() {
       <PageTransition variant="premium">
         <Header />
         <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-pulse text-muted-foreground">Loading cultivar details...</div>
+          <div className="animate-pulse text-muted-foreground">Loading strain details...</div>
         </div>
         <Footer />
       </PageTransition>
@@ -137,8 +137,8 @@ export default function CultivarDetail() {
         <Header />
         <div className="min-h-screen flex flex-col items-center justify-center gap-4">
           <AlertCircle className="h-16 w-16 text-muted-foreground" />
-          <h1 className="text-2xl font-bold">Cultivar Not Found</h1>
-          <p className="text-muted-foreground">The cultivar you're looking for doesn't exist.</p>
+          <h1 className="text-2xl font-bold">Strain Not Found</h1>
+          <p className="text-muted-foreground">The strain you're looking for doesn't exist.</p>
           <Button onClick={() => navigate('/shop')}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Dispensary
@@ -155,22 +155,22 @@ export default function CultivarDetail() {
   const categoryInfo: Record<string, { title: string; description: string; benefits: string[] }> = {
     sativa: {
       title: 'Sativa Dominant',
-      description: 'Sativa cultivars are known for their energizing and uplifting effects. They typically produce a cerebral, creative high that\'s great for daytime use.',
+      description: 'Sativa strains are known for their energizing and uplifting effects. They typically produce a cerebral, creative high that\'s great for daytime use.',
       benefits: ['Increased energy', 'Enhanced creativity', 'Mood elevation', 'Focus improvement'],
     },
     indica: {
       title: 'Indica Dominant',
-      description: 'Indica cultivars provide deep relaxation and calming effects. They\'re ideal for evening use, helping with sleep and physical discomfort.',
+      description: 'Indica strains provide deep relaxation and calming effects. They\'re ideal for evening use, helping with sleep and physical discomfort.',
       benefits: ['Deep relaxation', 'Pain relief', 'Sleep aid', 'Muscle relaxation'],
     },
     hybrid: {
       title: 'Hybrid Balance',
-      description: 'Hybrid cultivars combine the best of both Sativa and Indica genetics, offering a balanced experience that can be tailored to your needs.',
+      description: 'Hybrid strains combine the best of both Sativa and Indica genetics, offering a balanced experience that can be tailored to your needs.',
       benefits: ['Balanced effects', 'Versatile use', 'Customized experience', 'Best of both worlds'],
     },
     cbd: {
       title: 'CBD Rich',
-      description: 'CBD-dominant cultivars provide therapeutic benefits without significant psychoactive effects. Ideal for medical patients seeking relief.',
+      description: 'CBD-dominant strains provide therapeutic benefits without significant psychoactive effects. Ideal for medical patients seeking relief.',
       benefits: ['Non-intoxicating', 'Anti-inflammatory', 'Anxiety relief', 'Therapeutic'],
     },
   };
@@ -180,8 +180,8 @@ export default function CultivarDetail() {
   return (
     <PageTransition variant="premium">
       <Helmet>
-        <title>{product.name} | Medical Cannabis Cultivar | HealingBuds</title>
-        <meta name="description" content={product.description || `${product.name} - A premium ${product.category} cultivar with ${product.thcContent}% THC and ${product.cbdContent}% CBD. Available at HealingBuds dispensary.`} />
+        <title>{product.name} | Medical Cannabis Strain | HealingBuds</title>
+        <meta name="description" content={product.description || `${product.name} - A premium ${product.category} strain with ${product.thcContent}% THC and ${product.cbdContent}% CBD. Available at HealingBuds dispensary.`} />
       </Helmet>
       
       <Header />
@@ -254,7 +254,7 @@ export default function CultivarDetail() {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <Star className="h-5 w-5 text-amber-400 fill-amber-400" />
-                    <span className="text-sm text-muted-foreground">Premium Medical Cultivar</span>
+                    <span className="text-sm text-muted-foreground">Premium Medical Strain</span>
                   </div>
                   <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-3">
                     {product.name}

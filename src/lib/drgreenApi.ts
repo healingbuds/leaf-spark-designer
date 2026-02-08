@@ -166,6 +166,8 @@ export interface OrderResponse {
   createdAt: string;
 }
 
+import { getApiEnvironment } from '@/hooks/useApiEnvironment';
+
 /**
  * Call the Dr. Green proxy edge function
  */
@@ -174,10 +176,15 @@ async function callProxy<T = unknown>(
   data?: Record<string, unknown>
 ): Promise<DrGreenResponse<T>> {
   try {
-    console.log(`[DrGreen API] Calling action: ${action}`, data);
+    // Get current API environment from localStorage
+    const apiEnvironment = getApiEnvironment();
+    console.log(`[DrGreen API] Calling action: ${action} (env: ${apiEnvironment})`, data);
     
     const { data: response, error } = await supabase.functions.invoke('drgreen-proxy', {
       body: { action, ...data },
+      headers: {
+        'x-api-environment': apiEnvironment,
+      },
     });
 
     if (error) {

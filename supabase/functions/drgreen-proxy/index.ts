@@ -15,7 +15,7 @@ secp256k1.etc.hmacSha256Sync = (key: Uint8Array, ...messages: Uint8Array[]) => {
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-admin-debug-key',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-admin-debug-key, x-api-environment',
 };
 
 // Log level configuration - defaults to INFO in production
@@ -251,7 +251,25 @@ async function verifyClientOwnership(
   return data.user_id === userId;
 }
 
-// Use production API
+// API environment configuration
+type ApiEnvironment = 'production' | 'staging';
+
+function getApiConfig(environment: ApiEnvironment): { apiUrl: string; apiKeyEnv: string; privateKeyEnv: string } {
+  if (environment === 'staging') {
+    return {
+      apiUrl: Deno.env.get('DRGREEN_STAGING_API_URL') || 'https://api.drgreennft.com/api/v1',
+      apiKeyEnv: 'DRGREEN_STAGING_API_KEY',
+      privateKeyEnv: 'DRGREEN_STAGING_PRIVATE_KEY',
+    };
+  }
+  return {
+    apiUrl: 'https://api.drgreennft.com/api/v1',
+    apiKeyEnv: 'DRGREEN_API_KEY',
+    privateKeyEnv: 'DRGREEN_PRIVATE_KEY',
+  };
+}
+
+// Default to production API (will be overridden per-request)
 const DRGREEN_API_URL = "https://api.drgreennft.com/api/v1";
 
 // API timeout in milliseconds (20 seconds)
@@ -995,26 +1013,36 @@ async function drGreenRequestBody(
   endpoint: string,
   method: string,
   body?: object,
-  enableDetailedLogging = false
+  enableDetailedLogging = false,
+  environment?: ApiEnvironment
 ): Promise<Response> {
-  const apiKey = Deno.env.get("DRGREEN_API_KEY");
-  const secretKey = Deno.env.get("DRGREEN_PRIVATE_KEY");
+  // Use provided environment or fall back to current request environment
+  const env = environment ?? getCurrentEnvironment();
+  // Use provided environment or fall back to current request environment
+  const envConfig = getApiConfig(env);
+  const apiKey = Deno.env.get(envConfig.apiKeyEnv);
+  const secretKey = Deno.env.get(envConfig.privateKeyEnv);
+  const apiUrl = envConfig.apiUrl;
   
   // Enhanced credential diagnostics when enabled
   if (enableDetailedLogging) {
     console.log("[API-DEBUG] ========== BODY REQUEST PREPARATION ==========");
+    console.log("[API-DEBUG] Environment:", env);
+    console.log("[API-DEBUG] API URL:", apiUrl);
     console.log("[API-DEBUG] Endpoint:", endpoint);
     console.log("[API-DEBUG] Method:", method);
+    console.log("[API-DEBUG] API Key Env:", envConfig.apiKeyEnv);
     console.log("[API-DEBUG] API Key present:", !!apiKey);
     console.log("[API-DEBUG] API Key length:", apiKey?.length || 0);
     console.log("[API-DEBUG] API Key prefix:", apiKey ? apiKey.slice(0, 8) + "..." : "N/A");
     console.log("[API-DEBUG] API Key is Base64:", apiKey ? /^[A-Za-z0-9+/=]+$/.test(apiKey) : false);
+    console.log("[API-DEBUG] Private Key Env:", envConfig.privateKeyEnv);
     console.log("[API-DEBUG] Private Key present:", !!secretKey);
     console.log("[API-DEBUG] Private Key length:", secretKey?.length || 0);
   }
   
   if (!apiKey || !secretKey) {
-    throw new Error("Dr Green API credentials not configured");
+    throw new Error(`Dr Green API credentials not configured for ${env} environment`);
   }
   
   const payload = body ? JSON.stringify(body) : "";
@@ -1042,8 +1070,9 @@ async function drGreenRequestBody(
     });
   }
   
-  const url = `${DRGREEN_API_URL}${endpoint}`;
-  logInfo(`API request: ${method} ${endpoint}`);
+  const url = `${apiUrl}${endpoint}`;
+  logInfo(`API request: ${method} ${endpoint} (env: ${env})`);
+
   
   // Wrap the fetch in retry logic
   return withRetry(
@@ -1099,19 +1128,26 @@ async function drGreenRequestBody(
 async function drGreenRequestQuery(
   endpoint: string,
   queryParams: Record<string, string | number>,
-  enableDetailedLogging = false
+  enableDetailedLogging = false,
+  environment?: ApiEnvironment
 ): Promise<Response> {
-  const apiKey = Deno.env.get("DRGREEN_API_KEY");
-  const secretKey = Deno.env.get("DRGREEN_PRIVATE_KEY");
+  // Use provided environment or fall back to current request environment
+  const env = environment ?? getCurrentEnvironment();
+  const envConfig = getApiConfig(env);
+  const apiKey = Deno.env.get(envConfig.apiKeyEnv);
+  const secretKey = Deno.env.get(envConfig.privateKeyEnv);
+  const apiUrl = envConfig.apiUrl;
   
   if (enableDetailedLogging) {
     console.log("[API-DEBUG] ========== QUERY REQUEST PREPARATION ==========");
+    console.log("[API-DEBUG] Environment:", env);
+    console.log("[API-DEBUG] API URL:", apiUrl);
     console.log("[API-DEBUG] Endpoint:", endpoint);
     console.log("[API-DEBUG] Query params:", JSON.stringify(queryParams));
   }
   
   if (!apiKey || !secretKey) {
-    throw new Error("Dr Green API credentials not configured");
+    throw new Error(`Dr Green API credentials not configured for ${env} environment`);
   }
   
   // Build query string exactly like WordPress: http_build_query
@@ -1137,8 +1173,8 @@ async function drGreenRequestQuery(
     "x-auth-signature": signature,
   };
   
-  const url = `${DRGREEN_API_URL}${endpoint}?${queryString}`;
-  logInfo(`API request: GET ${endpoint}`);
+  const url = `${apiUrl}${endpoint}?${queryString}`;
+  logInfo(`API request: GET ${endpoint} (env: ${env})`);
   
   // Wrap the fetch in retry logic
   return withRetry(
@@ -1183,9 +1219,21 @@ async function drGreenRequestQuery(
 async function drGreenRequest(
   endpoint: string,
   method: string,
-  body?: object
+  body?: object,
+  environment: ApiEnvironment = 'production'
 ): Promise<Response> {
-  return drGreenRequestBody(endpoint, method, body);
+  return drGreenRequestBody(endpoint, method, body, false, environment);
+}
+
+// Store current request environment for use in nested calls
+// This is set at the start of each request and read by helper functions
+let currentRequestEnvironment: ApiEnvironment = 'production';
+
+/**
+ * Get the current request's API environment
+ */
+function getCurrentEnvironment(): ApiEnvironment {
+  return currentRequestEnvironment;
 }
 
 serve(async (req) => {
@@ -1194,6 +1242,12 @@ serve(async (req) => {
   console.log("[drgreen-proxy] Method:", req.method);
   console.log("[drgreen-proxy] URL:", req.url);
   console.log("[drgreen-proxy] Timestamp:", new Date().toISOString());
+  
+  // Read API environment from header (defaults to 'production')
+  const envHeader = req.headers.get('x-api-environment');
+  const apiEnvironment: ApiEnvironment = envHeader === 'staging' ? 'staging' : 'production';
+  currentRequestEnvironment = apiEnvironment; // Set for use in nested calls
+  console.log("[drgreen-proxy] API Environment:", apiEnvironment);
   
   // Handle CORS preflight
   if (req.method === "OPTIONS") {

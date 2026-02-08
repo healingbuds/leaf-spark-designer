@@ -10,12 +10,22 @@ import { z } from "zod";
 import Header from "@/layout/Header";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
-import { Mail, Lock, User as UserIcon, ArrowRight, Loader2 } from "lucide-react";
+import { Mail, Lock, User as UserIcon, ArrowRight, Loader2, ChevronDown, Beaker } from "lucide-react";
 import hbLogoWhite from "@/assets/hb-logo-white-new.png";
 import { useTranslation } from "react-i18next";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useShop } from "@/context/ShopContext";
 import { getProductionPath } from "@/lib/urls";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+// Test account for dev quick login
+const DEV_TEST_ACCOUNT = {
+  email: "admin@healingbuds.test",
+  password: "Admin123!",
+  label: "Admin",
+  description: "Full admin access",
+};
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -29,6 +39,10 @@ const Auth = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [devQuickLoginOpen, setDevQuickLoginOpen] = useState(false);
+  
+  // Only show dev quick login in dev mode or on lovable domains
+  const isDev = import.meta.env.DEV || window.location.hostname.includes('lovable');
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -475,7 +489,43 @@ const Auth = () => {
                     {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
                   </Button>
 
-                  <div className="text-center pt-4 border-t border-border">
+                  {/* Dev Quick Login - only visible in development */}
+                  {isDev && isLogin && (
+                    <Collapsible
+                      open={devQuickLoginOpen}
+                      onOpenChange={setDevQuickLoginOpen}
+                      className="border-t border-border pt-4"
+                    >
+                      <CollapsibleTrigger className="flex items-center justify-center gap-2 w-full text-sm text-muted-foreground hover:text-foreground transition-colors">
+                        <Beaker className="h-4 w-4" />
+                        <span>Dev Quick Login</span>
+                        <ChevronDown className={`h-4 w-4 transition-transform ${devQuickLoginOpen ? 'rotate-180' : ''}`} />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pt-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full"
+                          onClick={() => {
+                            setEmail(DEV_TEST_ACCOUNT.email);
+                            setPassword(DEV_TEST_ACCOUNT.password);
+                            toast({
+                              title: "Credentials Filled",
+                              description: `${DEV_TEST_ACCOUNT.label}: ${DEV_TEST_ACCOUNT.description}`,
+                            });
+                          }}
+                          disabled={loading}
+                        >
+                          <span className="flex items-center gap-2">
+                            <span className="font-medium">{DEV_TEST_ACCOUNT.label}</span>
+                            <span className="text-muted-foreground text-xs">— {DEV_TEST_ACCOUNT.description}</span>
+                          </span>
+                        </Button>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  )}
+
+                  <div className={`text-center pt-4 ${isDev && isLogin ? '' : 'border-t border-border'}`}>
                     <p className="text-muted-foreground text-sm">
                       {isLogin ? t('noAccount') : t('hasAccount')}
                       <button

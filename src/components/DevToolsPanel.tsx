@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, X, ShieldCheck, ShieldX, RefreshCw } from 'lucide-react';
+import { Settings, X, ShieldCheck, ShieldX, RefreshCw, Server } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useShop } from '@/context/ShopContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useApiEnvironment, API_ENVIRONMENTS, type ApiEnvironment } from '@/hooks/useApiEnvironment';
 
 export function DevToolsPanel() {
   const [isOpen, setIsOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const { drGreenClient, isEligible, refreshClient, isSyncing } = useShop();
   const { toast } = useToast();
+  const { environment, setEnvironment } = useApiEnvironment();
 
   // Only show in development or for debugging
   const isDev = import.meta.env.DEV || window.location.hostname.includes('lovable');
@@ -65,6 +68,15 @@ export function DevToolsPanel() {
     }
   };
 
+  const handleEnvironmentChange = (value: string) => {
+    const newEnv = value as ApiEnvironment;
+    setEnvironment(newEnv);
+    toast({
+      title: `API Environment: ${API_ENVIRONMENTS[newEnv].label}`,
+      description: `Switched to ${API_ENVIRONMENTS[newEnv].description}`,
+    });
+  };
+
   return (
     <>
       {/* Floating toggle button */}
@@ -88,7 +100,7 @@ export function DevToolsPanel() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="fixed bottom-40 right-6 z-50 w-72 rounded-xl bg-card border border-border shadow-xl overflow-hidden"
+            className="fixed bottom-40 right-6 z-50 w-80 rounded-xl bg-card border border-border shadow-xl overflow-hidden"
           >
             {/* Header */}
             <div className="px-4 py-3 bg-muted/50 border-b border-border">
@@ -103,37 +115,80 @@ export function DevToolsPanel() {
 
             {/* Content */}
             <div className="p-4 space-y-4">
-              {/* Verification Toggle */}
+              {/* API Environment Toggle */}
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="verification-toggle" className="text-sm font-medium">
-                    Verification Status
-                  </Label>
-                  <Switch
-                    id="verification-toggle"
-                    checked={isEligible}
-                    onCheckedChange={toggleVerification}
-                    disabled={isUpdating || !drGreenClient}
-                  />
+                <div className="flex items-center gap-2">
+                  <Server className="h-4 w-4 text-muted-foreground" />
+                  <Label className="text-sm font-medium">API Environment</Label>
                 </div>
                 
-                {/* Status display */}
-                <div className={`flex items-center gap-2 p-2.5 rounded-lg text-xs ${
-                  isEligible 
+                <RadioGroup
+                  value={environment}
+                  onValueChange={handleEnvironmentChange}
+                  className="grid gap-2"
+                >
+                  {(Object.entries(API_ENVIRONMENTS) as [ApiEnvironment, typeof API_ENVIRONMENTS[ApiEnvironment]][]).map(([key, info]) => (
+                    <div key={key} className="flex items-center space-x-2">
+                      <RadioGroupItem value={key} id={`env-${key}`} />
+                      <Label 
+                        htmlFor={`env-${key}`} 
+                        className="text-sm cursor-pointer flex-1"
+                      >
+                        <span className="font-medium">{info.label}</span>
+                        <span className="text-muted-foreground text-xs ml-2">
+                          {info.description}
+                        </span>
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+
+                {/* Environment status badge */}
+                <div className={`flex items-center gap-2 p-2 rounded-lg text-xs ${
+                  environment === 'production' 
                     ? 'bg-primary/10 text-primary' 
-                    : 'bg-destructive/10 text-destructive'
+                    : 'bg-orange-500/10 text-orange-600 dark:text-orange-400'
                 }`}>
-                  {isEligible ? (
-                    <>
-                      <ShieldCheck className="h-3.5 w-3.5" />
-                      <span>Cart & Checkout Enabled</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShieldX className="h-3.5 w-3.5" />
-                      <span>Cart & Checkout Restricted</span>
-                    </>
-                  )}
+                  <Server className="h-3.5 w-3.5" />
+                  <span>
+                    {environment === 'production' ? 'Production API' : 'Staging (Railway)'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="border-t border-border pt-4">
+                {/* Verification Toggle */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="verification-toggle" className="text-sm font-medium">
+                      Verification Status
+                    </Label>
+                    <Switch
+                      id="verification-toggle"
+                      checked={isEligible}
+                      onCheckedChange={toggleVerification}
+                      disabled={isUpdating || !drGreenClient}
+                    />
+                  </div>
+                  
+                  {/* Status display */}
+                  <div className={`flex items-center gap-2 p-2.5 rounded-lg text-xs ${
+                    isEligible 
+                      ? 'bg-primary/10 text-primary' 
+                      : 'bg-destructive/10 text-destructive'
+                  }`}>
+                    {isEligible ? (
+                      <>
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                        <span>Cart & Checkout Enabled</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShieldX className="h-3.5 w-3.5" />
+                        <span>Cart & Checkout Restricted</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
